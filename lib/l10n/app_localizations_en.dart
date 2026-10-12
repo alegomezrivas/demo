@@ -79,4 +79,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonDismiss => 'Got it';
+
+  @override
+  String get authLoginTitle => 'Sign in';
+
+  @override
+  String get authLoginSubtitle => 'Use your account to continue';
+
+  @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Password';
+
+  @override
+  String get authLoginButton => 'Sign in';
+
+  @override
+  String get authNoAccount => 'Don\'t have an account?';
+
+  @override
+  String get authGoToRegister => 'Create account';
+
+  @override
+  String get authRegisterTitle => 'Create account';
+
+  @override
+  String get authRegisterSubtitle => 'Fill in your details to sign up';
+
+  @override
+  String get authNameLabel => 'Name';
+
+  @override
+  String get authPhoneLabel => 'Phone (optional)';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get authRegisterButton => 'Sign up';
+
+  @override
+  String get authHaveAccount => 'Already have an account?';
+
+  @override
+  String get authGoToLogin => 'Sign in';
+
+  @override
+  String get authTogglePassword => 'Show or hide password';
+
+  @override
+  String get authInvalidCredentials => 'Incorrect email or password';
+
+  @override
+  String get authEmailTaken => 'An account with that email already exists';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String get homeLogout => 'Sign out';
 }

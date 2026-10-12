@@ -80,4 +80,66 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get commonDismiss => 'Entendido';
+
+  @override
+  String get authLoginTitle => 'Iniciar sesión';
+
+  @override
+  String get authLoginSubtitle => 'Accede con tu cuenta para continuar';
+
+  @override
+  String get authEmailLabel => 'Correo electrónico';
+
+  @override
+  String get authPasswordLabel => 'Contraseña';
+
+  @override
+  String get authLoginButton => 'Entrar';
+
+  @override
+  String get authNoAccount => '¿No tienes cuenta?';
+
+  @override
+  String get authGoToRegister => 'Crear cuenta';
+
+  @override
+  String get authRegisterTitle => 'Crear cuenta';
+
+  @override
+  String get authRegisterSubtitle => 'Completa tus datos para registrarte';
+
+  @override
+  String get authNameLabel => 'Nombre';
+
+  @override
+  String get authPhoneLabel => 'Teléfono (opcional)';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirmar contraseña';
+
+  @override
+  String get authRegisterButton => 'Registrarme';
+
+  @override
+  String get authHaveAccount => '¿Ya tienes cuenta?';
+
+  @override
+  String get authGoToLogin => 'Iniciar sesión';
+
+  @override
+  String get authTogglePassword => 'Mostrar u ocultar contraseña';
+
+  @override
+  String get authInvalidCredentials => 'Correo o contraseña incorrectos';
+
+  @override
+  String get authEmailTaken => 'Ya existe una cuenta con ese correo';
+
+  @override
+  String homeGreeting(String name) {
+    return 'Hola, $name';
+  }
+
+  @override
+  String get homeLogout => 'Cerrar sesión';
 }

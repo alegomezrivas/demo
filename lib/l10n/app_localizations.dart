@@ -223,6 +223,126 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Entendido'**
   String get commonDismiss;
+
+  /// No description provided for @authLoginTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión'**
+  String get authLoginTitle;
+
+  /// No description provided for @authLoginSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Accede con tu cuenta para continuar'**
+  String get authLoginSubtitle;
+
+  /// No description provided for @authEmailLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo electrónico'**
+  String get authEmailLabel;
+
+  /// No description provided for @authPasswordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña'**
+  String get authPasswordLabel;
+
+  /// No description provided for @authLoginButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar'**
+  String get authLoginButton;
+
+  /// No description provided for @authNoAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes cuenta?'**
+  String get authNoAccount;
+
+  /// No description provided for @authGoToRegister.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear cuenta'**
+  String get authGoToRegister;
+
+  /// No description provided for @authRegisterTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear cuenta'**
+  String get authRegisterTitle;
+
+  /// No description provided for @authRegisterSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Completa tus datos para registrarte'**
+  String get authRegisterSubtitle;
+
+  /// No description provided for @authNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get authNameLabel;
+
+  /// No description provided for @authPhoneLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Teléfono (opcional)'**
+  String get authPhoneLabel;
+
+  /// No description provided for @authConfirmPasswordLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar contraseña'**
+  String get authConfirmPasswordLabel;
+
+  /// No description provided for @authRegisterButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrarme'**
+  String get authRegisterButton;
+
+  /// No description provided for @authHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Ya tienes cuenta?'**
+  String get authHaveAccount;
+
+  /// No description provided for @authGoToLogin.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión'**
+  String get authGoToLogin;
+
+  /// No description provided for @authTogglePassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Mostrar u ocultar contraseña'**
+  String get authTogglePassword;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In es, this message translates to:
+  /// **'Correo o contraseña incorrectos'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authEmailTaken.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya existe una cuenta con ese correo'**
+  String get authEmailTaken;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In es, this message translates to:
+  /// **'Hola, {name}'**
+  String homeGreeting(String name);
+
+  /// No description provided for @homeLogout.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get homeLogout;
 }
 
 class _AppLocalizationsDelegate

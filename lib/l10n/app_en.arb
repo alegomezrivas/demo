@@ -27,5 +27,32 @@
   "integrityWarning": "This device looks modified (root/jailbreak or debugging). Some security protections may not be effective.",
   "integrityBlockedTitle": "Unsupported device",
   "integrityBlockedMessage": "For security reasons the app cannot run on modified devices.",
-  "commonDismiss": "Got it"
+  "commonDismiss": "Got it",
+  "authLoginTitle": "Sign in",
+  "authLoginSubtitle": "Use your account to continue",
+  "authEmailLabel": "Email",
+  "authPasswordLabel": "Password",
+  "authLoginButton": "Sign in",
+  "authNoAccount": "Don't have an account?",
+  "authGoToRegister": "Create account",
+  "authRegisterTitle": "Create account",
+  "authRegisterSubtitle": "Fill in your details to sign up",
+  "authNameLabel": "Name",
+  "authPhoneLabel": "Phone (optional)",
+  "authConfirmPasswordLabel": "Confirm password",
+  "authRegisterButton": "Sign up",
+  "authHaveAccount": "Already have an account?",
+  "authGoToLogin": "Sign in",
+  "authTogglePassword": "Show or hide password",
+  "authInvalidCredentials": "Incorrect email or password",
+  "authEmailTaken": "An account with that email already exists",
+  "homeGreeting": "Hello, {name}",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeLogout": "Sign out"
 }

@@ -30,5 +30,32 @@
   "integrityWarning": "Este dispositivo parece modificado (root/jailbreak o depuración). Algunas protecciones de seguridad podrían no ser efectivas.",
   "integrityBlockedTitle": "Dispositivo no compatible",
   "integrityBlockedMessage": "Por seguridad, la aplicación no puede ejecutarse en dispositivos modificados.",
-  "commonDismiss": "Entendido"
+  "commonDismiss": "Entendido",
+  "authLoginTitle": "Iniciar sesión",
+  "authLoginSubtitle": "Accede con tu cuenta para continuar",
+  "authEmailLabel": "Correo electrónico",
+  "authPasswordLabel": "Contraseña",
+  "authLoginButton": "Entrar",
+  "authNoAccount": "¿No tienes cuenta?",
+  "authGoToRegister": "Crear cuenta",
+  "authRegisterTitle": "Crear cuenta",
+  "authRegisterSubtitle": "Completa tus datos para registrarte",
+  "authNameLabel": "Nombre",
+  "authPhoneLabel": "Teléfono (opcional)",
+  "authConfirmPasswordLabel": "Confirmar contraseña",
+  "authRegisterButton": "Registrarme",
+  "authHaveAccount": "¿Ya tienes cuenta?",
+  "authGoToLogin": "Iniciar sesión",
+  "authTogglePassword": "Mostrar u ocultar contraseña",
+  "authInvalidCredentials": "Correo o contraseña incorrectos",
+  "authEmailTaken": "Ya existe una cuenta con ese correo",
+  "homeGreeting": "Hola, {name}",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeLogout": "Cerrar sesión"
 }
