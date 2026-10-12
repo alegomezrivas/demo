@@ -51,5 +51,6 @@
 
 - `pubspec.lock` is committed (this is an app); the generic `*.lock` ignore is overridden.
 - Never read or print `config/*.json`, `.env*`, keystores or `google-services.json`.
-- Flutter SDK is supplied by the user; if `flutter` is missing, say so instead of
+- The Flutter version is pinned with FVM (`.fvmrc`); use `fvm flutter` / `fvm dart`. If neither
+  `fvm` nor `flutter` is available, say so instead of
   pretending checks passed.

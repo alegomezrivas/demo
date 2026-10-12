@@ -1,169 +1,213 @@
 # Stark Showcase
 
-Aplicación Flutter (Android e iOS) pensada como portafolio: demuestra Clean Architecture,
-Stacked, GoRouter, formularios reactivos, seguridad en red y pruebas unitarias.
-Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exista una API real.
+**English** · [Español](README.es.md)
 
-> Estado: **Fase 5** (revisión final). Plan completo en [`CLAUDE.md`](CLAUDE.md); antes de publicar sigue
-> el [checklist de release](docs/RELEASE_CHECKLIST.md).
+Flutter app (Android and iOS) built as a portfolio piece. It demonstrates Clean Architecture, Stacked,
+GoRouter, reactive forms, network security and thorough unit testing.
+Identifier: `com.softstark.demo`. The backend is a Dio mock until a real API exists.
 
-## Requisitos
+> Status: **Phase 5** (final review). Full plan in [`CLAUDE.md`](CLAUDE.md); before publishing, follow the
+> [release checklist](docs/RELEASE_CHECKLIST.md).
 
-- Flutter estable (probado con 3.47.7, Dart 3.13)
+## Requirements
+
+- [FVM](https://fvm.app) (the Flutter version is pinned in [`.fvmrc`](.fvmrc): **3.47.7**, Dart 3.13)
 - Android: `minSdk 24` · iOS 15.0+
 
-## Comandos
+## Setting up the SDK with FVM
 
 ```bash
-flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # mocks y código generado
-flutter gen-l10n                                           # textos localizados (ARB)
-dart format .
-flutter analyze
-flutter test --coverage
+dart pub global activate fvm   # once
+fvm install                    # downloads the version listed in .fvmrc
+fvm flutter pub get
 ```
 
-Ejecutar con configuración de entorno (copia `config/dev.example.json` a `config/dev.json`;
-los `config/*.json` reales están ignorados por git):
+Every project command is run with the `fvm` prefix, so the whole team and CI use the same SDK.
+To change the version: `fvm use <version>` and commit the new `.fvmrc`. The `.fvm/` folder is local and git-ignored.
+
+- **VS Code**: `.vscode/settings.json` already points to `.fvm/flutter_sdk` (run `fvm use` once to create the link).
+- **Android Studio / IntelliJ**: *Settings → Languages & Frameworks → Flutter → Flutter SDK path* = `<project>/.fvm/flutter_sdk`.
+
+## Commands
 
 ```bash
-flutter run --dart-define-from-file=config/dev.json
+fvm flutter pub get
+fvm dart run build_runner build --delete-conflicting-outputs   # mocks and generated code
+fvm flutter gen-l10n                                           # localized strings (ARB)
+fvm dart format .
+fvm flutter analyze
+fvm flutter test --coverage
 ```
 
-## Arquitectura
+Run with an environment configuration (copy `config/dev.example.json` to `config/dev.json`;
+the real `config/*.json` files are git-ignored):
+
+```bash
+fvm flutter run --dart-define-from-file=config/dev.json
+```
+
+> Without FVM, any Flutter 3.47.7 on the `PATH` also works: drop the `fvm` prefix.
+
+## Architecture
 
 ```
 lib/
-├── app/        App, locator (GetIt) y router (GoRouter)
-├── core/       tema (design tokens), config, servicios, seguridad, widgets
+├── app/        App, locator (GetIt) and router (GoRouter)
+├── core/       theme (design tokens), config, services, security, widgets
 ├── features/   <feature>/{data,domain,presentation}
-└── l10n/       ARB (español por defecto + inglés)
-test/           espeja lib/
+└── l10n/       ARB files (Spanish by default + English)
+test/           mirrors lib/
 ```
 
-Dependencias hacia adentro (`presentation → domain ← data`). Los ViewModels solo llaman a
-casos de uso y navegan a través de `NavigationService`. Reglas completas en [`AGENTS.md`](AGENTS.md).
+Dependencies point inward (`presentation → domain ← data`). ViewModels only call use cases and navigate
+through `NavigationService`. Full rules in [`AGENTS.md`](AGENTS.md).
 
-## Cómo cambiar el diseño (design tokens)
+## How to change the design (design tokens)
 
-Todo el aspecto visual vive en `lib/core/theme/`. Los widgets nunca llevan colores, tamaños,
-paddings ni radios literales: usan `context.colors`, `context.text` y `context.spacing`.
+All visuals live in `lib/core/theme/`. Widgets never contain literal colors, sizes, paddings or radii:
+they use `context.colors`, `context.text` and `context.spacing`.
 
-| Quiero cambiar… | Edito solo… |
+| I want to change… | I only edit… |
 |---|---|
-| Paleta de colores (claro / oscuro) | `lib/core/theme/app_colors.dart` (`AppColors.light` y `AppColors.dark`) |
-| Fuente | `AppTypography.fontFamily` en `app_typography.dart` + `fonts:` en `pubspec.yaml` (archivos en `assets/fonts/`) |
-| Tamaños y pesos de texto | `AppTypography.build` en `app_typography.dart` |
-| Escala de espacios, radios, elevaciones | `lib/core/theme/app_spacing.dart` |
-| Cómo se aplican a los componentes de Material | `lib/core/theme/app_theme.dart` |
+| Color palette (light / dark) | `lib/core/theme/app_colors.dart` (`AppColors.light` and `AppColors.dark`) |
+| Font | `AppTypography.fontFamily` in `app_typography.dart` + `fonts:` in `pubspec.yaml` (files in `assets/fonts/`) |
+| Text sizes and weights | `AppTypography.build` in `app_typography.dart` |
+| Spacing, radius and elevation scale | `lib/core/theme/app_spacing.dart` |
+| How they apply to Material components | `lib/core/theme/app_theme.dart` |
 
-Notas:
+Notes:
 
-- **Modo claro/oscuro**: automático según el sistema (`ThemeMode.system`).
-- **Escalado de texto**: respeta el del sistema con un tope (`AppConstants.maxTextScaleFactor`).
-- **Fuente**: Inter se empaqueta en `assets/fonts/inter/` (licencia OFL incluida); la app no descarga fuentes.
-- **Nombre de la app**: `AppConstants.appName`, `appName` en `lib/l10n/app_*.arb`, `android/app/src/main/res/values/strings.xml` y `CFBundleDisplayName` en `ios/Runner/Info.plist`.
+- **Light/dark mode**: automatic, following the system (`ThemeMode.system`).
+- **Text scaling**: follows the system setting up to a cap (`AppConstants.maxTextScaleFactor`).
+- **Font**: Inter is bundled in `assets/fonts/inter/` (OFL license included); the app never downloads fonts.
+- **App name**: `AppConstants.appName`, `appName` in `lib/l10n/app_*.arb`, `android/app/src/main/res/values/strings.xml` and `CFBundleDisplayName` in `ios/Runner/Info.plist`.
 
-## Configuración por entorno
+## Per-environment configuration
 
-Claves (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINNING_ENABLED`,
-`PINNING_SHA256`, `ROOT_POLICY` (`warn` | `block`), `PROTECT_SCREENS`. Plantillas en `config/*.example.json`.
+Keys (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINNING_ENABLED`,
+`PINNING_SHA256`, `ROOT_POLICY` (`warn` | `block`), `PROTECT_SCREENS`. Templates in `config/*.example.json`.
 
-- `USE_MOCK_API` se ignora en builds release **y profile**, y los backends mock ni se construyen en release.
-- Pasar del mock a la API real solo requiere cambiar `API_BASE_URL`.
-- Con `PINNING_ENABLED=true` y `PINNING_SHA256` vacío el cliente rechazará todo el tráfico (falla cerrado).
-- `PROTECT_SCREENS` (por defecto `true`) oculta toda la app autenticada de capturas y de la vista previa del
-  selector de apps. Ponlo en `false` solo para builds de demostración en los que necesites capturas.
-- **Un build release no arranca con configuración débil**: `ENV` debe ser `staging` o `prod` (si falta, la app
-  lanza un `StateError` al iniciar), `prod` exige `PINNING_ENABLED=true` y un `ROOT_POLICY` desconocido se
-  convierte en `block`.
+- `USE_MOCK_API` is ignored in **release and profile** builds, and the mock backends are not even built in release.
+- Moving from the mock to the real API only requires changing `API_BASE_URL`.
+- With `PINNING_ENABLED=true` and an empty `PINNING_SHA256`, the client rejects all traffic (fails closed).
+- `PROTECT_SCREENS` (default `true`) hides the whole authenticated app from screenshots and from the app-switcher
+  preview. Set it to `false` only for demo builds where you need screenshots.
+- **A release build refuses to start with a weak configuration**: `ENV` must be `staging` or `prod` (if it is
+  missing, the app throws a `StateError` at startup), `prod` requires `PINNING_ENABLED=true`, and an unknown
+  `ROOT_POLICY` becomes `block`.
 
-## Autenticación (feature `auth`)
+## Authentication (`auth` feature)
 
-Login y registro completos con `reactive_forms`, casos de uso (`Login`, `Register`, `Logout`,
-`GetCurrentUser`), repositorio con datasources remoto (Dio) y local (almacenamiento seguro) y DTOs `freezed`.
+Complete sign-in and sign-up with `reactive_forms`, use cases (`Login`, `Register`, `Logout`,
+`GetCurrentUser`), a repository with remote (Dio) and local (secure storage) datasources, and `freezed` DTOs.
 
-- **Cuenta demo del mock**: `demo@starkshowcase.dev` / `Demo1234!` (solo existe en memoria con `USE_MOCK_API=true`).
-- **Guard del router**: sin sesión solo se accede a `/login` y `/register`; con sesión, `/login` redirige al inicio.
-  `SessionService` notifica al router y se desloguea solo cuando falla el refresh del token.
-- **Sesión persistente**: al abrir la app se restaura el usuario guardado (tokens en Keystore/Keychain).
-- **Pantallas sensibles**: login y registro activan `ScreenProtection` (con conteo de referencias).
-- **Errores**: mensajes genéricos y localizados (credenciales incorrectas, correo ya registrado, sin conexión...).
-- **Entrada**: validadores en los formularios y `InputSanitizer` en el repositorio (la contraseña nunca se modifica).
+- **Mock demo account**: `demo@starkshowcase.dev` / `Demo1234!` (exists only in memory with `USE_MOCK_API=true`).
+- **Router guard**: without a session only `/login` and `/register` are reachable; with a session, `/login`
+  redirects to the home screen. `SessionService` notifies the router and signs the user out when the token
+  refresh is rejected.
+- **Persistent session**: on launch the stored user is restored (tokens live in the Keystore/Keychain).
+- **Sensitive screens**: sign-in and sign-up enable `ScreenProtection` (reference counted).
+- **Errors**: generic, localized messages (wrong credentials, e-mail already registered, no connection...).
+- **Input**: validators in the forms and `InputSanitizer` in the repository (passwords are never modified).
 
-## Funcionalidades
+## Features
 
-La app es un gestor de tareas con tres pestañas (barra de navegación inferior):
+The app is a task manager with three tabs (bottom navigation bar):
 
-| Pestaña | Qué hace |
+| Tab | What it does |
 |---|---|
-| **Inicio** (`dashboard`) | Saludo, % completado y estadísticas (total, completadas, vencidas, prioridad alta pendientes). Se recarga sola cuando cambian las tareas en otra pestaña. |
-| **Tareas** (`tasks`) | Lista paginada (scroll infinito), búsqueda con *debounce*, filtros por estado y prioridad, completar con el checkbox (optimista, con rollback), borrar con confirmación, crear y editar en un formulario `reactive_forms`. |
-| **Ajustes** (`settings`) | Perfil, tema (sistema/claro/oscuro), idioma (sistema/español/inglés), confirmación biométrica y cierre de sesión. |
+| **Home** (`dashboard`) | Greeting, completion percentage and statistics (total, completed, overdue, open high-priority). It reloads by itself when tasks change in another tab. |
+| **Tasks** (`tasks`) | Paginated list (infinite scroll), debounced search, status and priority filters, completing with the checkbox (optimistic, with rollback), deleting with confirmation, and a `reactive_forms` form to create and edit. |
+| **Settings** (`settings`) | Profile, theme (system/light/dark), language (system/Spanish/English), biometric confirmation and sign-out. |
 
-- **Preferencias**: se guardan en `shared_preferences` (no son secretos) y se aplican al instante vía `AppPreferences`.
-- **Confirmación biométrica** (opcional): al activarla se pide huella/rostro/PIN antes de **eliminar tareas** y **cerrar sesión**
-  (`SensitiveActionGuard`). Cambiar la opción también exige confirmación. Si el dispositivo no puede autenticar
-  (sin bloqueo de pantalla) no se bloquea al usuario.
-- **Backend mock**: `MockTasksBackend` simula búsqueda, filtros, paginación, CRUD y estadísticas (23 tareas de ejemplo;
-  responde 401 sin token). Prueba los fallos con el header `x-mock-scenario` (ver más abajo).
-- **Nombre de la entidad**: `TaskItem` (no `Task`) para no chocar con el tipo `Task` de `fpdart`.
+- **Preferences**: stored in `shared_preferences` (they are not secrets) and applied instantly through `AppPreferences`.
+- **Biometric confirmation** (optional): when on, fingerprint/face/PIN is requested before **deleting tasks** and
+  **signing out** (`SensitiveActionGuard`). Changing the option also requires confirmation. If the device cannot
+  authenticate (no screen lock), the user is not locked out.
+- **Mock backend**: `MockTasksBackend` simulates search, filters, pagination, CRUD and statistics (23 sample tasks;
+  it answers 401 without a token). Try failures with the `x-mock-scenario` header (see below).
+- **Entity name**: `TaskItem` (not `Task`) to avoid clashing with `fpdart`'s `Task` type.
 
-## Red y backend mock
+## Networking and mock backend
 
-`DioClientFactory` crea el cliente con este orden de interceptores: **HTTPS enforcer → auth → logging → mock**.
+`DioClientFactory` builds the client with this interceptor order: **HTTPS enforcer → auth → logging → mock**.
 
-- **Auth**: añade el bearer; ante un 401 renueva el token **una sola vez** (varios 401 simultáneos comparten
-  una única renovación) y reintenta. Si el servidor **rechaza** el refresh (401/403), borra los tokens y
-  `SessionExpiredNotifier` avisa para volver al login. Si el refresh falla por red, timeout o error 5xx,
-  la sesión **se conserva** y el usuario ve un error de conexión.
-- **Mock** (`MockApiInterceptor`): solo con `USE_MOCK_API=true` y nunca en release. Simula latencia y
-  puede forzarse por petición con el header `x-mock-scenario`:
+- **Auth**: adds the bearer token; on a 401 it renews the token **only once** (several simultaneous 401s share a
+  single renewal) and retries. If the server **rejects** the refresh (401/403), it clears the tokens and
+  `SessionExpiredNotifier` sends the user back to sign-in. If the refresh fails because of the network, a timeout
+  or a 5xx, the session **is kept** and the user sees a connection error.
+- **Mock** (`MockApiInterceptor`): only with `USE_MOCK_API=true` and never in release. It simulates latency and can
+  be forced per request with the `x-mock-scenario` header:
 
-| Valor | Efecto |
+| Value | Effect |
 |---|---|
-| `server_error` | responde 500 |
-| `offline` | falla como sin conexión |
-| `unauthorized` | responde 401 siempre |
-| `unauthorized_once` | responde 401 una vez; tras el refresh funciona |
+| `server_error` | answers 500 |
+| `offline` | fails as if there were no connection |
+| `unauthorized` | always answers 401 |
+| `unauthorized_once` | answers 401 once; works after the refresh |
 
-  Las features registran sus endpoints con `MockRoute` mediante `setupLocator(mockRoutes: ...)`.
-  Para pasar a la API real solo cambia `API_BASE_URL` (y `USE_MOCK_API=false`).
-- **Errores**: los datasources convierten `DioException` con `DioExceptionMapper`; los repositorios los
-  mapean a `Failure` (`FailureMapper`) y la UI muestra mensajes genéricos localizados.
+  Features register their endpoints as `MockRoute`s through `setupLocator(mockRoutes: ...)`.
+  To use the real API, only change `API_BASE_URL` (and set `USE_MOCK_API=false`).
+- **Errors**: datasources convert `DioException` with `DioExceptionMapper`; repositories map them to
+  `Failure` (`FailureMapper`) and the UI shows generic, localized messages.
 
-## Seguridad
+## Security
 
-- **Almacenamiento**: tokens solo en `flutter_secure_storage` (`SecureTokenStorage`).
-- **Transporte**: solo HTTPS (interceptor + `network_security_config` + ATS). Certificate pinning configurable
-  (`PINNING_ENABLED`, `PINNING_SHA256` con huellas SHA-256 en base64 del certificado); activado sin huellas
-  **rechaza todo el tráfico**. Ver *Limitaciones conocidas* más abajo.
-- **Integridad del dispositivo**: `ROOT_POLICY=warn|block` (root/jailbreak y depurador) aplicada por `IntegrityGate`.
-  Si la detección falla: con `warn` se ignora y con `block` el dispositivo se considera no confiable.
-- **Biometría** (`BiometricAuthenticator`, `local_auth`) y **protección de pantalla** (`ScreenProtection`, con
-  conteo de referencias): bloquea capturas en Android y difumina la vista previa del selector de apps en todo
-  el shell autenticado (configurable con `PROTECT_SCREENS`).
-- **Dependencias de los ViewModels**: casos de uso para la lógica de negocio, más servicios de `core`
-  (`NavigationService`, `SessionService`, `AppPreferences`, `ScreenProtection`, `BiometricAuthenticator`,
-  `SensitiveActionGuard`); nunca repositorios ni datasources.
-- **Entrada de usuario**: validadores reutilizables (`AppValidators`) con mensajes localizados y
-  `InputSanitizer` antes de enviar al backend.
-- **Logs**: `ConsoleAppLogger` redacta tokens/contraseñas y en release solo emite errores.
-- **Android**: sin cleartext, `allowBackup=false`, R8 + `shrinkResources` en release. El release **no se firma**
-  con claves de debug: define `android/key.properties` (ignorado por git) con `keyAlias`, `keyPassword`,
-  `storeFile` y `storePassword`.
-- **iOS**: App Transport Security sin excepciones; Keychain con `first_unlock_this_device` (no se copia a otros
-  dispositivos ni a copias de seguridad).
-- **Release**: `--obfuscate --split-debug-info=debug-info/<plataforma>` (ver `.claude/skills/deploy/`).
+- **Storage**: tokens only in `flutter_secure_storage` (`SecureTokenStorage`).
+- **Transport**: HTTPS only (interceptor + `network_security_config` + ATS). Configurable certificate pinning
+  (`PINNING_ENABLED`, `PINNING_SHA256` with base64 SHA-256 fingerprints of the certificate); enabled without
+  fingerprints it **rejects all traffic**. See *Known limitations* below.
+- **Device integrity**: `ROOT_POLICY=warn|block` (root/jailbreak and debugger) applied by `IntegrityGate`.
+  If detection fails: with `warn` it is ignored, with `block` the device is treated as untrusted.
+- **Biometrics** (`BiometricAuthenticator`, `local_auth`) and **screen protection** (`ScreenProtection`, reference
+  counted): blocks screenshots on Android and blurs the app-switcher preview across the whole authenticated
+  shell (configurable with `PROTECT_SCREENS`).
+- **ViewModel dependencies**: use cases for business logic, plus `core` services (`NavigationService`,
+  `SessionService`, `AppPreferences`, `ScreenProtection`, `BiometricAuthenticator`, `SensitiveActionGuard`);
+  never repositories or datasources.
+- **User input**: reusable validators (`AppValidators`) with localized messages, and `InputSanitizer` before
+  sending to the backend.
+- **Logs**: `ConsoleAppLogger` redacts tokens/passwords and only emits errors in release.
+- **Android**: no cleartext traffic, `allowBackup=false`, R8 + `shrinkResources` in release. The release build is
+  **not signed** with debug keys: define `android/key.properties` (git-ignored) with `keyAlias`, `keyPassword`,
+  `storeFile` and `storePassword`.
+- **iOS**: App Transport Security with no exceptions; Keychain items use `first_unlock_this_device` (not copied to
+  other devices or backups).
+- **Release**: `--obfuscate --split-debug-info=debug-info/<platform>` (see `.claude/skills/deploy/`).
 
-## Limitaciones conocidas (revisión de la Fase 5)
+## Continuous integration
 
-- **Pinning**: Dio valida el certificado cuando llegan las cabeceras, así que la petición ya se envió (la respuesta se
-  descarta), y se fija el hash del certificado completo, no el de su clave pública (SPKI). Antes de producción con una
-  API real: fijar SPKI con al menos dos huellas (actual y de respaldo) y comprobarlo en el *handshake* TLS.
-- **Detección de root/jailbreak**: es evitable por naturaleza (herramientas de *hooking*); es una defensa en profundidad,
-  no una garantía. Para algo más fuerte hace falta atestación (Play Integrity / App Attest).
-- **Ajuste de biometría** en `shared_preferences`: en un dispositivo con root puede modificarse; solo protege contra uso casual.
-- **No se pudo compilar en Android/iOS** en el entorno de desarrollo (sin Android SDK ni Xcode): falta una prueba de
-  humo de un build release con R8 y ofuscación (ver `docs/RELEASE_CHECKLIST.md`).
-- Las pruebas de plugins nativos usan *mocks*: valídalas en dispositivos reales.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every pull request, on every push to `master`
+and manually (*workflow_dispatch*). It uses the Flutter version from `.fvmrc`.
+
+| Job | What it checks |
+|---|---|
+| `verify` | `pub get`, that generated code (`build_runner`, `gen-l10n`) is up to date, `dart format`, `flutter analyze`, `flutter test --coverage` and the coverage threshold (`tool/check_coverage.sh`: `domain/` and ViewModels ≥ 80 %). Uploads `lcov.info` as an artifact. |
+| `dependencies` | `flutter pub outdated` (informational: never blocks). |
+| `android-release-build` | Builds an **unsigned** `appbundle` with R8 and `--obfuscate` using `config/prod.example.json`, to catch minification breakage early. Uploads the symbols as an artifact. |
+| `ios-release-build` | Only on pushes to `master` and manual runs (pull requests do not start it). On a **macOS** runner: `flutter build ios --release --no-codesign --obfuscate` with `config/prod.example.json`, to check that the iOS project, the Pods and obfuscation build without certificates. Uploads the symbols as an artifact. |
+
+The Android and iOS jobs could not be run in the development environment (no Android SDK or Xcode):
+
+- Android: if it fails the first time because of some plugin's R8 rules, add the required `-keep` rules to
+  `android/app/proguard-rules.pro`.
+- iOS: there is no versioned `ios/Podfile` (Flutter generates it during the build). After the first build on a Mac,
+  commit `ios/Podfile` and `ios/Podfile.lock` so the Pods are reproducible.
+- macOS runners cost more minutes than Linux ones: that is why the iOS job does not run on pull requests, only after
+  merging into `master` or when started by hand (*Actions → CI → Run workflow*), and always after `verify` passes.
+
+To reproduce the coverage gate locally: `fvm flutter test --coverage && tool/check_coverage.sh`.
+
+## Known limitations (phase 5 review)
+
+- **Pinning**: Dio validates the certificate when the response headers arrive, so the request has already been sent
+  (the response is discarded), and the hash of the whole certificate is pinned, not that of its public key (SPKI).
+  Before production with a real API: pin the SPKI with at least two fingerprints (current and backup) and check it
+  during the TLS handshake.
+- **Root/jailbreak detection**: it can be bypassed by nature (hooking tools); it is defense in depth, not a
+  guarantee. Anything stronger needs attestation (Play Integrity / App Attest).
+- **Biometric setting** in `shared_preferences`: it can be modified on a rooted device; it only protects against
+  casual use.
+- **Android/iOS builds could not be compiled** in the development environment (no Android SDK or Xcode): a smoke
+  test of a release build with R8 and obfuscation is still missing (see `docs/RELEASE_CHECKLIST.md`).
+- Native plugin tests use *mocks*: validate them on real devices.

@@ -150,3 +150,6 @@ debug-info/
 # IDE
 .idea/
 *.iml
+
+# FVM: commit only .fvmrc; the .fvm/ folder holds a local SDK link
+.fvm/
