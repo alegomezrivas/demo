@@ -6,5 +6,26 @@
   "homeGetStarted": "Learn more",
   "aboutTitle": "About",
   "aboutBody": "Demo application showcasing Clean Architecture, Stacked, GoRouter, reactive forms and unit tests.",
-  "commonBack": "Back"
+  "commonBack": "Back",
+  "validationRequired": "This field is required",
+  "validationEmail": "Enter a valid email address",
+  "validationStrongPassword": "Use at least 8 characters with upper case, lower case, a number and a symbol",
+  "validationPhone": "Enter a valid phone number",
+  "validationMinLength": "Must be at least {length} characters",
+  "@validationMinLength": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "validationMustMatch": "Values do not match",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "errorNetwork": "No connection. Check your network and try again.",
+  "errorServer": "The service is unavailable right now. Please try again later.",
+  "errorUnauthorized": "Your session expired. Please sign in again.",
+  "integrityWarning": "This device looks modified (root/jailbreak or debugging). Some security protections may not be effective.",
+  "integrityBlockedTitle": "Unsupported device",
+  "integrityBlockedMessage": "For security reasons the app cannot run on modified devices.",
+  "commonDismiss": "Got it"
 }

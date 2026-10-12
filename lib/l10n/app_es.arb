@@ -1,11 +1,34 @@
 {
   "@@locale": "es",
   "appName": "Stark Showcase",
-  "@appName": {"description": "Visible application name"},
+  "@appName": {
+    "description": "Visible application name"
+  },
   "homeTitle": "Stark Showcase",
   "homeSubtitle": "Portafolio de ingeniería Flutter con arquitectura limpia",
   "homeGetStarted": "Conocer más",
   "aboutTitle": "Acerca de",
   "aboutBody": "Aplicación de demostración que muestra Clean Architecture, Stacked, GoRouter, formularios reactivos y pruebas unitarias.",
-  "commonBack": "Volver"
+  "commonBack": "Volver",
+  "validationRequired": "Este campo es obligatorio",
+  "validationEmail": "Ingresa un correo electrónico válido",
+  "validationStrongPassword": "Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo",
+  "validationPhone": "Ingresa un teléfono válido",
+  "validationMinLength": "Debe tener al menos {length} caracteres",
+  "@validationMinLength": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "validationMustMatch": "Los valores no coinciden",
+  "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
+  "errorNetwork": "No hay conexión. Revisa tu red e inténtalo de nuevo.",
+  "errorServer": "El servicio no está disponible por ahora. Inténtalo más tarde.",
+  "errorUnauthorized": "Tu sesión expiró. Inicia sesión de nuevo.",
+  "integrityWarning": "Este dispositivo parece modificado (root/jailbreak o depuración). Algunas protecciones de seguridad podrían no ser efectivas.",
+  "integrityBlockedTitle": "Dispositivo no compatible",
+  "integrityBlockedMessage": "Por seguridad, la aplicación no puede ejecutarse en dispositivos modificados.",
+  "commonDismiss": "Entendido"
 }

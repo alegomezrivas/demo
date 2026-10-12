@@ -139,6 +139,90 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Volver'**
   String get commonBack;
+
+  /// No description provided for @validationRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Este campo es obligatorio'**
+  String get validationRequired;
+
+  /// No description provided for @validationEmail.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa un correo electrónico válido'**
+  String get validationEmail;
+
+  /// No description provided for @validationStrongPassword.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo'**
+  String get validationStrongPassword;
+
+  /// No description provided for @validationPhone.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa un teléfono válido'**
+  String get validationPhone;
+
+  /// No description provided for @validationMinLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Debe tener al menos {length} caracteres'**
+  String validationMinLength(int length);
+
+  /// No description provided for @validationMustMatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Los valores no coinciden'**
+  String get validationMustMatch;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In es, this message translates to:
+  /// **'Algo salió mal. Inténtalo de nuevo.'**
+  String get errorGeneric;
+
+  /// No description provided for @errorNetwork.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay conexión. Revisa tu red e inténtalo de nuevo.'**
+  String get errorNetwork;
+
+  /// No description provided for @errorServer.
+  ///
+  /// In es, this message translates to:
+  /// **'El servicio no está disponible por ahora. Inténtalo más tarde.'**
+  String get errorServer;
+
+  /// No description provided for @errorUnauthorized.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu sesión expiró. Inicia sesión de nuevo.'**
+  String get errorUnauthorized;
+
+  /// No description provided for @integrityWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Este dispositivo parece modificado (root/jailbreak o depuración). Algunas protecciones de seguridad podrían no ser efectivas.'**
+  String get integrityWarning;
+
+  /// No description provided for @integrityBlockedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Dispositivo no compatible'**
+  String get integrityBlockedTitle;
+
+  /// No description provided for @integrityBlockedMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Por seguridad, la aplicación no puede ejecutarse en dispositivos modificados.'**
+  String get integrityBlockedMessage;
+
+  /// No description provided for @commonDismiss.
+  ///
+  /// In es, this message translates to:
+  /// **'Entendido'**
+  String get commonDismiss;
 }
 
 class _AppLocalizationsDelegate
