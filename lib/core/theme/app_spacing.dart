@@ -20,6 +20,9 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
     this.elevationLow = 1,
     this.elevationMedium = 3,
     this.elevationHigh = 8,
+    this.formMaxWidth = 420,
+    this.illustrationSize = 48,
+    this.progressHeight = 8,
   });
 
   /// Smallest gap.
@@ -67,6 +70,15 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
   /// High elevation.
   final double elevationHigh;
 
+  /// Widest a centered form may grow (tablets, landscape).
+  final double formMaxWidth;
+
+  /// Size of the large icon shown in empty / error / blocked states.
+  final double illustrationSize;
+
+  /// Thickness of linear progress bars.
+  final double progressHeight;
+
   /// Small [BorderRadius].
   BorderRadius get borderRadiusSm => BorderRadius.circular(radiusSm);
 
@@ -96,6 +108,9 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
     double? elevationLow,
     double? elevationMedium,
     double? elevationHigh,
+    double? formMaxWidth,
+    double? illustrationSize,
+    double? progressHeight,
   }) {
     return AppSpacing(
       xxs: xxs ?? this.xxs,
@@ -113,6 +128,9 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
       elevationLow: elevationLow ?? this.elevationLow,
       elevationMedium: elevationMedium ?? this.elevationMedium,
       elevationHigh: elevationHigh ?? this.elevationHigh,
+      formMaxWidth: formMaxWidth ?? this.formMaxWidth,
+      illustrationSize: illustrationSize ?? this.illustrationSize,
+      progressHeight: progressHeight ?? this.progressHeight,
     );
   }
 

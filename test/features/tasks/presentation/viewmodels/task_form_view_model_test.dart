@@ -280,4 +280,20 @@ void main() {
       expect(notified, 1);
     });
   });
+
+  group('while loading', () {
+    test('ignores a submit made before the task finished loading', () async {
+      final completer = Completer<Either<Failure, TaskItem>>();
+      when(getTask(any)).thenAnswer((_) => completer.future);
+      final loading = viewModel.init(taskId: 't9');
+      fillTitle('typed too early');
+
+      await viewModel.submit();
+
+      verifyZeroInteractions(updateTask);
+      verifyZeroInteractions(createTask);
+      completer.complete(right(buildTask(id: 't9')));
+      await loading;
+    });
+  });
 }

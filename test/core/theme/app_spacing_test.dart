@@ -36,4 +36,29 @@ void main() {
       expect(a.lerp(null, 0.8), a);
     });
   });
+
+  group('AppSpacing layout tokens', () {
+    test(
+      'exposes sane defaults for forms, illustrations and progress bars',
+      () {
+        const s = AppSpacing();
+
+        expect(s.formMaxWidth, greaterThan(s.xxl));
+        expect(s.illustrationSize, s.xxl);
+        expect(s.progressHeight, s.sm);
+      },
+    );
+
+    test('copyWith overrides them', () {
+      final s = const AppSpacing().copyWith(
+        formMaxWidth: 500,
+        illustrationSize: 64,
+        progressHeight: 12,
+      );
+
+      expect(s.formMaxWidth, 500);
+      expect(s.illustrationSize, 64);
+      expect(s.progressHeight, 12);
+    });
+  });
 }

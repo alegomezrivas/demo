@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:demo/app/router/app_routes.dart';
 import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/services/data_change_notifier.dart';
@@ -161,6 +163,81 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       verifyNever(getStats(any));
+    });
+  });
+
+  group('overlapping loads', () {
+    const fresh = TaskStats(
+      total: 20,
+      done: 10,
+      overdue: 0,
+      highPriorityPending: 0,
+    );
+
+    test('a slow older response never overwrites a newer one', () async {
+      final slow = Completer<Either<Failure, TaskStats>>();
+      var call = 0;
+      when(getStats(any)).thenAnswer((_) {
+        call++;
+        return call == 1 ? slow.future : Future.value(right(fresh));
+      });
+
+      final first = viewModel.refresh();
+      await Future<void>.delayed(Duration.zero);
+      await viewModel.refresh();
+      slow.complete(right(stats));
+      await first;
+
+      expect(viewModel.stats, fresh);
+      expect(viewModel.isBusy, isFalse);
+    });
+
+    test(
+      'a silent reload that supersedes a spinner load still clears the spinner',
+      () async {
+        await viewModel.init();
+        final slow = Completer<Either<Failure, TaskStats>>();
+        var call = 0;
+        when(getStats(any)).thenAnswer((_) {
+          call++;
+          return call == 1 ? slow.future : Future.value(right(fresh));
+        });
+
+        final spinner = viewModel.refresh();
+        await Future<void>.delayed(Duration.zero);
+        expect(viewModel.isBusy, isTrue);
+        changes.notifyChanged();
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        slow.complete(right(stats));
+        await spinner;
+
+        expect(viewModel.isBusy, isFalse);
+        expect(viewModel.stats, fresh);
+      },
+    );
+
+    test('keeps the previous statistics when a refresh fails', () async {
+      await viewModel.init();
+      when(getStats(any)).thenAnswer((_) async => left(const NetworkFailure()));
+
+      await viewModel.refresh();
+
+      expect(viewModel.stats, stats);
+      expect(viewModel.failure, const NetworkFailure());
+    });
+
+    test('ignores a response that arrives after dispose', () async {
+      final slow = Completer<Either<Failure, TaskStats>>();
+      when(getStats(any)).thenAnswer((_) => slow.future);
+
+      final future = viewModel.init();
+      await Future<void>.delayed(Duration.zero);
+      viewModel.dispose();
+      slow.complete(right(stats));
+      await future;
+
+      expect(viewModel.stats, isNull);
     });
   });
 }

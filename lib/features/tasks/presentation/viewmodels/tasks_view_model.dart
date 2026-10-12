@@ -24,8 +24,11 @@ class TasksViewModel extends BaseViewModel {
     required this._guard,
     required this._navigation,
     required this._changes,
-    this._searchDebounce = const Duration(milliseconds: 400),
+    this._searchDebounce = defaultSearchDebounce,
   });
+
+  /// Default wait after the last keystroke before searching.
+  static const Duration defaultSearchDebounce = Duration(milliseconds: 400);
 
   /// Name of the search control.
   static const String searchField = 'search';

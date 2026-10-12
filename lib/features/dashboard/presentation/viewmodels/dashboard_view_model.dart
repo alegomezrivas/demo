@@ -30,6 +30,7 @@ class DashboardViewModel extends BaseViewModel {
   User? _user;
   TaskStats? _stats;
   Failure? _failure;
+  int _requestId = 0;
 
   /// The signed-in user, once loaded.
   User? get user => _user;
@@ -50,15 +51,21 @@ class DashboardViewModel extends BaseViewModel {
   }
 
   Future<void> _load({required bool showSpinner}) async {
+    final requestId = ++_requestId;
     _failure = null;
     if (showSpinner) setBusy(true);
     final results = await (
       _getCurrentUser(const NoParams()),
       _getStats(const NoParams()),
     ).wait;
+    // A newer load owns the state; also nothing to update after dispose.
+    if (requestId != _requestId || disposed) return;
+
     _user = results.$1.fold((_) => null, (user) => user);
+    // Previous statistics are kept on failure so a refresh error does not
+    // blank the screen; the view only shows the error when there are none.
     results.$2.fold((failure) => _failure = failure, (stats) => _stats = stats);
-    if (showSpinner) {
+    if (isBusy) {
       setBusy(false);
     } else {
       notifyListeners();

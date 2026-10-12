@@ -1,5 +1,6 @@
 import 'package:demo/app/locator.dart';
 import 'package:demo/app/router/app_routes.dart';
+import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/services/session_service.dart';
 import 'package:demo/features/auth/domain/entities/user.dart';
 import 'package:demo/features/settings/domain/entities/app_language.dart';
@@ -175,6 +176,41 @@ void main() {
 
       verifyNever(logout(any));
       expect(session.isAuthenticated, isTrue);
+    });
+  });
+
+  group('SettingsView errors', () {
+    testWidgets(
+      'shows a generic message when sign-out fails and stays signed in',
+      (tester) async {
+        when(logout(any)).thenAnswer((_) async => left(const CacheFailure()));
+        await pumpView(tester);
+
+        await tester.tap(find.text('Cerrar sesión'));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('settings_error')), findsOneWidget);
+        expect(
+          find.text('Algo salió mal. Inténtalo de nuevo.'),
+          findsOneWidget,
+        );
+        expect(session.isAuthenticated, isTrue);
+      },
+    );
+
+    testWidgets('shows a message when preferences cannot be saved', (
+      tester,
+    ) async {
+      when(saveSettings(any))
+          .thenAnswer((_) async => left(const CacheFailure()));
+      await pumpView(tester);
+
+      await tester.tap(find.byType(DropdownButton<AppThemeMode>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Oscuro').last);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('settings_error')), findsOneWidget);
     });
   });
 }

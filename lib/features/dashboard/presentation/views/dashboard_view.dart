@@ -104,7 +104,7 @@ class _Stats extends StatelessWidget {
                     SizedBox(height: context.spacing.sm),
                     LinearProgressIndicator(
                       value: stats.completionRate,
-                      minHeight: context.spacing.sm,
+                      minHeight: context.spacing.progressHeight,
                       borderRadius: context.spacing.borderRadiusSm,
                     ),
                   ],

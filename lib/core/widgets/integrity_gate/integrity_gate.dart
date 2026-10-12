@@ -78,7 +78,7 @@ class _BlockedScreen extends StatelessWidget {
           children: [
             Icon(
               Icons.gpp_bad_outlined,
-              size: context.spacing.xxl,
+              size: context.spacing.illustrationSize,
               color: context.colors.error,
             ),
             SizedBox(height: context.spacing.md),

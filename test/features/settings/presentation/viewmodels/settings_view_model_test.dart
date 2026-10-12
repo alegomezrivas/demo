@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:demo/app/router/app_routes.dart';
 import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/services/session_service.dart';
@@ -293,5 +295,111 @@ void main() {
       expect(session.isAuthenticated, isTrue);
       verifyZeroInteractions(navigation);
     });
+  });
+
+  group('robustness', () {
+    test('calling init twice does not persist (or prompt) twice', () async {
+      await ready();
+      await ready();
+
+      viewModel.form.control(SettingsViewModel.themeField).value =
+          AppThemeMode.dark;
+      await settle();
+
+      verify(saveSettings(any)).called(1);
+    });
+
+    test('only one biometric prompt runs at a time', () async {
+      preferences.apply(const AppSettings(biometricConfirmation: true));
+      viewModel.dispose();
+      viewModel = SettingsViewModel(
+        getCurrentUser: getCurrentUser,
+        saveSettings: saveSettings,
+        logout: logout,
+        preferences: preferences,
+        authenticator: authenticator,
+        guard: guard,
+        navigation: navigation,
+        session: session,
+      );
+      final pending = Completer<bool>();
+      when(guard.confirm(reason: anyNamed('reason')))
+          .thenAnswer((_) => pending.future);
+      await ready();
+      final control = viewModel.form.control(SettingsViewModel.biometricField)
+        ..value = false;
+      await settle();
+      control.value = true;
+      await settle();
+      control.value = false;
+      await settle();
+      pending.complete(true);
+      await settle();
+      await settle();
+
+      verify(guard.confirm(reason: 'confirm')).called(1);
+      expect(control.value, preferences.biometricConfirmation);
+    });
+
+    test('a prompt that finishes after dispose changes nothing', () async {
+      final pending = Completer<bool>();
+      when(authenticator.authenticate(reason: anyNamed('reason')))
+          .thenAnswer((_) => pending.future);
+      await ready();
+
+      viewModel.form.control(SettingsViewModel.biometricField).value = true;
+      await settle();
+      viewModel.dispose();
+      pending.complete(true);
+      await settle();
+
+      expect(preferences.biometricConfirmation, isFalse);
+      verifyNever(saveSettings(any));
+      viewModel = SettingsViewModel(
+        getCurrentUser: getCurrentUser,
+        saveSettings: saveSettings,
+        logout: logout,
+        preferences: preferences,
+        authenticator: authenticator,
+        guard: guard,
+        navigation: navigation,
+        session: session,
+      );
+    });
+
+    test('a failing logout keeps the user signed in and reports it', () async {
+      when(logout(any)).thenAnswer((_) async => left(const CacheFailure()));
+
+      await viewModel.logout(reason: 'r');
+
+      expect(viewModel.failure, const CacheFailure());
+      expect(session.isAuthenticated, isTrue);
+      verifyZeroInteractions(navigation);
+    });
+
+    test(
+      'init stops quietly when disposed while loading the profile',
+      () async {
+        final pending = Completer<Either<Failure, User>>();
+        when(getCurrentUser(any)).thenAnswer((_) => pending.future);
+
+        final future = ready();
+        viewModel.dispose();
+        pending.complete(right(user));
+        await future;
+
+        expect(viewModel.user, isNull);
+        viewModel = SettingsViewModel(
+          getCurrentUser: getCurrentUser,
+          saveSettings: saveSettings,
+          logout: logout,
+          preferences: preferences,
+          authenticator: authenticator,
+          guard: guard,
+          navigation: navigation,
+          session: session,
+        );
+      },
+    );
   });
 }

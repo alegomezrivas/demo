@@ -4,7 +4,8 @@ Aplicación Flutter (Android e iOS) pensada como portafolio: demuestra Clean Arc
 Stacked, GoRouter, formularios reactivos, seguridad en red y pruebas unitarias.
 Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exista una API real.
 
-> Estado: **Fase 4** (tareas, dashboard y ajustes sobre auth y la capa core). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
+> Estado: **Fase 5** (revisión final). Plan completo en [`CLAUDE.md`](CLAUDE.md); antes de publicar sigue
+> el [checklist de release](docs/RELEASE_CHECKLIST.md).
 
 ## Requisitos
 
@@ -66,11 +67,16 @@ Notas:
 ## Configuración por entorno
 
 Claves (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINNING_ENABLED`,
-`PINNING_SHA256`, `ROOT_POLICY` (`warn` | `block`). Plantillas en `config/*.example.json`.
+`PINNING_SHA256`, `ROOT_POLICY` (`warn` | `block`), `PROTECT_SCREENS`. Plantillas en `config/*.example.json`.
 
-- `USE_MOCK_API` se ignora en builds release.
+- `USE_MOCK_API` se ignora en builds release **y profile**, y los backends mock ni se construyen en release.
 - Pasar del mock a la API real solo requiere cambiar `API_BASE_URL`.
 - Con `PINNING_ENABLED=true` y `PINNING_SHA256` vacío el cliente rechazará todo el tráfico (falla cerrado).
+- `PROTECT_SCREENS` (por defecto `true`) oculta toda la app autenticada de capturas y de la vista previa del
+  selector de apps. Ponlo en `false` solo para builds de demostración en los que necesites capturas.
+- **Un build release no arranca con configuración débil**: `ENV` debe ser `staging` o `prod` (si falta, la app
+  lanza un `StateError` al iniciar), `prod` exige `PINNING_ENABLED=true` y un `ROOT_POLICY` desconocido se
+  convierte en `block`.
 
 ## Autenticación (feature `auth`)
 
@@ -108,8 +114,9 @@ La app es un gestor de tareas con tres pestañas (barra de navegación inferior)
 `DioClientFactory` crea el cliente con este orden de interceptores: **HTTPS enforcer → auth → logging → mock**.
 
 - **Auth**: añade el bearer; ante un 401 renueva el token **una sola vez** (varios 401 simultáneos comparten
-  una única renovación) y reintenta. Si el refresh falla, borra los tokens y `SessionExpiredNotifier` avisa
-  para volver al login.
+  una única renovación) y reintenta. Si el servidor **rechaza** el refresh (401/403), borra los tokens y
+  `SessionExpiredNotifier` avisa para volver al login. Si el refresh falla por red, timeout o error 5xx,
+  la sesión **se conserva** y el usuario ve un error de conexión.
 - **Mock** (`MockApiInterceptor`): solo con `USE_MOCK_API=true` y nunca en release. Simula latencia y
   puede forzarse por petición con el header `x-mock-scenario`:
 
@@ -130,17 +137,33 @@ La app es un gestor de tareas con tres pestañas (barra de navegación inferior)
 - **Almacenamiento**: tokens solo en `flutter_secure_storage` (`SecureTokenStorage`).
 - **Transporte**: solo HTTPS (interceptor + `network_security_config` + ATS). Certificate pinning configurable
   (`PINNING_ENABLED`, `PINNING_SHA256` con huellas SHA-256 en base64 del certificado); activado sin huellas
-  **rechaza todo el tráfico**. Limitación conocida: Dio valida el certificado al recibir las cabeceras, por lo
-  que la petición ya se envió (la respuesta se descarta); se revisará en la Fase 5.
+  **rechaza todo el tráfico**. Ver *Limitaciones conocidas* más abajo.
 - **Integridad del dispositivo**: `ROOT_POLICY=warn|block` (root/jailbreak y depurador) aplicada por `IntegrityGate`.
-  Si el plugin falla se trata como "sin problemas" para no bloquear la app.
-- **Biometría** (`BiometricAuthenticator`, `local_auth`) y **protección de pantalla** (`ScreenProtection`:
-  bloquea capturas en Android y difumina la vista previa del app switcher).
+  Si la detección falla: con `warn` se ignora y con `block` el dispositivo se considera no confiable.
+- **Biometría** (`BiometricAuthenticator`, `local_auth`) y **protección de pantalla** (`ScreenProtection`, con
+  conteo de referencias): bloquea capturas en Android y difumina la vista previa del selector de apps en todo
+  el shell autenticado (configurable con `PROTECT_SCREENS`).
+- **Dependencias de los ViewModels**: casos de uso para la lógica de negocio, más servicios de `core`
+  (`NavigationService`, `SessionService`, `AppPreferences`, `ScreenProtection`, `BiometricAuthenticator`,
+  `SensitiveActionGuard`); nunca repositorios ni datasources.
 - **Entrada de usuario**: validadores reutilizables (`AppValidators`) con mensajes localizados y
   `InputSanitizer` antes de enviar al backend.
 - **Logs**: `ConsoleAppLogger` redacta tokens/contraseñas y en release solo emite errores.
 - **Android**: sin cleartext, `allowBackup=false`, R8 + `shrinkResources` en release. El release **no se firma**
   con claves de debug: define `android/key.properties` (ignorado por git) con `keyAlias`, `keyPassword`,
   `storeFile` y `storePassword`.
-- **iOS**: App Transport Security sin excepciones.
+- **iOS**: App Transport Security sin excepciones; Keychain con `first_unlock_this_device` (no se copia a otros
+  dispositivos ni a copias de seguridad).
 - **Release**: `--obfuscate --split-debug-info=debug-info/<plataforma>` (ver `.claude/skills/deploy/`).
+
+## Limitaciones conocidas (revisión de la Fase 5)
+
+- **Pinning**: Dio valida el certificado cuando llegan las cabeceras, así que la petición ya se envió (la respuesta se
+  descarta), y se fija el hash del certificado completo, no el de su clave pública (SPKI). Antes de producción con una
+  API real: fijar SPKI con al menos dos huellas (actual y de respaldo) y comprobarlo en el *handshake* TLS.
+- **Detección de root/jailbreak**: es evitable por naturaleza (herramientas de *hooking*); es una defensa en profundidad,
+  no una garantía. Para algo más fuerte hace falta atestación (Play Integrity / App Attest).
+- **Ajuste de biometría** en `shared_preferences`: en un dispositivo con root puede modificarse; solo protege contra uso casual.
+- **No se pudo compilar en Android/iOS** en el entorno de desarrollo (sin Android SDK ni Xcode): falta una prueba de
+  humo de un build release con R8 y ofuscación (ver `docs/RELEASE_CHECKLIST.md`).
+- Las pruebas de plugins nativos usan *mocks*: valídalas en dispositivos reales.

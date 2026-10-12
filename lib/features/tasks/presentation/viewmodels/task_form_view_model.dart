@@ -120,7 +120,7 @@ class TaskFormViewModel extends BaseViewModel {
 
   /// Validates the form, saves and closes the screen with `true`.
   Future<void> submit() async {
-    if (isBusy) return;
+    if (isBusy || _isLoading) return;
     if (form.invalid) {
       form.markAllAsTouched();
       notifyListeners();

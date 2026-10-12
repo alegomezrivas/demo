@@ -26,7 +26,7 @@ class EmptyView extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: context.spacing.xxl,
+              size: context.spacing.illustrationSize,
               color: context.colors.textSecondary,
             ),
             SizedBox(height: context.spacing.md),

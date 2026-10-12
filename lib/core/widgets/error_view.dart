@@ -31,7 +31,7 @@ class ErrorView extends StatelessWidget {
           children: [
             Icon(
               Icons.error_outline,
-              size: context.spacing.xxl,
+              size: context.spacing.illustrationSize,
               color: context.colors.error,
             ),
             SizedBox(height: context.spacing.md),

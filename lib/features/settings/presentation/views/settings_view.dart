@@ -1,5 +1,6 @@
 import 'package:demo/app/locator.dart';
 import 'package:demo/core/theme/app_theme.dart';
+import 'package:demo/core/utils/failure_message.dart';
 import 'package:demo/core/widgets/app_button.dart';
 import 'package:demo/features/settings/domain/entities/app_language.dart';
 import 'package:demo/features/settings/domain/entities/app_theme_mode.dart';
@@ -105,6 +106,16 @@ class SettingsView extends StatelessWidget {
                   onTap: viewModel.openAbout,
                 ),
               ),
+              if (viewModel.failure case final failure?) ...[
+                SizedBox(height: context.spacing.md),
+                Text(
+                  failure.message(l10n),
+                  key: const Key('settings_error'),
+                  style: context.text.bodySmall.copyWith(
+                    color: context.colors.error,
+                  ),
+                ),
+              ],
               SizedBox(height: context.spacing.lg),
               AppButton(
                 label: l10n.settingsLogout,

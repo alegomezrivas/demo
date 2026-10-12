@@ -47,7 +47,9 @@ class RegisterView extends StatelessWidget {
               child: SingleChildScrollView(
                 padding: context.spacing.screenPadding,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
+                  constraints: BoxConstraints(
+                    maxWidth: context.spacing.formMaxWidth,
+                  ),
                   child: ReactiveForm(
                     formGroup: viewModel.form,
                     child: Column(

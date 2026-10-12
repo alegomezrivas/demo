@@ -69,6 +69,7 @@ class SettingsViewModel extends BaseViewModel {
 
   final List<StreamSubscription<Object?>> _subscriptions = [];
   String _toggleReason = '';
+  bool _handlingBiometric = false;
   User? _user;
   bool _biometricUnavailable = false;
   Failure? _failure;
@@ -88,12 +89,16 @@ class SettingsViewModel extends BaseViewModel {
   /// changed.
   Future<void> init({required String toggleReason}) async {
     _toggleReason = toggleReason;
-    _subscriptions
-      ..add(_theme.valueChanges.listen((_) => unawaited(_persist())))
-      ..add(_language.valueChanges.listen((_) => unawaited(_persist())))
-      ..add(_biometric.valueChanges.listen(_onBiometricChanged));
+    // Subscribe only once so a second call cannot persist twice or prompt twice.
+    if (_subscriptions.isEmpty) {
+      _subscriptions
+        ..add(_theme.valueChanges.listen((_) => unawaited(_persist())))
+        ..add(_language.valueChanges.listen((_) => unawaited(_persist())))
+        ..add(_biometric.valueChanges.listen(_onBiometricChanged));
+    }
 
     final result = await _getCurrentUser(const NoParams());
+    if (disposed) return;
     _user = result.fold((_) => null, (user) => user);
     notifyListeners();
   }
@@ -104,7 +109,15 @@ class SettingsViewModel extends BaseViewModel {
   /// Ends the session after the optional biometric confirmation.
   Future<void> logout({required String reason}) async {
     if (!await _guard.confirm(reason: reason)) return;
-    await _logout(const NoParams());
+    final result = await _logout(const NoParams());
+    if (disposed) return;
+    final failure = result.fold((failure) => failure, (_) => null);
+    if (failure != null) {
+      // Local session data could not be wiped: stay signed in and say so.
+      _failure = failure;
+      notifyListeners();
+      return;
+    }
     _session.markSignedOut();
     _navigation.go(AppRoutes.login);
   }
@@ -122,6 +135,7 @@ class SettingsViewModel extends BaseViewModel {
     // Apply first so the UI reacts instantly; saving can fail independently.
     _preferences.apply(settings);
     final result = await _saveSettings(settings);
+    if (disposed) return;
     _failure = result.fold((failure) => failure, (_) => null);
     notifyListeners();
   }
@@ -130,28 +144,40 @@ class SettingsViewModel extends BaseViewModel {
     final wantsOn = enabled ?? false;
     // A revert re-emits the already confirmed value; nothing to do then.
     if (wantsOn == _preferences.biometricConfirmation) return;
+    // One prompt at a time: toggles made while a prompt is open are undone
+    // when it finishes.
+    if (_handlingBiometric) return;
 
+    _handlingBiometric = true;
+    try {
+      await _confirmBiometricChange(wantsOn: wantsOn);
+    } finally {
+      _handlingBiometric = false;
+      _syncBiometricControl();
+    }
+  }
+
+  Future<void> _confirmBiometricChange({required bool wantsOn}) async {
     if (wantsOn) {
       if (!await _authenticator.isAvailable()) {
         _biometricUnavailable = true;
-        _revertBiometric(to: false);
         return;
       }
-      if (!await _authenticator.authenticate(reason: _toggleReason)) {
-        _revertBiometric(to: false);
-        return;
-      }
+      if (!await _authenticator.authenticate(reason: _toggleReason)) return;
     } else if (!await _guard.confirm(reason: _toggleReason)) {
       // Turning protection off needs the same confirmation.
-      _revertBiometric(to: true);
       return;
     }
+    if (disposed) return;
     _biometricUnavailable = false;
     await _persist();
   }
 
-  void _revertBiometric({required bool to}) {
-    _biometric.updateValue(to);
+  /// Puts the switch back to the confirmed value when a change was denied.
+  void _syncBiometricControl() {
+    if (disposed) return;
+    final confirmed = _preferences.biometricConfirmation;
+    if (_biometric.value != confirmed) _biometric.updateValue(confirmed);
     notifyListeners();
   }
 

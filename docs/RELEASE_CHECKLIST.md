@@ -20,7 +20,9 @@ Marca cada punto antes de publicar. Los comandos asumen el SDK de Flutter en el 
 - [ ] `USE_MOCK_API` = `false` (en release se ignora de todos modos)
 - [ ] `PINNING_ENABLED` = `true` y `PINNING_SHA256` con las huellas (base64 SHA-256 del certificado) **de producción y de respaldo**
 - [ ] `ROOT_POLICY` = `block` (o `warn` si se decide permitirlo)
+- [ ] `PROTECT_SCREENS` = `true` (solo `false` en builds de demostración)
 - [ ] El archivo **no** está en git (`git check-ignore config/prod.json`)
+- [ ] El build arranca: en release la app lanza un `StateError` si falta `ENV` (o no es `staging`/`prod`) y si `prod` no activa el pinning
 
 > Pinning: la huella es la del certificado completo, así que cambia al renovarlo. Incluye siempre la del
 > certificado siguiente antes de rotar, o la app dejará de conectar.
@@ -66,8 +68,17 @@ flutter build ipa --release --obfuscate \
 - [ ] Capturas en ES y EN; descripción y notas de versión
 - [ ] Subida **solo** tras confirmación explícita; etiqueta `v<version>+<build>` tras publicar
 
+## 8. Bloqueantes antes de producción con una API real
+
+- [ ] **Pinning SPKI en el *handshake***: fijar el hash de la clave pública (no del certificado completo) con ≥ 2 huellas (actual + respaldo) y validarlo durante el TLS, no al recibir las cabeceras
+- [ ] **Prueba de humo del build release** con R8 + `--obfuscate` en Android e iOS reales (los plugins `jailbreak_root_detection` y `screen_protector` pueden necesitar reglas en `proguard-rules.pro`)
+- [ ] Decidir si hace falta atestación (Play Integrity / App Attest) además de la detección de root
+- [ ] Revisar la compatibilidad de `get_it` 9 y `cupertino_icons` 2 (hay versiones mayores disponibles) con `flutter pub outdated`
+
 ## Limitaciones conocidas
 
 - El pinning se evalúa cuando llegan las cabeceras de respuesta (limitación de `dio`): la petición ya se envió, aunque la respuesta se descarta.
-- Si el plugin de detección de root falla, la app lo trata como "sin problemas".
+- La detección de root/jailbreak es evitable; con `ROOT_POLICY=warn` un fallo de la detección se ignora y con `block` se trata como dispositivo no confiable.
+- El ajuste de confirmación biométrica vive en `shared_preferences` y puede alterarse en un dispositivo con root.
 - Las integraciones nativas (biometría, protección de pantalla, detección de root) están probadas con *mocks*; hay que validarlas en dispositivos reales.
+- No hay build de Android/iOS verificado en el entorno de desarrollo (sin Android SDK ni Xcode).

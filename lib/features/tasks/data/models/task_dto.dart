@@ -28,6 +28,7 @@ abstract class TaskDto with _$TaskDto {
 extension TaskDtoMapper on TaskDto {
   /// Converts this DTO to a domain [TaskItem].
   TaskItem toEntity() {
+    final due = dueDate;
     return TaskItem(
       id: id,
       title: title,
@@ -35,7 +36,7 @@ extension TaskDtoMapper on TaskDto {
       priority: TaskPriority.parse(priority),
       isDone: isDone,
       createdAt: DateTime.parse(createdAt),
-      dueDate: dueDate == null ? null : DateTime.parse(dueDate!),
+      dueDate: due == null ? null : DateTime.parse(due),
     );
   }
 }
