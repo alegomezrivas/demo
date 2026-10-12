@@ -19,9 +19,10 @@ linter:
     # The UI is localized through ARB files, public docs are enforced selectively.
     public_member_api_docs: false
     lines_longer_than_80_chars: false
-    unnecessary_type_name_in_constructor: false
     # Keep explicit closures over tear-offs when they read better.
     unnecessary_lambdas: false
     # Private named parameters (`required this._x`) need a recent Dart SDK and
     # show as errors in older IDE analyzers; use a public name + initializer.
     prefer_initializing_formals: false
+    # Single-method contracts (use cases, authenticators) are intentional.
+    one_member_abstracts: false

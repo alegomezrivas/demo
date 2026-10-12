@@ -115,8 +115,9 @@ void main() {
     testWidgets('shows a generic message for invalid credentials', (
       tester,
     ) async {
-      when(login(any))
-          .thenAnswer((_) async => left(const UnauthorizedFailure()));
+      when(
+        login(any),
+      ).thenAnswer((_) async => left(const UnauthorizedFailure()));
       await pumpView(tester);
 
       await tester.enterText(field('Correo electrónico'), 'ana@test.com');

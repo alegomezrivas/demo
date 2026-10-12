@@ -50,8 +50,9 @@ void main() {
     });
 
     test('forwards failures', () async {
-      when(repository.getTasks(any))
-          .thenAnswer((_) async => left(const NetworkFailure()));
+      when(
+        repository.getTasks(any),
+      ).thenAnswer((_) async => left(const NetworkFailure()));
 
       final result = await GetTasksUseCase(repository)(const TaskQuery());
 

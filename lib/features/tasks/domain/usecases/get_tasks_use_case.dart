@@ -18,6 +18,6 @@ class GetTasksUseCase implements UseCase<PagedResult<TaskItem>, TaskQuery> {
     if (params.page < 1 || params.pageSize < 1) {
       return left(const ValidationFailure('invalid_pagination'));
     }
-    return await _repository.getTasks(params);
+    return _repository.getTasks(params);
   }
 }

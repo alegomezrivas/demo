@@ -4,7 +4,8 @@ enum SecurityPolicy {
   warn,
 
   /// Refuse to run the app.
-  block;
+  block
+  ;
 
   /// Parses [value] (case-insensitive); unknown values become [fallback].
   static SecurityPolicy parse(

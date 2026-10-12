@@ -218,8 +218,9 @@ void main() {
     }
 
     test('keeps the session when the refresh response is malformed', () async {
-      when(refresher.refresh(any))
-          .thenThrow(const ServerException(code: 'invalid_refresh_response'));
+      when(
+        refresher.refresh(any),
+      ).thenThrow(const ServerException(code: 'invalid_refresh_response'));
       build();
 
       await expectLater(

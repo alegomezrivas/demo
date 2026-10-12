@@ -67,21 +67,28 @@ void main() {
     });
 
     test('maps other statuses to ServerException using the body code', () {
-      final result = DioExceptionMapper.map(
-        error(
-          DioExceptionType.badResponse,
-          response: response(422, {'code': 'email_taken'}),
-        ),
-      ) as ServerException;
+      final result =
+          DioExceptionMapper.map(
+                error(
+                  DioExceptionType.badResponse,
+                  response: response(422, {'code': 'email_taken'}),
+                ),
+              )
+              as ServerException;
 
       expect(result.code, 'email_taken');
       expect(result.statusCode, 422);
     });
 
     test('falls back to an http_<status> code without a body code', () {
-      final result = DioExceptionMapper.map(
-        error(DioExceptionType.badResponse, response: response(500, 'oops')),
-      ) as ServerException;
+      final result =
+          DioExceptionMapper.map(
+                error(
+                  DioExceptionType.badResponse,
+                  response: response(500, 'oops'),
+                ),
+              )
+              as ServerException;
 
       expect(result.code, 'http_500');
     });

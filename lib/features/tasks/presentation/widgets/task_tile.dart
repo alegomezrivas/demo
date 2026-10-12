@@ -41,8 +41,9 @@ class TaskTile extends StatelessWidget {
     final dateText = dueDate == null
         ? null
         : l10n.tasksDueDate(
-            DateFormat.yMMMd(Localizations.localeOf(context).toString())
-                .format(dueDate),
+            DateFormat.yMMMd(
+              Localizations.localeOf(context).toString(),
+            ).format(dueDate),
           );
 
     return Card(

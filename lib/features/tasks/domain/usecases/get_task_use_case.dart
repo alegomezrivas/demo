@@ -16,6 +16,6 @@ class GetTaskUseCase implements UseCase<TaskItem, String> {
     if (params.trim().isEmpty) {
       return left(const ValidationFailure('empty_id'));
     }
-    return await _repository.getTask(params);
+    return _repository.getTask(params);
   }
 }

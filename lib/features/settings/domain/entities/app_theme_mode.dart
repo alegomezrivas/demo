@@ -7,7 +7,8 @@ enum AppThemeMode {
   light,
 
   /// Always dark.
-  dark;
+  dark
+  ;
 
   /// Parses a stored name; unknown values fall back to [system].
   static AppThemeMode parse(String value) => AppThemeMode.values.firstWhere(

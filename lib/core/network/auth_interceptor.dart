@@ -9,9 +9,10 @@ import 'package:demo/core/security/token_storage.dart';
 import 'package:dio/dio.dart';
 
 /// Re-sends a request (normally `dio.fetch`).
-typedef RequestRetrier = Future<Response<dynamic>> Function(
-  RequestOptions options,
-);
+typedef RequestRetrier =
+    Future<Response<dynamic>> Function(
+      RequestOptions options,
+    );
 
 /// Adds the bearer token and renews it once when the server answers 401.
 ///
@@ -105,9 +106,9 @@ class AuthInterceptor extends Interceptor {
       // Another request already renewed the token; just reuse it.
       return _Renewed(stored);
     }
-    return await (_inFlightRefresh ??= _refresh().whenComplete(
+    return _inFlightRefresh ??= _refresh().whenComplete(
       () => _inFlightRefresh = null,
-    ));
+    );
   }
 
   Future<_Renewal> _refresh() async {
@@ -152,7 +153,7 @@ class AuthInterceptor extends Interceptor {
 }
 
 /// Outcome of trying to renew the tokens.
-sealed class _Renewal;
+sealed class _Renewal {}
 
 /// New tokens are available.
 final class _Renewed extends _Renewal {
@@ -162,7 +163,7 @@ final class _Renewed extends _Renewal {
 }
 
 /// The server refused the refresh token: the session is over.
-final class _Rejected extends _Renewal;
+final class _Rejected extends _Renewal {}
 
 /// The refresh could not be completed (network or server problem).
-final class _Unavailable extends _Renewal;
+final class _Unavailable extends _Renewal {}

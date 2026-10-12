@@ -20,6 +20,6 @@ class UpdateTaskUseCase implements UseCase<TaskItem, TaskItem> {
     if (title.isEmpty || title.length > maxTitleLength) {
       return left(const ValidationFailure('invalid_title'));
     }
-    return await _repository.updateTask(params);
+    return _repository.updateTask(params);
   }
 }

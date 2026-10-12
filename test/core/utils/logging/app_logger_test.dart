@@ -24,8 +24,9 @@ void main() {
     });
 
     test('records only the runtime type of an error', () {
-      ConsoleAppLogger(sink: lines.add)
-          .error('failed', error: StateError('pw'));
+      ConsoleAppLogger(
+        sink: lines.add,
+      ).error('failed', error: StateError('pw'));
 
       expect(lines.single, contains('StateError'));
       expect(lines.single, isNot(contains('pw')));

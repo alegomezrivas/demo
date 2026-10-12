@@ -22,6 +22,6 @@ class SensitiveActionGuard {
   Future<bool> confirm({required String reason}) async {
     if (!_isEnabled()) return true;
     if (!await _authenticator.isAvailable()) return true;
-    return await _authenticator.authenticate(reason: reason);
+    return _authenticator.authenticate(reason: reason);
   }
 }

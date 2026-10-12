@@ -19,8 +19,9 @@ void main() {
 
   group('LoginUseCase', () {
     test('returns the user when the repository succeeds', () async {
-      when(repository.login(email: 'ana@test.com', password: 'pw'))
-          .thenAnswer((_) async => right(user));
+      when(
+        repository.login(email: 'ana@test.com', password: 'pw'),
+      ).thenAnswer((_) async => right(user));
 
       final result = await useCase(
         const LoginParams(email: 'ana@test.com', password: 'pw'),

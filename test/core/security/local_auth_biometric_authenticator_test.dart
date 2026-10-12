@@ -31,15 +31,17 @@ void main() {
 
   group('authenticate', () {
     test('returns true when the user is authenticated', () async {
-      when(auth.authenticate(localizedReason: 'Confirm'))
-          .thenAnswer((_) async => true);
+      when(
+        auth.authenticate(localizedReason: 'Confirm'),
+      ).thenAnswer((_) async => true);
 
       expect(await authenticator.authenticate(reason: 'Confirm'), isTrue);
     });
 
     test('returns false when the user cancels', () async {
-      when(auth.authenticate(localizedReason: 'Confirm'))
-          .thenAnswer((_) async => false);
+      when(
+        auth.authenticate(localizedReason: 'Confirm'),
+      ).thenAnswer((_) async => false);
 
       expect(await authenticator.authenticate(reason: 'Confirm'), isFalse);
     });

@@ -45,10 +45,12 @@ void main() {
     when(saveSettings(any)).thenAnswer((_) async => right(unit));
     when(logout(any)).thenAnswer((_) async => right(unit));
     when(authenticator.isAvailable()).thenAnswer((_) async => true);
-    when(authenticator.authenticate(reason: anyNamed('reason')))
-        .thenAnswer((_) async => true);
-    when(guard.confirm(reason: anyNamed('reason')))
-        .thenAnswer((_) async => true);
+    when(
+      authenticator.authenticate(reason: anyNamed('reason')),
+    ).thenAnswer((_) async => true);
+    when(
+      guard.confirm(reason: anyNamed('reason')),
+    ).thenAnswer((_) async => true);
     locator.registerFactory<SettingsViewModel>(
       () => SettingsViewModel(
         getCurrentUser: getCurrentUser,
@@ -157,8 +159,9 @@ void main() {
       await tester.tap(find.text('Cerrar sesión'));
       await tester.pumpAndSettle();
 
-      verify(guard.confirm(reason: 'Confirma tu identidad para cerrar sesión'))
-          .called(1);
+      verify(
+        guard.confirm(reason: 'Confirma tu identidad para cerrar sesión'),
+      ).called(1);
       verify(logout(any)).called(1);
       expect(session.isAuthenticated, isFalse);
       verify(navigation.go(AppRoutes.login)).called(1);
@@ -167,8 +170,9 @@ void main() {
     testWidgets('keeps the session when the confirmation is denied', (
       tester,
     ) async {
-      when(guard.confirm(reason: anyNamed('reason')))
-          .thenAnswer((_) async => false);
+      when(
+        guard.confirm(reason: anyNamed('reason')),
+      ).thenAnswer((_) async => false);
       await pumpView(tester);
 
       await tester.tap(find.text('Cerrar sesión'));
@@ -201,8 +205,9 @@ void main() {
     testWidgets('shows a message when preferences cannot be saved', (
       tester,
     ) async {
-      when(saveSettings(any))
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        saveSettings(any),
+      ).thenAnswer((_) async => left(const CacheFailure()));
       await pumpView(tester);
 
       await tester.tap(find.byType(DropdownButton<AppThemeMode>));

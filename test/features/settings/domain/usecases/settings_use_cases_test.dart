@@ -27,8 +27,9 @@ void main() {
     });
 
     test('forwards failures', () async {
-      when(repository.load())
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        repository.load(),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       expect(
         (await GetSettingsUseCase(repository)(const NoParams())).isLeft(),
@@ -49,8 +50,9 @@ void main() {
     });
 
     test('forwards failures', () async {
-      when(repository.save(any))
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        repository.save(any),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       expect(
         (await SaveSettingsUseCase(repository)(settings)).isLeft(),

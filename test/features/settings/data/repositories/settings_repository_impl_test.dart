@@ -71,8 +71,9 @@ void main() {
     });
 
     test('maps write errors to failures', () async {
-      when(local.write(any))
-          .thenThrow(const CacheException('settings_not_saved'));
+      when(
+        local.write(any),
+      ).thenThrow(const CacheException('settings_not_saved'));
 
       expect(
         (await repository.save(AppSettings.defaults)).getLeft().toNullable(),

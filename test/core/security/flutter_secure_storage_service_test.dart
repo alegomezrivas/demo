@@ -34,8 +34,9 @@ void main() {
     });
 
     test('hides platform errors behind a CacheException', () async {
-      when(backend.read(key: 'k'))
-          .thenThrow(PlatformException(code: 'keystore', message: 'secret'));
+      when(
+        backend.read(key: 'k'),
+      ).thenThrow(PlatformException(code: 'keystore', message: 'secret'));
 
       await expectLater(
         service.read('k'),

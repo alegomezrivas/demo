@@ -6,11 +6,16 @@ import 'package:meta/meta.dart';
 @immutable
 class AppSettings {
   /// Creates settings.
+  ///
+  /// Defaults are applied in the initializer list because `mockito`'s
+  /// analyzer-based builder cannot read constant default values.
   const AppSettings({
-    this.themeMode = AppThemeMode.system,
-    this.language = AppLanguage.system,
-    this.biometricConfirmation = false,
-  });
+    AppThemeMode? themeMode,
+    AppLanguage? language,
+    bool? biometricConfirmation,
+  }) : themeMode = themeMode ?? AppThemeMode.system,
+       language = language ?? AppLanguage.system,
+       biometricConfirmation = biometricConfirmation ?? false;
 
   /// Settings used before the user changes anything.
   static const AppSettings defaults = AppSettings();

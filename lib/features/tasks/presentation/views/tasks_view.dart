@@ -64,8 +64,9 @@ class TasksView extends StatelessWidget {
     if (failure == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(failure.message(l10n))));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message(l10n))));
     });
   }
 }

@@ -132,8 +132,9 @@ void main() {
     testWidgets('shows a specific message when the e-mail is taken', (
       tester,
     ) async {
-      when(register(any))
-          .thenAnswer((_) async => left(const ServerFailure('email_taken')));
+      when(
+        register(any),
+      ).thenAnswer((_) async => left(const ServerFailure('email_taken')));
       await pumpView(tester);
 
       await fillForm(tester);

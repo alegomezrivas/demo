@@ -70,8 +70,9 @@ void main() {
     });
 
     test('keeps the user empty when it cannot be restored', () async {
-      when(getCurrentUser(any))
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        getCurrentUser(any),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       await viewModel.init();
 

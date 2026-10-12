@@ -15,6 +15,6 @@ class DeleteTaskUseCase implements UseCase<Unit, String> {
     if (params.trim().isEmpty) {
       return left(const ValidationFailure('empty_id'));
     }
-    return await _repository.deleteTask(params);
+    return _repository.deleteTask(params);
   }
 }
