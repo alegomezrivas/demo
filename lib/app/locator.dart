@@ -15,9 +15,20 @@ import 'package:demo/core/security/secure_token_storage.dart';
 import 'package:demo/core/security/token_storage.dart';
 import 'package:demo/core/services/go_router_navigation_service.dart';
 import 'package:demo/core/services/navigation_service.dart';
+import 'package:demo/core/services/session_service.dart';
 import 'package:demo/core/utils/logging/app_logger.dart';
 import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart';
 import 'package:demo/features/about/presentation/viewmodels/about_view_model.dart';
+import 'package:demo/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:demo/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:demo/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:demo/features/auth/domain/repositories/auth_repository.dart';
+import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/login_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/logout_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/register_use_case.dart';
+import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
+import 'package:demo/features/auth/presentation/viewmodels/register_view_model.dart';
 import 'package:demo/features/home/presentation/viewmodels/home_view_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -39,12 +50,14 @@ Future<void> setupLocator({
   required GoRouter router,
   AppConfig? config,
   List<MockRoute> mockRoutes = const [],
+  SessionService? session,
 }) async {
   final appConfig = config ?? AppConfig.fromEnvironment();
   locator
     ..registerSingleton<AppConfig>(appConfig)
     ..registerSingleton<AppLogger>(ConsoleAppLogger.forMode())
     ..registerSingleton<GoRouter>(router)
+    ..registerSingleton<SessionService>(session ?? SessionService())
     ..registerLazySingleton<NavigationService>(
       () => GoRouterNavigationService(locator<GoRouter>()),
     )
@@ -79,12 +92,61 @@ Future<void> setupLocator({
         mockRoutes: mockRoutes,
       ).create(),
     )
+    // Auth feature.
+    ..registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(locator<Dio>()),
+    )
+    ..registerLazySingleton<AuthLocalDataSource>(
+      () => AuthLocalDataSourceImpl(
+        locator<TokenStorage>(),
+        locator<SecureStorage>(),
+      ),
+    )
+    ..registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(
+        remote: locator<AuthRemoteDataSource>(),
+        local: locator<AuthLocalDataSource>(),
+      ),
+    )
+    ..registerFactory<LoginUseCase>(
+      () => LoginUseCase(locator<AuthRepository>()),
+    )
+    ..registerFactory<RegisterUseCase>(
+      () => RegisterUseCase(locator<AuthRepository>()),
+    )
+    ..registerFactory<LogoutUseCase>(
+      () => LogoutUseCase(locator<AuthRepository>()),
+    )
+    ..registerFactory<GetCurrentUserUseCase>(
+      () => GetCurrentUserUseCase(locator<AuthRepository>()),
+    )
     // ViewModels.
+    ..registerFactory<LoginViewModel>(
+      () => LoginViewModel(
+        login: locator<LoginUseCase>(),
+        navigation: locator<NavigationService>(),
+        session: locator<SessionService>(),
+        screenProtection: locator<ScreenProtection>(),
+      ),
+    )
+    ..registerFactory<RegisterViewModel>(
+      () => RegisterViewModel(
+        register: locator<RegisterUseCase>(),
+        navigation: locator<NavigationService>(),
+        session: locator<SessionService>(),
+        screenProtection: locator<ScreenProtection>(),
+      ),
+    )
     ..registerFactory<IntegrityGateViewModel>(
       () => IntegrityGateViewModel(locator<DeviceIntegrityService>()),
     )
     ..registerFactory<HomeViewModel>(
-      () => HomeViewModel(locator<NavigationService>()),
+      () => HomeViewModel(
+        navigation: locator<NavigationService>(),
+        getCurrentUser: locator<GetCurrentUserUseCase>(),
+        logout: locator<LogoutUseCase>(),
+        session: locator<SessionService>(),
+      ),
     )
     ..registerFactory<AboutViewModel>(
       () => AboutViewModel(locator<NavigationService>()),

@@ -14,8 +14,9 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return ViewModelBuilder<HomeViewModel>.nonReactive(
+    return ViewModelBuilder<HomeViewModel>.reactive(
       viewModelBuilder: () => locator<HomeViewModel>(),
+      onViewModelReady: (viewModel) => viewModel.init(),
       builder: (context, viewModel, _) => Scaffold(
         body: SafeArea(
           child: Padding(
@@ -24,6 +25,8 @@ class HomeView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (viewModel.user case final user?)
+                  Text(l10n.homeGreeting(user.name), style: context.text.title),
                 Text(l10n.homeTitle, style: context.text.display),
                 SizedBox(height: context.spacing.sm),
                 Text(l10n.homeSubtitle, style: context.text.bodySmall),
@@ -31,6 +34,11 @@ class HomeView extends StatelessWidget {
                 AppButton(
                   label: l10n.homeGetStarted,
                   onPressed: viewModel.openAbout,
+                ),
+                SizedBox(height: context.spacing.sm),
+                TextButton(
+                  onPressed: viewModel.logout,
+                  child: Text(l10n.homeLogout),
                 ),
               ],
             ),

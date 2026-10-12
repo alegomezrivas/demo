@@ -4,7 +4,7 @@ Aplicación Flutter (Android e iOS) pensada como portafolio: demuestra Clean Arc
 Stacked, GoRouter, formularios reactivos, seguridad en red y pruebas unitarias.
 Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exista una API real.
 
-> Estado: **Fase 2** (capa core: red, errores y seguridad). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
+> Estado: **Fase 3** (autenticación de punta a punta sobre la capa core). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
 
 ## Requisitos
 
@@ -71,6 +71,19 @@ Claves (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINN
 - `USE_MOCK_API` se ignora en builds release.
 - Pasar del mock a la API real solo requiere cambiar `API_BASE_URL`.
 - Con `PINNING_ENABLED=true` y `PINNING_SHA256` vacío el cliente rechazará todo el tráfico (falla cerrado).
+
+## Autenticación (feature `auth`)
+
+Login y registro completos con `reactive_forms`, casos de uso (`Login`, `Register`, `Logout`,
+`GetCurrentUser`), repositorio con datasources remoto (Dio) y local (almacenamiento seguro) y DTOs `freezed`.
+
+- **Cuenta demo del mock**: `demo@starkshowcase.dev` / `Demo1234!` (solo existe en memoria con `USE_MOCK_API=true`).
+- **Guard del router**: sin sesión solo se accede a `/login` y `/register`; con sesión, `/login` redirige al inicio.
+  `SessionService` notifica al router y se desloguea solo cuando falla el refresh del token.
+- **Sesión persistente**: al abrir la app se restaura el usuario guardado (tokens en Keystore/Keychain).
+- **Pantallas sensibles**: login y registro activan `ScreenProtection` (con conteo de referencias).
+- **Errores**: mensajes genéricos y localizados (credenciales incorrectas, correo ya registrado, sin conexión...).
+- **Entrada**: validadores en los formularios y `InputSanitizer` en el repositorio (la contraseña nunca se modifica).
 
 ## Red y backend mock
 
