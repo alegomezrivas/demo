@@ -130,3 +130,40 @@ jobs:
           name: android-debug-info
           path: build/debug-info
           retention-days: 14
+
+  ios-release-build:
+    name: iOS release build (no codesign, obfuscation)
+    # macOS runners are billed at a higher rate, so it waits for `verify`.
+    runs-on: macos-latest
+    timeout-minutes: 45
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the Flutter version from .fvmrc
+        id: fvm
+        run: echo "flutter=$(jq -r '.flutter' .fvmrc)" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.fvm.outputs.flutter }}
+          cache: true
+
+      - run: flutter pub get
+
+      # Compiles the app for devices without signing, only to prove that the
+      # iOS project, the CocoaPods dependencies and obfuscation build. It uses
+      # the production example config and needs no certificates or profiles.
+      - name: Build release app (no codesign)
+        run: |
+          flutter build ios --release --no-codesign --obfuscate \
+            --split-debug-info=build/debug-info \
+            --dart-define-from-file=config/prod.example.json
+
+      - name: Upload symbols (needed to read obfuscated crash reports)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-debug-info
+          path: build/debug-info
+          retention-days: 14
