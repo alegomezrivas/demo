@@ -5,9 +5,10 @@ import 'package:demo/core/security/biometric_authenticator.dart';
 class SensitiveActionGuard {
   /// Creates the guard; [_isEnabled] is read every time so changes apply at once.
   const SensitiveActionGuard({
-    required this._authenticator,
-    required this._isEnabled,
-  });
+    required BiometricAuthenticator authenticator,
+    required bool Function() isEnabled,
+  }) : _authenticator = authenticator,
+       _isEnabled = isEnabled;
 
   final BiometricAuthenticator _authenticator;
   final bool Function() _isEnabled;

@@ -15,12 +15,16 @@ import 'package:stacked/stacked.dart';
 class TaskFormViewModel extends BaseViewModel {
   /// Creates the ViewModel with its dependencies.
   TaskFormViewModel({
-    required this._getTask,
-    required this._createTask,
-    required this._updateTask,
-    required this._navigation,
-    required this._changes,
-  });
+    required GetTaskUseCase getTask,
+    required CreateTaskUseCase createTask,
+    required UpdateTaskUseCase updateTask,
+    required NavigationService navigation,
+    required DataChangeNotifier changes,
+  }) : _getTask = getTask,
+       _createTask = createTask,
+       _updateTask = updateTask,
+       _navigation = navigation,
+       _changes = changes;
 
   /// Name of the title control.
   static const String titleField = 'title';

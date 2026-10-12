@@ -22,15 +22,22 @@ import 'package:stacked/stacked.dart';
 class SettingsViewModel extends BaseViewModel {
   /// Creates the ViewModel with its dependencies.
   SettingsViewModel({
-    required this._getCurrentUser,
-    required this._saveSettings,
-    required this._logout,
-    required this._preferences,
-    required this._authenticator,
-    required this._guard,
-    required this._navigation,
-    required this._session,
-  }) {
+    required GetCurrentUserUseCase getCurrentUser,
+    required SaveSettingsUseCase saveSettings,
+    required LogoutUseCase logout,
+    required AppPreferences preferences,
+    required BiometricAuthenticator authenticator,
+    required SensitiveActionGuard guard,
+    required NavigationService navigation,
+    required SessionService session,
+  }) : _getCurrentUser = getCurrentUser,
+       _saveSettings = saveSettings,
+       _logout = logout,
+       _preferences = preferences,
+       _authenticator = authenticator,
+       _guard = guard,
+       _navigation = navigation,
+       _session = session {
     final settings = _preferences.settings;
     _theme = FormControl<AppThemeMode>(value: settings.themeMode);
     _language = FormControl<AppLanguage>(value: settings.language);

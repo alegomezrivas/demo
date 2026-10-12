@@ -18,7 +18,11 @@ import 'package:fpdart/fpdart.dart';
 /// Passwords are never modified.
 class AuthRepositoryImpl implements AuthRepository {
   /// Creates the repository.
-  const AuthRepositoryImpl({required this._remote, required this._local});
+  const AuthRepositoryImpl({
+    required AuthRemoteDataSource remote,
+    required AuthLocalDataSource local,
+  }) : _remote = remote,
+       _local = local;
 
   final AuthRemoteDataSource _remote;
   final AuthLocalDataSource _local;

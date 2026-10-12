@@ -20,7 +20,8 @@ import 'package:fpdart/fpdart.dart';
 /// Free text is sanitized right before it is sent to the backend.
 class TaskRepositoryImpl implements TaskRepository {
   /// Creates the repository.
-  const TaskRepositoryImpl({required this._remote});
+  const TaskRepositoryImpl({required TasksRemoteDataSource remote})
+    : _remote = remote;
 
   static const int _maxTitle = 120;
   static const int _maxDescription = 1000;
