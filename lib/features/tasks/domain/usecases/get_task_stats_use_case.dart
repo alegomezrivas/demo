@@ -13,5 +13,5 @@ class GetTaskStatsUseCase implements UseCase<TaskStats, NoParams> {
 
   @override
   Future<Either<Failure, TaskStats>> call(NoParams params) async =>
-      await _repository.getStats();
+      _repository.getStats();
 }

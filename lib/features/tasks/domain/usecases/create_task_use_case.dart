@@ -21,6 +21,6 @@ class CreateTaskUseCase implements UseCase<TaskItem, TaskDraft> {
     if (title.isEmpty || title.length > maxTitleLength) {
       return left(const ValidationFailure('invalid_title'));
     }
-    return await _repository.createTask(params);
+    return _repository.createTask(params);
   }
 }

@@ -41,7 +41,7 @@ class RegisterUseCase implements UseCase<User, RegisterParams> {
         params.password.isEmpty) {
       return left(const ValidationFailure('empty_fields'));
     }
-    return await _repository.register(
+    return _repository.register(
       name: params.name,
       email: params.email,
       password: params.password,

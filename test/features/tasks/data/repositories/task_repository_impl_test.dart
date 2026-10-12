@@ -154,8 +154,9 @@ void main() {
       final result = await repository.updateTask(buildTask(isDone: true));
 
       expect(result.isRight(), isTrue);
-      final captured = verify(remote.updateTask(captureAny, captureAny))
-          .captured;
+      final captured = verify(
+        remote.updateTask(captureAny, captureAny),
+      ).captured;
       expect(captured.first, 't1');
       expect((captured.last as TaskInputDto).isDone, isTrue);
     });
@@ -170,8 +171,9 @@ void main() {
     });
 
     test('getTask maps a missing task to a ServerFailure', () async {
-      when(remote.getTask(any))
-          .thenThrow(const ServerException(code: 'not_found', statusCode: 404));
+      when(
+        remote.getTask(any),
+      ).thenThrow(const ServerException(code: 'not_found', statusCode: 404));
 
       expect(
         (await repository.getTask('nope')).getLeft().toNullable(),

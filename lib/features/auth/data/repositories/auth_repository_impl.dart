@@ -36,7 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final response = await _remote.login(
         LoginRequestDto(email: InputSanitizer.email(email), password: password),
       );
-      return await _persist(response);
+      return _persist(response);
     });
   }
 
@@ -57,7 +57,7 @@ class AuthRepositoryImpl implements AuthRepository {
           phone: (cleanPhone?.isEmpty ?? true) ? null : cleanPhone,
         ),
       );
-      return await _persist(response);
+      return _persist(response);
     });
   }
 

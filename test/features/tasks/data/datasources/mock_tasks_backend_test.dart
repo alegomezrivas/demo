@@ -98,8 +98,9 @@ void main() {
 
       expect(items(done).every((t) => t['isDone'] == true), isTrue);
       expect(
-        items(pendingHigh)
-            .every((t) => t['isDone'] == false && t['priority'] == 'high'),
+        items(
+          pendingHigh,
+        ).every((t) => t['isDone'] == false && t['priority'] == 'high'),
         isTrue,
       );
       final pending = await list({'status': 'pending'});

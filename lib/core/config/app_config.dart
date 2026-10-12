@@ -10,7 +10,8 @@ enum AppEnvironment {
   staging,
 
   /// Production.
-  prod;
+  prod
+  ;
 
   /// Parses [value] (case-insensitive); unknown values fall back to [dev].
   static AppEnvironment parse(String value) =>

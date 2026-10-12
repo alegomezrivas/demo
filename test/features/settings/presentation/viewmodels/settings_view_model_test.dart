@@ -42,10 +42,12 @@ void main() {
     when(saveSettings(any)).thenAnswer((_) async => right(unit));
     when(logout(any)).thenAnswer((_) async => right(unit));
     when(authenticator.isAvailable()).thenAnswer((_) async => true);
-    when(authenticator.authenticate(reason: anyNamed('reason')))
-        .thenAnswer((_) async => true);
-    when(guard.confirm(reason: anyNamed('reason')))
-        .thenAnswer((_) async => true);
+    when(
+      authenticator.authenticate(reason: anyNamed('reason')),
+    ).thenAnswer((_) async => true);
+    when(
+      guard.confirm(reason: anyNamed('reason')),
+    ).thenAnswer((_) async => true);
     viewModel = SettingsViewModel(
       getCurrentUser: getCurrentUser,
       saveSettings: saveSettings,
@@ -106,8 +108,9 @@ void main() {
     });
 
     test('keeps the profile empty when loading fails', () async {
-      when(getCurrentUser(any))
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        getCurrentUser(any),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       await ready();
 
@@ -143,8 +146,9 @@ void main() {
     test(
       'keeps the new value but reports a failure when saving fails',
       () async {
-        when(saveSettings(any))
-            .thenAnswer((_) async => left(const CacheFailure()));
+        when(
+          saveSettings(any),
+        ).thenAnswer((_) async => left(const CacheFailure()));
         await ready();
 
         viewModel.form.control(SettingsViewModel.themeField).value =
@@ -157,8 +161,9 @@ void main() {
     );
 
     test('clears the failure after a successful save', () async {
-      when(saveSettings(any))
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        saveSettings(any),
+      ).thenAnswer((_) async => left(const CacheFailure()));
       await ready();
       viewModel.form.control(SettingsViewModel.themeField).value =
           AppThemeMode.light;
@@ -203,8 +208,9 @@ void main() {
     });
 
     test('stays off when the user fails to authenticate', () async {
-      when(authenticator.authenticate(reason: anyNamed('reason')))
-          .thenAnswer((_) async => false);
+      when(
+        authenticator.authenticate(reason: anyNamed('reason')),
+      ).thenAnswer((_) async => false);
       await ready();
 
       viewModel.form.control(SettingsViewModel.biometricField).value = true;
@@ -242,8 +248,9 @@ void main() {
 
     test('turning it off is reverted when confirmation is denied', () async {
       preferences.apply(const AppSettings(biometricConfirmation: true));
-      when(guard.confirm(reason: anyNamed('reason')))
-          .thenAnswer((_) async => false);
+      when(
+        guard.confirm(reason: anyNamed('reason')),
+      ).thenAnswer((_) async => false);
       viewModel.dispose();
       viewModel = SettingsViewModel(
         getCurrentUser: getCurrentUser,
@@ -286,8 +293,9 @@ void main() {
     });
 
     test('logout is cancelled when the confirmation is denied', () async {
-      when(guard.confirm(reason: anyNamed('reason')))
-          .thenAnswer((_) async => false);
+      when(
+        guard.confirm(reason: anyNamed('reason')),
+      ).thenAnswer((_) async => false);
 
       await viewModel.logout(reason: 'r');
 
@@ -323,8 +331,9 @@ void main() {
         session: session,
       );
       final pending = Completer<bool>();
-      when(guard.confirm(reason: anyNamed('reason')))
-          .thenAnswer((_) => pending.future);
+      when(
+        guard.confirm(reason: anyNamed('reason')),
+      ).thenAnswer((_) => pending.future);
       await ready();
       final control = viewModel.form.control(SettingsViewModel.biometricField)
         ..value = false;
@@ -343,8 +352,9 @@ void main() {
 
     test('a prompt that finishes after dispose changes nothing', () async {
       final pending = Completer<bool>();
-      when(authenticator.authenticate(reason: anyNamed('reason')))
-          .thenAnswer((_) => pending.future);
+      when(
+        authenticator.authenticate(reason: anyNamed('reason')),
+      ).thenAnswer((_) => pending.future);
       await ready();
 
       viewModel.form.control(SettingsViewModel.biometricField).value = true;

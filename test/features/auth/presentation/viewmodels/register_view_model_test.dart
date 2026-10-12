@@ -124,8 +124,9 @@ void main() {
     });
 
     test('exposes the failure and does not sign in when it fails', () async {
-      when(register(any))
-          .thenAnswer((_) async => left(const ServerFailure('email_taken')));
+      when(
+        register(any),
+      ).thenAnswer((_) async => left(const ServerFailure('email_taken')));
       fill();
 
       await viewModel.submit();

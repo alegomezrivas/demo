@@ -13,7 +13,8 @@ enum MockScenario {
   unauthorized,
 
   /// Answer 401 once; the retry after a token refresh succeeds.
-  unauthorizedOnce;
+  unauthorizedOnce
+  ;
 
   /// Parses a header value (`server_error`, `offline`, ...); unknown -> [none].
   static MockScenario parse(Object? value) {

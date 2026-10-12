@@ -126,8 +126,9 @@ void main() {
         phone: 'abc',
       );
 
-      final requests = verify(remote.register(captureAny)).captured
-          .cast<RegisterRequestDto>();
+      final requests = verify(
+        remote.register(captureAny),
+      ).captured.cast<RegisterRequestDto>();
       expect(requests.map((r) => r.phone), [null, null]);
     });
 
@@ -179,8 +180,9 @@ void main() {
     });
 
     test('maps storage errors to failures', () async {
-      when(local.readUser())
-          .thenThrow(const CacheException('invalid_user_cache'));
+      when(
+        local.readUser(),
+      ).thenThrow(const CacheException('invalid_user_cache'));
 
       expect(
         await repository.restoreSession(),

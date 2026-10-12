@@ -11,7 +11,7 @@ Identifier: `com.softstark.demo`. The backend is a Dio mock until a real API exi
 
 ## Requirements
 
-- [FVM](https://fvm.app) (the Flutter version is pinned in [`.fvmrc`](.fvmrc): **3.47.7**, Dart 3.13)
+- [FVM](https://fvm.app) (the Flutter version is pinned in [`.fvmrc`](.fvmrc): **3.41.6**, Dart 3.11)
 - Android: `minSdk 24` · iOS 15.0+
 
 ## Setting up the SDK with FVM
@@ -46,7 +46,7 @@ the real `config/*.json` files are git-ignored):
 fvm flutter run --dart-define-from-file=config/dev.json
 ```
 
-> Without FVM, any Flutter 3.47.7 on the `PATH` also works: drop the `fvm` prefix.
+> Without FVM, any Flutter 3.41.6 on the `PATH` also works: drop the `fvm` prefix.
 
 ## Architecture
 

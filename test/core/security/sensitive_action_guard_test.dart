@@ -31,15 +31,17 @@ void main() {
     );
 
     test('allows the action when the user authenticates', () async {
-      when(authenticator.authenticate(reason: 'r'))
-          .thenAnswer((_) async => true);
+      when(
+        authenticator.authenticate(reason: 'r'),
+      ).thenAnswer((_) async => true);
 
       expect(await build().confirm(reason: 'r'), isTrue);
     });
 
     test('blocks the action when authentication fails', () async {
-      when(authenticator.authenticate(reason: 'r'))
-          .thenAnswer((_) async => false);
+      when(
+        authenticator.authenticate(reason: 'r'),
+      ).thenAnswer((_) async => false);
 
       expect(await build().confirm(reason: 'r'), isFalse);
     });
@@ -55,8 +57,9 @@ void main() {
     );
 
     test('reads the enabled flag on every call', () async {
-      when(authenticator.authenticate(reason: 'r'))
-          .thenAnswer((_) async => false);
+      when(
+        authenticator.authenticate(reason: 'r'),
+      ).thenAnswer((_) async => false);
       final guard = build();
 
       expect(await guard.confirm(reason: 'r'), isFalse);

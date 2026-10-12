@@ -52,8 +52,9 @@ void main() {
     guard = MockSensitiveActionGuard();
     navigation = MockNavigationService();
     changes = DataChangeNotifier();
-    when(guard.confirm(reason: anyNamed('reason')))
-        .thenAnswer((_) async => true);
+    when(
+      guard.confirm(reason: anyNamed('reason')),
+    ).thenAnswer((_) async => true);
     viewModel = build();
   });
 
@@ -93,8 +94,9 @@ void main() {
       () async {
         stubPages({1: buildPage(buildTasks(3))});
         await viewModel.init();
-        when(getTasks(any))
-            .thenAnswer((_) async => left(const NetworkFailure()));
+        when(
+          getTasks(any),
+        ).thenAnswer((_) async => left(const NetworkFailure()));
 
         await viewModel.refresh();
 
@@ -187,8 +189,9 @@ void main() {
       () async {
         stubPages({1: buildPage(buildTasks(10), total: 30)});
         await viewModel.init();
-        when(getTasks(any))
-            .thenAnswer((_) async => left(const NetworkFailure()));
+        when(
+          getTasks(any),
+        ).thenAnswer((_) async => left(const NetworkFailure()));
 
         await viewModel.loadMore();
 
@@ -352,8 +355,9 @@ void main() {
     });
 
     test('rolls back and reports the error when saving fails', () async {
-      when(updateTask(any))
-          .thenAnswer((_) async => left(const ServerFailure()));
+      when(
+        updateTask(any),
+      ).thenAnswer((_) async => left(const ServerFailure()));
 
       await viewModel.toggleDone(task);
 
@@ -365,8 +369,9 @@ void main() {
       'removes the task when it no longer matches the status filter',
       () async {
         await viewModel.setStatus(TaskStatusFilter.pending);
-        when(updateTask(any))
-            .thenAnswer((_) async => right(task.copyWith(isDone: true)));
+        when(
+          updateTask(any),
+        ).thenAnswer((_) async => right(task.copyWith(isDone: true)));
 
         await viewModel.toggleDone(viewModel.items.first);
 
@@ -402,8 +407,9 @@ void main() {
     });
 
     test('does nothing when the confirmation is denied', () async {
-      when(guard.confirm(reason: anyNamed('reason')))
-          .thenAnswer((_) async => false);
+      when(
+        guard.confirm(reason: anyNamed('reason')),
+      ).thenAnswer((_) async => false);
 
       await viewModel.delete(task, reason: 'why');
 
@@ -412,8 +418,9 @@ void main() {
     });
 
     test('keeps the task and reports the error when deleting fails', () async {
-      when(deleteTask(any))
-          .thenAnswer((_) async => left(const NetworkFailure()));
+      when(
+        deleteTask(any),
+      ).thenAnswer((_) async => left(const NetworkFailure()));
 
       await viewModel.delete(task, reason: 'why');
 
@@ -469,8 +476,9 @@ void main() {
         1: buildPage([buildTask()]),
       });
       await viewModel.init();
-      when(updateTask(any))
-          .thenAnswer((_) async => left(const ServerFailure()));
+      when(
+        updateTask(any),
+      ).thenAnswer((_) async => left(const ServerFailure()));
       await viewModel.toggleDone(buildTask());
 
       expect(viewModel.takeActionFailure(), const ServerFailure());
@@ -505,8 +513,9 @@ void main() {
     Future<void> flush() => Future<void>.delayed(Duration.zero);
 
     test('announces a successful completion toggle', () async {
-      when(updateTask(any))
-          .thenAnswer((_) async => right(buildTask(id: 't0', isDone: true)));
+      when(
+        updateTask(any),
+      ).thenAnswer((_) async => right(buildTask(id: 't0', isDone: true)));
 
       await viewModel.toggleDone(buildTask(id: 't0'));
       await flush();
@@ -515,8 +524,9 @@ void main() {
     });
 
     test('stays silent when the toggle fails', () async {
-      when(updateTask(any))
-          .thenAnswer((_) async => left(const ServerFailure()));
+      when(
+        updateTask(any),
+      ).thenAnswer((_) async => left(const ServerFailure()));
 
       await viewModel.toggleDone(buildTask(id: 't0'));
       await flush();
@@ -527,8 +537,9 @@ void main() {
     test(
       'announces a successful delete and stays silent when it fails',
       () async {
-        when(deleteTask(any))
-            .thenAnswer((_) async => left(const ServerFailure()));
+        when(
+          deleteTask(any),
+        ).thenAnswer((_) async => left(const ServerFailure()));
         await viewModel.delete(buildTask(id: 't0'), reason: 'r');
         await flush();
         expect(notified, 0);

@@ -30,8 +30,9 @@ void main() {
     });
 
     test('keeps the defaults when loading fails', () async {
-      when(getSettings(any))
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        getSettings(any),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       await loadPreferences(getSettings: getSettings, preferences: preferences);
 

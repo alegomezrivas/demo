@@ -76,8 +76,9 @@ void main() {
     });
 
     test('keeps the failure and stays on the screen when it fails', () async {
-      when(login(any))
-          .thenAnswer((_) async => left(const UnauthorizedFailure()));
+      when(
+        login(any),
+      ).thenAnswer((_) async => left(const UnauthorizedFailure()));
       fill();
 
       await viewModel.submit();

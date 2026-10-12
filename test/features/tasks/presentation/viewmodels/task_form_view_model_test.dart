@@ -116,8 +116,9 @@ void main() {
     });
 
     test('stays open and exposes the failure when creation fails', () async {
-      when(createTask(any))
-          .thenAnswer((_) async => left(const NetworkFailure()));
+      when(
+        createTask(any),
+      ).thenAnswer((_) async => left(const NetworkFailure()));
       await viewModel.init();
       fillTitle('x');
 
@@ -225,8 +226,9 @@ void main() {
     });
 
     test('exposes the load failure and can retry', () async {
-      when(getTask(any))
-          .thenAnswer((_) async => left(const ServerFailure('not_found')));
+      when(
+        getTask(any),
+      ).thenAnswer((_) async => left(const ServerFailure('not_found')));
       await viewModel.init(taskId: 't9');
       expect(viewModel.loadFailure, const ServerFailure('not_found'));
 
@@ -250,8 +252,9 @@ void main() {
 
     test('keeps the form open when the update fails', () async {
       when(getTask(any)).thenAnswer((_) async => right(existing));
-      when(updateTask(any))
-          .thenAnswer((_) async => left(const ServerFailure()));
+      when(
+        updateTask(any),
+      ).thenAnswer((_) async => left(const ServerFailure()));
       await viewModel.init(taskId: 't9');
 
       await viewModel.submit();
@@ -267,8 +270,9 @@ void main() {
       changes.onChanged.listen((_) => notified++);
       await viewModel.init();
       fillTitle('x');
-      when(createTask(any))
-          .thenAnswer((_) async => left(const NetworkFailure()));
+      when(
+        createTask(any),
+      ).thenAnswer((_) async => left(const NetworkFailure()));
       await viewModel.submit();
       await Future<void>.delayed(Duration.zero);
       expect(notified, 0);

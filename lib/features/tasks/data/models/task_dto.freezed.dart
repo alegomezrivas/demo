@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'task_dto.dart';
@@ -9,7 +9,6 @@ part of 'task_dto.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -29,21 +28,16 @@ $TaskDtoCopyWith<TaskDto> get copyWith => _$TaskDtoCopyWithImpl<TaskDto>(this as
 
 @override
 bool operator ==(Object other) {
-  final _this = this as TaskDto;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskDto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.description, _this.description) || other.description == _this.description)&&(identical(other.priority, _this.priority) || other.priority == _this.priority)&&(identical(other.isDone, _this.isDone) || other.isDone == _this.isDone)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.dueDate, _this.dueDate) || other.dueDate == _this.dueDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.isDone, isDone) || other.isDone == isDone)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode {
-  final _this = this as TaskDto;
-  return Object.hash(runtimeType,_this.id,_this.title,_this.description,_this.priority,_this.isDone,_this.createdAt,_this.dueDate);
-}
+int get hashCode => Object.hash(runtimeType,id,title,description,priority,isDone,createdAt,dueDate);
 
 @override
 String toString() {
-  final _this = this as TaskDto;
-  return 'TaskDto(id: ${_this.id}, title: ${_this.title}, description: ${_this.description}, priority: ${_this.priority}, isDone: ${_this.isDone}, createdAt: ${_this.createdAt}, dueDate: ${_this.dueDate})';
+  return 'TaskDto(id: $id, title: $title, description: $description, priority: $priority, isDone: $isDone, createdAt: $createdAt, dueDate: $dueDate)';
 }
 
 
@@ -72,7 +66,7 @@ class _$TaskDtoCopyWithImpl<$Res>
 /// Create a copy of TaskDto
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? description = null,Object? priority = null,Object? isDone = null,Object? createdAt = null,Object? dueDate = freezed,}) {
-  return _then(TaskDto(
+  return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -245,18 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.isDone, isDone) || other.isDone == isDone)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.isDone, isDone) || other.isDone == isDone)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode {
-    return Object.hash(runtimeType,id,title,description,priority,isDone,createdAt,dueDate);
-}
+int get hashCode => Object.hash(runtimeType,id,title,description,priority,isDone,createdAt,dueDate);
 
 @override
 String toString() {
-    return 'TaskDto(id: $id, title: $title, description: $description, priority: $priority, isDone: $isDone, createdAt: $createdAt, dueDate: $dueDate)';
+  return 'TaskDto(id: $id, title: $title, description: $description, priority: $priority, isDone: $isDone, createdAt: $createdAt, dueDate: $dueDate)';
 }
 
 

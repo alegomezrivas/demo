@@ -37,8 +37,9 @@ void main() {
     guard = MockSensitiveActionGuard();
     navigation = MockNavigationService();
     changes = DataChangeNotifier();
-    when(guard.confirm(reason: anyNamed('reason')))
-        .thenAnswer((_) async => true);
+    when(
+      guard.confirm(reason: anyNamed('reason')),
+    ).thenAnswer((_) async => true);
     locator.registerFactory<TasksViewModel>(
       () => TasksViewModel(
         getTasks: getTasks,
@@ -258,8 +259,9 @@ void main() {
     });
 
     testWidgets('shows a snack bar when an action fails', (tester) async {
-      when(updateTask(any))
-          .thenAnswer((_) async => left(const NetworkFailure()));
+      when(
+        updateTask(any),
+      ).thenAnswer((_) async => left(const NetworkFailure()));
       await pumpView(tester);
 
       await tester.tap(find.byType(Checkbox));
@@ -293,9 +295,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Task 14'), findsOneWidget);
-      final pages = verify(getTasks(captureAny)).captured
-          .cast<TaskQuery>()
-          .map((q) => q.page);
+      final pages = verify(
+        getTasks(captureAny),
+      ).captured.cast<TaskQuery>().map((q) => q.page);
       expect(pages, [1, 2]);
     });
   });

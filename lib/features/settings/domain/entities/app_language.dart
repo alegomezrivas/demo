@@ -7,9 +7,10 @@ enum AppLanguage {
   spanish('es'),
 
   /// English.
-  english('en');
+  english('en')
+  ;
 
-  AppLanguage(this.code);
+  const AppLanguage(this.code);
 
   /// ISO 639-1 code, or null to follow the system.
   final String? code;

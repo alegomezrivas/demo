@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 /// Tracks whether the user is signed in; the router listens to it.
 class SessionService extends ChangeNotifier {
   /// Creates the service, signed out by default.
-  SessionService({this._isAuthenticated = false});
+  SessionService({bool isAuthenticated = false})
+    : _isAuthenticated = isAuthenticated;
 
   bool _isAuthenticated;
   StreamSubscription<void>? _expiredSubscription;

@@ -25,8 +25,9 @@ void main() {
     });
 
     test('forwards failures', () async {
-      when(repository.logout())
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        repository.logout(),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       expect(
         await LogoutUseCase(repository)(const NoParams()),
@@ -56,8 +57,9 @@ void main() {
     });
 
     test('forwards failures', () async {
-      when(repository.restoreSession())
-          .thenAnswer((_) async => left(const CacheFailure()));
+      when(
+        repository.restoreSession(),
+      ).thenAnswer((_) async => left(const CacheFailure()));
 
       expect(
         (await GetCurrentUserUseCase(repository)(const NoParams())).isLeft(),

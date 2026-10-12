@@ -345,7 +345,8 @@ void main() {
       tester,
     ) async {
       SharedPreferences.setMockInitialValues({
-        'settings.v1': '{"themeMode":"dark","language":"english","biometricConfirmation":false}',
+        'settings.v1':
+            '{"themeMode":"dark","language":"english","biometricConfirmation":false}',
       });
 
       await boot(tester);

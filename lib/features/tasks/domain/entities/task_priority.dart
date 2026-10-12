@@ -7,7 +7,8 @@ enum TaskPriority {
   medium,
 
   /// Needs attention first.
-  high;
+  high
+  ;
 
   /// Parses a wire value; unknown values fall back to [medium].
   static TaskPriority parse(String value) {

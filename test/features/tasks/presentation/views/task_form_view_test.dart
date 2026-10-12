@@ -144,8 +144,9 @@ void main() {
     });
 
     testWidgets('shows a generic error when saving fails', (tester) async {
-      when(createTask(any))
-          .thenAnswer((_) async => left(const NetworkFailure()));
+      when(
+        createTask(any),
+      ).thenAnswer((_) async => left(const NetworkFailure()));
       await pumpView(tester);
 
       await tester.enterText(field('Título'), 'x');
@@ -211,8 +212,9 @@ void main() {
     testWidgets('shows an error with retry when the task cannot be loaded', (
       tester,
     ) async {
-      when(getTask(any))
-          .thenAnswer((_) async => left(const ServerFailure('not_found')));
+      when(
+        getTask(any),
+      ).thenAnswer((_) async => left(const ServerFailure('not_found')));
       await pumpView(tester, taskId: 't9');
       expect(
         find.text(

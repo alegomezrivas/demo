@@ -28,7 +28,7 @@ class LoginUseCase implements UseCase<User, LoginParams> {
     if (params.email.trim().isEmpty || params.password.isEmpty) {
       return left(const ValidationFailure('empty_credentials'));
     }
-    return await _repository.login(
+    return _repository.login(
       email: params.email,
       password: params.password,
     );
