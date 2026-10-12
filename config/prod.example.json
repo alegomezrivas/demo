@@ -1,0 +1,8 @@
+{
+  "ENV": "prod",
+  "API_BASE_URL": "https://api.example.com",
+  "USE_MOCK_API": "false",
+  "PINNING_ENABLED": "true",
+  "PINNING_SHA256": "",
+  "ROOT_POLICY": "block"
+}
