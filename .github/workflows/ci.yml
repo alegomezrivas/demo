@@ -102,10 +102,12 @@ jobs:
         id: fvm
         run: echo "flutter=$(jq -r '.flutter' .fvmrc)" >> "$GITHUB_OUTPUT"
 
+      # JDK 21 matches the one bundled with recent Android Studio: the build
+      # must not depend on the JDK being 17 (see android/build.gradle.kts).
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - uses: subosito/flutter-action@v2
         with:
