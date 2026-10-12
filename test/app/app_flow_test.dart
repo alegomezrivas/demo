@@ -2,12 +2,23 @@ import 'package:demo/app/app.dart';
 import 'package:demo/app/locator.dart';
 import 'package:demo/app/router/app_router.dart';
 import 'package:demo/app/router/app_routes.dart';
+import 'package:demo/core/security/device_integrity_service.dart';
+import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mockito/mockito.dart';
+
+import '../helpers/mocks.dart';
 
 void main() {
   late GoRouter router;
+
+  IntegrityGateViewModel integrityViewModel() {
+    final service = MockDeviceIntegrityService();
+    when(service.evaluate()).thenAnswer((_) async => IntegrityDecision.allow);
+    return IntegrityGateViewModel(service);
+  }
 
   setUp(() async {
     await resetLocator();
@@ -20,7 +31,9 @@ void main() {
   Future<void> pumpApp(WidgetTester tester, {String language = 'es'}) async {
     tester.platformDispatcher.localesTestValue = [Locale(language)];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
-    await tester.pumpWidget(App(routerConfig: router));
+    await tester.pumpWidget(
+      App(routerConfig: router, integrityViewModelBuilder: integrityViewModel),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -88,7 +101,12 @@ void main() {
 
       tester.platformDispatcher.localesTestValue = [const Locale('es')];
       addTearDown(tester.platformDispatcher.clearLocalesTestValue);
-      await tester.pumpWidget(App(routerConfig: guarded));
+      await tester.pumpWidget(
+        App(
+          routerConfig: guarded,
+          integrityViewModelBuilder: integrityViewModel,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Acerca de'), findsOneWidget);

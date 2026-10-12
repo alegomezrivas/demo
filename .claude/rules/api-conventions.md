@@ -25,9 +25,12 @@ paths:
   (`--dart-define-from-file`). Switching from the mock to a real API changes only the base URL.
 - HTTPS only. Certificate pinning is configurable; with pinning enabled and an empty fingerprint
   list the client must reject all connections (fail closed).
-- Interceptors, in order: mock (dev/staging only, behind `USE_MOCK_API`, never in release),
-  auth (adds bearer token, refreshes on 401 and retries ONCE, signs out if refresh fails),
-  logging (redacts `Authorization`, passwords and tokens; silent in release).
+- Interceptors, in order: HTTPS enforcer (rejects cleartext), auth (adds bearer token, refreshes on
+  401 and retries ONCE, signs out if refresh fails), logging (method + path + status only; reduced in
+  release) and, last, the mock (dev/staging only, behind `USE_MOCK_API`, never in release).
+- The mock honours the `x-mock-scenario` header: `server_error`, `offline`, `unauthorized`,
+  `unauthorized_once`. Features contribute `MockRoute`s through `setupLocator(mockRoutes: ...)`.
+- Datasources convert `DioException` with `DioExceptionMapper.map`.
 - Set explicit connect/receive timeouts.
 
 ## Input handling

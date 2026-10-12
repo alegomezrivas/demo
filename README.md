@@ -4,7 +4,7 @@ Aplicación Flutter (Android e iOS) pensada como portafolio: demuestra Clean Arc
 Stacked, GoRouter, formularios reactivos, seguridad en red y pruebas unitarias.
 Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exista una API real.
 
-> Estado: **Fase 1** (base del proyecto). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
+> Estado: **Fase 2** (capa core: red, errores y seguridad). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
 
 ## Requisitos
 
@@ -72,10 +72,44 @@ Claves (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINN
 - Pasar del mock a la API real solo requiere cambiar `API_BASE_URL`.
 - Con `PINNING_ENABLED=true` y `PINNING_SHA256` vacío el cliente rechazará todo el tráfico (falla cerrado).
 
-## Seguridad (base de la Fase 1)
+## Red y backend mock
 
-- Android: `network_security_config.xml` sin tráfico cleartext, `allowBackup=false`, R8 + `shrinkResources` en release.
-  El release **no se firma** con claves de debug: define `android/key.properties` (ignorado por git) con
-  `keyAlias`, `keyPassword`, `storeFile` y `storePassword`.
-- iOS: App Transport Security sin excepciones (`NSAllowsArbitraryLoads = false`).
-- Builds de release: `--obfuscate --split-debug-info=debug-info/<plataforma>` (ver `.claude/skills/deploy/`).
+`DioClientFactory` crea el cliente con este orden de interceptores: **HTTPS enforcer → auth → logging → mock**.
+
+- **Auth**: añade el bearer; ante un 401 renueva el token **una sola vez** (varios 401 simultáneos comparten
+  una única renovación) y reintenta. Si el refresh falla, borra los tokens y `SessionExpiredNotifier` avisa
+  para volver al login.
+- **Mock** (`MockApiInterceptor`): solo con `USE_MOCK_API=true` y nunca en release. Simula latencia y
+  puede forzarse por petición con el header `x-mock-scenario`:
+
+| Valor | Efecto |
+|---|---|
+| `server_error` | responde 500 |
+| `offline` | falla como sin conexión |
+| `unauthorized` | responde 401 siempre |
+| `unauthorized_once` | responde 401 una vez; tras el refresh funciona |
+
+  Las features registran sus endpoints con `MockRoute` mediante `setupLocator(mockRoutes: ...)`.
+  Para pasar a la API real solo cambia `API_BASE_URL` (y `USE_MOCK_API=false`).
+- **Errores**: los datasources convierten `DioException` con `DioExceptionMapper`; los repositorios los
+  mapean a `Failure` (`FailureMapper`) y la UI muestra mensajes genéricos localizados.
+
+## Seguridad
+
+- **Almacenamiento**: tokens solo en `flutter_secure_storage` (`SecureTokenStorage`).
+- **Transporte**: solo HTTPS (interceptor + `network_security_config` + ATS). Certificate pinning configurable
+  (`PINNING_ENABLED`, `PINNING_SHA256` con huellas SHA-256 en base64 del certificado); activado sin huellas
+  **rechaza todo el tráfico**. Limitación conocida: Dio valida el certificado al recibir las cabeceras, por lo
+  que la petición ya se envió (la respuesta se descarta); se revisará en la Fase 5.
+- **Integridad del dispositivo**: `ROOT_POLICY=warn|block` (root/jailbreak y depurador) aplicada por `IntegrityGate`.
+  Si el plugin falla se trata como "sin problemas" para no bloquear la app.
+- **Biometría** (`BiometricAuthenticator`, `local_auth`) y **protección de pantalla** (`ScreenProtection`:
+  bloquea capturas en Android y difumina la vista previa del app switcher).
+- **Entrada de usuario**: validadores reutilizables (`AppValidators`) con mensajes localizados y
+  `InputSanitizer` antes de enviar al backend.
+- **Logs**: `ConsoleAppLogger` redacta tokens/contraseñas y en release solo emite errores.
+- **Android**: sin cleartext, `allowBackup=false`, R8 + `shrinkResources` en release. El release **no se firma**
+  con claves de debug: define `android/key.properties` (ignorado por git) con `keyAlias`, `keyPassword`,
+  `storeFile` y `storePassword`.
+- **iOS**: App Transport Security sin excepciones.
+- **Release**: `--obfuscate --split-debug-info=debug-info/<plataforma>` (ver `.claude/skills/deploy/`).
