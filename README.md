@@ -182,7 +182,7 @@ y a mano (*workflow_dispatch*). Usa la versión de Flutter de `.fvmrc`.
 | `verify` | `pub get`, que el código generado (`build_runner`, `gen-l10n`) esté al día, `dart format`, `flutter analyze`, `flutter test --coverage` y el umbral de cobertura (`tool/check_coverage.sh`: `domain/` y ViewModels ≥ 80 %). Sube `lcov.info` como artefacto. |
 | `dependencies` | `flutter pub outdated` (informativo: nunca bloquea). |
 | `android-release-build` | Compila un `appbundle` **sin firmar** con R8 y `--obfuscate` usando `config/prod.example.json`, para detectar pronto roturas de minificación. Sube los símbolos como artefacto. |
-| `ios-release-build` | En un runner **macOS**: `flutter build ios --release --no-codesign --obfuscate` con `config/prod.example.json`, para comprobar que el proyecto iOS, los Pods y la ofuscación compilan sin certificados. Sube los símbolos como artefacto. |
+| `ios-release-build` | Solo en *push* a `master` y en ejecución manual (los PR no lo lanzan). En un runner **macOS**: `flutter build ios --release --no-codesign --obfuscate` con `config/prod.example.json`, para comprobar que el proyecto iOS, los Pods y la ofuscación compilan sin certificados. Sube los símbolos como artefacto. |
 
 Los jobs de Android e iOS no se pudieron ejecutar en el entorno de desarrollo (sin Android SDK ni Xcode):
 
@@ -190,7 +190,8 @@ Los jobs de Android e iOS no se pudieron ejecutar en el entorno de desarrollo (s
   `android/app/proguard-rules.pro`.
 - iOS: no hay `ios/Podfile` versionado (Flutter lo genera en el build). Tras el primer build en un Mac, commitea
   `ios/Podfile` y `ios/Podfile.lock` para que los Pods sean reproducibles.
-- Los runners macOS cuestan más minutos que los Linux; el job espera a `verify` para no gastarlos si ya falla algo.
+- Los runners macOS cuestan más minutos que los Linux: por eso el job de iOS no corre en los PR, solo tras fusionar en
+  `master` o al lanzarlo a mano (*Actions → CI → Run workflow*), y siempre después de que `verify` pase.
 
 Para reproducir el *gate* de cobertura en local: `fvm flutter test --coverage && tool/check_coverage.sh`.
 

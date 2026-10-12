@@ -133,7 +133,10 @@ jobs:
 
   ios-release-build:
     name: iOS release build (no codesign, obfuscation)
-    # macOS runners are billed at a higher rate, so it waits for `verify`.
+    # macOS runners are billed at a higher rate: run only after a push to
+    # master (the workflow's only push trigger) or when started by hand, and
+    # only once `verify` has passed. Pull requests skip it.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: macos-latest
     timeout-minutes: 45
     needs: verify
