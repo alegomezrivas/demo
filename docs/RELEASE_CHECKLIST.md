@@ -1,14 +1,14 @@
 # Checklist de release
 
-Marca cada punto antes de publicar. Los comandos asumen el SDK de Flutter en el `PATH`.
+Marca cada punto antes de publicar. Los comandos usan FVM (versión fijada en `.fvmrc`); sin FVM, quita el prefijo `fvm`.
 
 ## 1. Calidad (bloqueante)
 
-- [ ] `dart format --set-exit-if-changed .` no cambia nada
-- [ ] `flutter analyze` → *No issues found*
-- [ ] `flutter test --coverage` en verde; `domain/` y `presentation/viewmodels/` ≥ 80 %
-- [ ] `dart run build_runner build --delete-conflicting-outputs` no deja cambios sin commitear
-- [ ] `flutter pub outdated`: ningún paquete descontinuado; las actualizaciones pendientes están revisadas
+- [ ] `fvm dart format --set-exit-if-changed .` no cambia nada
+- [ ] `fvm flutter analyze` → *No issues found*
+- [ ] `fvm flutter test --coverage` en verde; `domain/` y `presentation/viewmodels/` ≥ 80 %
+- [ ] `fvm dart run build_runner build --delete-conflicting-outputs` no deja cambios sin commitear
+- [ ] `fvm flutter pub outdated`: ningún paquete descontinuado; las actualizaciones pendientes están revisadas
 - [ ] Sin `TODO`/`FIXME` sin dueño en `lib/`
 
 ## 2. Configuración por entorno
@@ -44,9 +44,9 @@ Marca cada punto antes de publicar. Los comandos asumen el SDK de Flutter en el 
 ## 5. Build
 
 ```bash
-flutter build appbundle --release --obfuscate \
+fvm flutter build appbundle --release --obfuscate \
   --split-debug-info=debug-info/android --dart-define-from-file=config/prod.json
-flutter build ipa --release --obfuscate \
+fvm flutter build ipa --release --obfuscate \
   --split-debug-info=debug-info/ios --dart-define-from-file=config/prod.json
 ```
 
@@ -73,7 +73,7 @@ flutter build ipa --release --obfuscate \
 - [ ] **Pinning SPKI en el *handshake***: fijar el hash de la clave pública (no del certificado completo) con ≥ 2 huellas (actual + respaldo) y validarlo durante el TLS, no al recibir las cabeceras
 - [ ] **Prueba de humo del build release** con R8 + `--obfuscate` en Android e iOS reales (los plugins `jailbreak_root_detection` y `screen_protector` pueden necesitar reglas en `proguard-rules.pro`)
 - [ ] Decidir si hace falta atestación (Play Integrity / App Attest) además de la detección de root
-- [ ] Revisar la compatibilidad de `get_it` 9 y `cupertino_icons` 2 (hay versiones mayores disponibles) con `flutter pub outdated`
+- [ ] Revisar la compatibilidad de `get_it` 9 y `cupertino_icons` 2 (hay versiones mayores disponibles) con `fvm flutter pub outdated`
 
 ## Limitaciones conocidas
 

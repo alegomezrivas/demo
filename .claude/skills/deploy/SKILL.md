@@ -12,17 +12,17 @@ secret files (`config/*.json`, keystores, `key.properties`).
 
 ## Pre-flight (stop on the first failure)
 1. `git status` is clean and you are on the intended release branch.
-2. `flutter pub get` then `dart run build_runner build --delete-conflicting-outputs`.
-3. `dart format --set-exit-if-changed .`
-4. `flutter analyze` reports no issues.
-5. `flutter test --coverage` passes and domain / viewmodels coverage is >= 80%.
-6. `flutter pub outdated` reviewed; no abandoned or vulnerable packages.
+2. `fvm flutter pub get` then `fvm dart run build_runner build --delete-conflicting-outputs`.
+3. `fvm dart format --set-exit-if-changed .`
+4. `fvm flutter analyze` reports no issues.
+5. `fvm flutter test --coverage` passes and domain / viewmodels coverage is >= 80%.
+6. `fvm flutter pub outdated` reviewed; no abandoned or vulnerable packages.
 7. Confirm `USE_MOCK_API` is `false` and certificate pinning fingerprints are set in `config/prod.json`
    (check only that the keys exist; do not print values).
 
 ## Build
-- Android: `flutter build appbundle --release --obfuscate --split-debug-info=debug-info/android --dart-define-from-file=config/<env>.json`
-- iOS: `flutter build ipa --release --obfuscate --split-debug-info=debug-info/ios --dart-define-from-file=config/<env>.json`
+- Android: `fvm flutter build appbundle --release --obfuscate --split-debug-info=debug-info/android --dart-define-from-file=config/<env>.json`
+- iOS: `fvm flutter build ipa --release --obfuscate --split-debug-info=debug-info/ios --dart-define-from-file=config/<env>.json`
 
 ## Post-build
 1. Archive `debug-info/` outside the repo (needed to symbolicate obfuscated crashes). It is git-ignored.

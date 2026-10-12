@@ -9,26 +9,42 @@ Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exis
 
 ## Requisitos
 
-- Flutter estable (probado con 3.47.7, Dart 3.13)
+- [FVM](https://fvm.app) (la versión de Flutter está fijada en [`.fvmrc`](.fvmrc): **3.47.7**, Dart 3.13)
 - Android: `minSdk 24` · iOS 15.0+
+
+## Configurar el SDK con FVM
+
+```bash
+dart pub global activate fvm   # una sola vez
+fvm install                    # descarga la versión indicada en .fvmrc
+fvm flutter pub get
+```
+
+Todos los comandos del proyecto se ejecutan con el prefijo `fvm` (así todo el equipo y la CI usan el mismo SDK).
+Para actualizar la versión: `fvm use <versión>` y commitea el nuevo `.fvmrc`. La carpeta `.fvm/` es local y está ignorada.
+
+- **VS Code**: `.vscode/settings.json` ya apunta a `.fvm/flutter_sdk` (ejecuta `fvm use` una vez para crear el enlace).
+- **Android Studio / IntelliJ**: *Settings → Languages & Frameworks → Flutter → Flutter SDK path* = `<proyecto>/.fvm/flutter_sdk`.
 
 ## Comandos
 
 ```bash
-flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # mocks y código generado
-flutter gen-l10n                                           # textos localizados (ARB)
-dart format .
-flutter analyze
-flutter test --coverage
+fvm flutter pub get
+fvm dart run build_runner build --delete-conflicting-outputs   # mocks y código generado
+fvm flutter gen-l10n                                           # textos localizados (ARB)
+fvm dart format .
+fvm flutter analyze
+fvm flutter test --coverage
 ```
 
 Ejecutar con configuración de entorno (copia `config/dev.example.json` a `config/dev.json`;
 los `config/*.json` reales están ignorados por git):
 
 ```bash
-flutter run --dart-define-from-file=config/dev.json
+fvm flutter run --dart-define-from-file=config/dev.json
 ```
+
+> Sin FVM también funciona cualquier Flutter 3.47.7 en el `PATH`: quita el prefijo `fvm`.
 
 ## Arquitectura
 

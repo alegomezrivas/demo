@@ -4,6 +4,10 @@
     "allow": [
       "Bash(flutter:*)",
       "Bash(dart:*)",
+      "Bash(fvm flutter:*)",
+      "Bash(fvm dart:*)",
+      "Bash(fvm use:*)",
+      "Bash(fvm install:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -54,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.dart) command -v dart >/dev/null 2>&1 && dart format \"$f\" >/dev/null 2>&1;; esac; exit 0"
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.dart) if [ -d \"$CLAUDE_PROJECT_DIR/.fvm/flutter_sdk\" ] && command -v fvm >/dev/null 2>&1; then (cd \"$CLAUDE_PROJECT_DIR\" && fvm dart format \"$f\") >/dev/null 2>&1; elif command -v dart >/dev/null 2>&1; then dart format \"$f\" >/dev/null 2>&1; fi;; esac; exit 0"
           }
         ]
       }

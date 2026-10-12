@@ -69,12 +69,15 @@ paddings or radii. Use `context.colors`, `context.text`, `context.spacing`.
 ## Commands
 
 ```bash
-flutter pub get
-dart run build_runner build --delete-conflicting-outputs
-dart format .
-flutter analyze
-flutter test --coverage
-flutter run --dart-define-from-file=config/dev.json
+fvm flutter pub get
+fvm dart run build_runner build --delete-conflicting-outputs
+fvm dart format .
+fvm flutter analyze
+fvm flutter test --coverage
+fvm flutter run --dart-define-from-file=config/dev.json
 ```
+
+The Flutter version is pinned in `.fvmrc` (FVM): run `fvm install` once and prefix every Flutter/Dart
+command with `fvm`. Without FVM, any Flutter on the `PATH` with the same version works (drop the prefix).
 
 A feature is not done until `dart format .`, `flutter analyze` and `flutter test` pass.
