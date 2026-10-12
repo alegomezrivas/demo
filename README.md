@@ -172,6 +172,23 @@ La app es un gestor de tareas con tres pestañas (barra de navegación inferior)
   dispositivos ni a copias de seguridad).
 - **Release**: `--obfuscate --split-debug-info=debug-info/<plataforma>` (ver `.claude/skills/deploy/`).
 
+## Integración continua
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) se ejecuta en cada *pull request*, en cada push a `master`
+y a mano (*workflow_dispatch*). Usa la versión de Flutter de `.fvmrc`.
+
+| Job | Qué comprueba |
+|---|---|
+| `verify` | `pub get`, que el código generado (`build_runner`, `gen-l10n`) esté al día, `dart format`, `flutter analyze`, `flutter test --coverage` y el umbral de cobertura (`tool/check_coverage.sh`: `domain/` y ViewModels ≥ 80 %). Sube `lcov.info` como artefacto. |
+| `dependencies` | `flutter pub outdated` (informativo: nunca bloquea). |
+| `android-release-build` | Compila un `appbundle` **sin firmar** con R8 y `--obfuscate` usando `config/prod.example.json`, para detectar pronto roturas de minificación. Sube los símbolos como artefacto. |
+
+El job de Android no se pudo ejecutar en el entorno de desarrollo (sin Android SDK): si falla la primera vez por reglas
+de R8 de algún plugin, añade las reglas `-keep` necesarias a `android/app/proguard-rules.pro`. No hay job de iOS
+(requiere runners macOS, más caros); puede añadirse con `flutter build ios --no-codesign`.
+
+Para reproducir el *gate* de cobertura en local: `fvm flutter test --coverage && tool/check_coverage.sh`.
+
 ## Limitaciones conocidas (revisión de la Fase 5)
 
 - **Pinning**: Dio valida el certificado cuando llegan las cabeceras, así que la petición ya se envió (la respuesta se
