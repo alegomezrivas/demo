@@ -4,9 +4,6 @@
   "@appName": {
     "description": "Visible application name"
   },
-  "homeTitle": "Stark Showcase",
-  "homeSubtitle": "Portafolio de ingeniería Flutter con arquitectura limpia",
-  "homeGetStarted": "Conocer más",
   "aboutTitle": "Acerca de",
   "aboutBody": "Aplicación de demostración que muestra Clean Architecture, Stacked, GoRouter, formularios reactivos y pruebas unitarias.",
   "commonBack": "Volver",
@@ -49,13 +46,99 @@
   "authTogglePassword": "Mostrar u ocultar contraseña",
   "authInvalidCredentials": "Correo o contraseña incorrectos",
   "authEmailTaken": "Ya existe una cuenta con ese correo",
-  "homeGreeting": "Hola, {name}",
-  "@homeGreeting": {
+  "navDashboard": "Inicio",
+  "navTasks": "Tareas",
+  "navSettings": "Ajustes",
+  "commonRetry": "Reintentar",
+  "commonCancel": "Cancelar",
+  "commonDelete": "Eliminar",
+  "commonSave": "Guardar",
+  "dashboardGreeting": "Hola, {name}",
+  "@dashboardGreeting": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "homeLogout": "Cerrar sesión"
+  "dashboardSubtitle": "Así va tu trabajo",
+  "dashboardCompletion": "{percent}% completado",
+  "@dashboardCompletion": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardStatTotal": "Total",
+  "dashboardStatDone": "Completadas",
+  "dashboardStatOverdue": "Vencidas",
+  "dashboardStatHighPriority": "Prioridad alta pendientes",
+  "dashboardViewTasks": "Ver tareas",
+  "dashboardNewTask": "Nueva tarea",
+  "tasksTitle": "Tareas",
+  "tasksSearchLabel": "Buscar tareas",
+  "tasksFilterAll": "Todas",
+  "tasksFilterPending": "Pendientes",
+  "tasksFilterDone": "Completadas",
+  "tasksPriorityAny": "Cualquier prioridad",
+  "priorityLow": "Baja",
+  "priorityMedium": "Media",
+  "priorityHigh": "Alta",
+  "tasksEmpty": "Aún no tienes tareas",
+  "tasksEmptyFiltered": "Ninguna tarea coincide con los filtros",
+  "tasksDueDate": "Vence: {date}",
+  "@tasksDueDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksOverdue": "Vencida",
+  "tasksDeleteTitle": "Eliminar tarea",
+  "tasksDeleteMessage": "¿Seguro que quieres eliminar \"{title}\"?",
+  "@tasksDeleteMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksNew": "Nueva tarea",
+  "tasksEdit": "Editar tarea",
+  "tasksFieldTitle": "Título",
+  "tasksFieldDescription": "Descripción",
+  "tasksFieldPriority": "Prioridad",
+  "tasksFieldDueDate": "Fecha límite",
+  "tasksFieldDone": "Completada",
+  "tasksClearDate": "Quitar fecha",
+  "settingsTitle": "Ajustes",
+  "settingsProfile": "Perfil",
+  "settingsAppearance": "Apariencia",
+  "settingsTheme": "Tema",
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+  "settingsLanguage": "Idioma",
+  "languageSystem": "Sistema",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  "settingsSecurity": "Seguridad",
+  "settingsBiometric": "Confirmar con biometría",
+  "settingsBiometricHint": "Pide tu huella, rostro o bloqueo de pantalla antes de eliminar tareas o cerrar sesión",
+  "settingsBiometricUnavailable": "Este dispositivo no tiene huella, rostro ni bloqueo de pantalla configurado",
+  "settingsAbout": "Acerca de",
+  "settingsLogout": "Cerrar sesión",
+  "biometricReasonDelete": "Confirma tu identidad para eliminar la tarea",
+  "biometricReasonLogout": "Confirma tu identidad para cerrar sesión",
+  "validationMaxLength": "No puede superar {length} caracteres",
+  "@validationMaxLength": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "biometricReasonToggle": "Confirma tu identidad para cambiar esta opción"
 }

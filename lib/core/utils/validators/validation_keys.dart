@@ -15,6 +15,9 @@ abstract final class ValidationKeys {
   /// Value is shorter than required (reactive_forms built-in).
   static const String minLength = 'minLength';
 
+  /// Value is longer than allowed (reactive_forms built-in).
+  static const String maxLength = 'maxLength';
+
   /// Two controls differ (reactive_forms built-in).
   static const String mustMatch = 'mustMatch';
 }

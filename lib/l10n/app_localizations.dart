@@ -104,24 +104,6 @@ abstract class AppLocalizations {
   /// **'Stark Showcase'**
   String get appName;
 
-  /// No description provided for @homeTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Stark Showcase'**
-  String get homeTitle;
-
-  /// No description provided for @homeSubtitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Portafolio de ingeniería Flutter con arquitectura limpia'**
-  String get homeSubtitle;
-
-  /// No description provided for @homeGetStarted.
-  ///
-  /// In es, this message translates to:
-  /// **'Conocer más'**
-  String get homeGetStarted;
-
   /// No description provided for @aboutTitle.
   ///
   /// In es, this message translates to:
@@ -332,17 +314,365 @@ abstract class AppLocalizations {
   /// **'Ya existe una cuenta con ese correo'**
   String get authEmailTaken;
 
-  /// No description provided for @homeGreeting.
+  /// No description provided for @navDashboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Inicio'**
+  String get navDashboard;
+
+  /// No description provided for @navTasks.
+  ///
+  /// In es, this message translates to:
+  /// **'Tareas'**
+  String get navTasks;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes'**
+  String get navSettings;
+
+  /// No description provided for @commonRetry.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get commonRetry;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get commonCancel;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar'**
+  String get commonDelete;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get commonSave;
+
+  /// No description provided for @dashboardGreeting.
   ///
   /// In es, this message translates to:
   /// **'Hola, {name}'**
-  String homeGreeting(String name);
+  String dashboardGreeting(String name);
 
-  /// No description provided for @homeLogout.
+  /// No description provided for @dashboardSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Así va tu trabajo'**
+  String get dashboardSubtitle;
+
+  /// No description provided for @dashboardCompletion.
+  ///
+  /// In es, this message translates to:
+  /// **'{percent}% completado'**
+  String dashboardCompletion(int percent);
+
+  /// No description provided for @dashboardStatTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Total'**
+  String get dashboardStatTotal;
+
+  /// No description provided for @dashboardStatDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Completadas'**
+  String get dashboardStatDone;
+
+  /// No description provided for @dashboardStatOverdue.
+  ///
+  /// In es, this message translates to:
+  /// **'Vencidas'**
+  String get dashboardStatOverdue;
+
+  /// No description provided for @dashboardStatHighPriority.
+  ///
+  /// In es, this message translates to:
+  /// **'Prioridad alta pendientes'**
+  String get dashboardStatHighPriority;
+
+  /// No description provided for @dashboardViewTasks.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver tareas'**
+  String get dashboardViewTasks;
+
+  /// No description provided for @dashboardNewTask.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva tarea'**
+  String get dashboardNewTask;
+
+  /// No description provided for @tasksTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tareas'**
+  String get tasksTitle;
+
+  /// No description provided for @tasksSearchLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar tareas'**
+  String get tasksSearchLabel;
+
+  /// No description provided for @tasksFilterAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas'**
+  String get tasksFilterAll;
+
+  /// No description provided for @tasksFilterPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendientes'**
+  String get tasksFilterPending;
+
+  /// No description provided for @tasksFilterDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Completadas'**
+  String get tasksFilterDone;
+
+  /// No description provided for @tasksPriorityAny.
+  ///
+  /// In es, this message translates to:
+  /// **'Cualquier prioridad'**
+  String get tasksPriorityAny;
+
+  /// No description provided for @priorityLow.
+  ///
+  /// In es, this message translates to:
+  /// **'Baja'**
+  String get priorityLow;
+
+  /// No description provided for @priorityMedium.
+  ///
+  /// In es, this message translates to:
+  /// **'Media'**
+  String get priorityMedium;
+
+  /// No description provided for @priorityHigh.
+  ///
+  /// In es, this message translates to:
+  /// **'Alta'**
+  String get priorityHigh;
+
+  /// No description provided for @tasksEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no tienes tareas'**
+  String get tasksEmpty;
+
+  /// No description provided for @tasksEmptyFiltered.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguna tarea coincide con los filtros'**
+  String get tasksEmptyFiltered;
+
+  /// No description provided for @tasksDueDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Vence: {date}'**
+  String tasksDueDate(String date);
+
+  /// No description provided for @tasksOverdue.
+  ///
+  /// In es, this message translates to:
+  /// **'Vencida'**
+  String get tasksOverdue;
+
+  /// No description provided for @tasksDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar tarea'**
+  String get tasksDeleteTitle;
+
+  /// No description provided for @tasksDeleteMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Seguro que quieres eliminar \"{title}\"?'**
+  String tasksDeleteMessage(String title);
+
+  /// No description provided for @tasksNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva tarea'**
+  String get tasksNew;
+
+  /// No description provided for @tasksEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar tarea'**
+  String get tasksEdit;
+
+  /// No description provided for @tasksFieldTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Título'**
+  String get tasksFieldTitle;
+
+  /// No description provided for @tasksFieldDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción'**
+  String get tasksFieldDescription;
+
+  /// No description provided for @tasksFieldPriority.
+  ///
+  /// In es, this message translates to:
+  /// **'Prioridad'**
+  String get tasksFieldPriority;
+
+  /// No description provided for @tasksFieldDueDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha límite'**
+  String get tasksFieldDueDate;
+
+  /// No description provided for @tasksFieldDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Completada'**
+  String get tasksFieldDone;
+
+  /// No description provided for @tasksClearDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar fecha'**
+  String get tasksClearDate;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil'**
+  String get settingsProfile;
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In es, this message translates to:
+  /// **'Apariencia'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In es, this message translates to:
+  /// **'Tema'**
+  String get settingsTheme;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Sistema'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get themeDark;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma'**
+  String get settingsLanguage;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Sistema'**
+  String get languageSystem;
+
+  /// No description provided for @languageSpanish.
+  ///
+  /// In es, this message translates to:
+  /// **'Español'**
+  String get languageSpanish;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In es, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @settingsSecurity.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguridad'**
+  String get settingsSecurity;
+
+  /// No description provided for @settingsBiometric.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar con biometría'**
+  String get settingsBiometric;
+
+  /// No description provided for @settingsBiometricHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Pide tu huella, rostro o bloqueo de pantalla antes de eliminar tareas o cerrar sesión'**
+  String get settingsBiometricHint;
+
+  /// No description provided for @settingsBiometricUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'Este dispositivo no tiene huella, rostro ni bloqueo de pantalla configurado'**
+  String get settingsBiometricUnavailable;
+
+  /// No description provided for @settingsAbout.
+  ///
+  /// In es, this message translates to:
+  /// **'Acerca de'**
+  String get settingsAbout;
+
+  /// No description provided for @settingsLogout.
   ///
   /// In es, this message translates to:
   /// **'Cerrar sesión'**
-  String get homeLogout;
+  String get settingsLogout;
+
+  /// No description provided for @biometricReasonDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma tu identidad para eliminar la tarea'**
+  String get biometricReasonDelete;
+
+  /// No description provided for @biometricReasonLogout.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma tu identidad para cerrar sesión'**
+  String get biometricReasonLogout;
+
+  /// No description provided for @validationMaxLength.
+  ///
+  /// In es, this message translates to:
+  /// **'No puede superar {length} caracteres'**
+  String validationMaxLength(int length);
+
+  /// No description provided for @biometricReasonToggle.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirma tu identidad para cambiar esta opción'**
+  String get biometricReasonToggle;
 }
 
 class _AppLocalizationsDelegate

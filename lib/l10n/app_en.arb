@@ -1,9 +1,6 @@
 {
   "@@locale": "en",
   "appName": "Stark Showcase",
-  "homeTitle": "Stark Showcase",
-  "homeSubtitle": "A Flutter engineering portfolio built with clean architecture",
-  "homeGetStarted": "Learn more",
   "aboutTitle": "About",
   "aboutBody": "Demo application showcasing Clean Architecture, Stacked, GoRouter, reactive forms and unit tests.",
   "commonBack": "Back",
@@ -46,13 +43,99 @@
   "authTogglePassword": "Show or hide password",
   "authInvalidCredentials": "Incorrect email or password",
   "authEmailTaken": "An account with that email already exists",
-  "homeGreeting": "Hello, {name}",
-  "@homeGreeting": {
+  "navDashboard": "Home",
+  "navTasks": "Tasks",
+  "navSettings": "Settings",
+  "commonRetry": "Retry",
+  "commonCancel": "Cancel",
+  "commonDelete": "Delete",
+  "commonSave": "Save",
+  "dashboardGreeting": "Hello, {name}",
+  "@dashboardGreeting": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "homeLogout": "Sign out"
+  "dashboardSubtitle": "Here is how your work is going",
+  "dashboardCompletion": "{percent}% completed",
+  "@dashboardCompletion": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardStatTotal": "Total",
+  "dashboardStatDone": "Completed",
+  "dashboardStatOverdue": "Overdue",
+  "dashboardStatHighPriority": "High priority open",
+  "dashboardViewTasks": "View tasks",
+  "dashboardNewTask": "New task",
+  "tasksTitle": "Tasks",
+  "tasksSearchLabel": "Search tasks",
+  "tasksFilterAll": "All",
+  "tasksFilterPending": "Pending",
+  "tasksFilterDone": "Completed",
+  "tasksPriorityAny": "Any priority",
+  "priorityLow": "Low",
+  "priorityMedium": "Medium",
+  "priorityHigh": "High",
+  "tasksEmpty": "You have no tasks yet",
+  "tasksEmptyFiltered": "No task matches the filters",
+  "tasksDueDate": "Due: {date}",
+  "@tasksDueDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksOverdue": "Overdue",
+  "tasksDeleteTitle": "Delete task",
+  "tasksDeleteMessage": "Are you sure you want to delete \"{title}\"?",
+  "@tasksDeleteMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksNew": "New task",
+  "tasksEdit": "Edit task",
+  "tasksFieldTitle": "Title",
+  "tasksFieldDescription": "Description",
+  "tasksFieldPriority": "Priority",
+  "tasksFieldDueDate": "Due date",
+  "tasksFieldDone": "Completed",
+  "tasksClearDate": "Clear date",
+  "settingsTitle": "Settings",
+  "settingsProfile": "Profile",
+  "settingsAppearance": "Appearance",
+  "settingsTheme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsLanguage": "Language",
+  "languageSystem": "System",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  "settingsSecurity": "Security",
+  "settingsBiometric": "Confirm with biometrics",
+  "settingsBiometricHint": "Asks for your fingerprint, face or screen lock before deleting tasks or signing out",
+  "settingsBiometricUnavailable": "This device has no fingerprint, face or screen lock set up",
+  "settingsAbout": "About",
+  "settingsLogout": "Sign out",
+  "biometricReasonDelete": "Confirm your identity to delete the task",
+  "biometricReasonLogout": "Confirm your identity to sign out",
+  "validationMaxLength": "Cannot exceed {length} characters",
+  "@validationMaxLength": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "biometricReasonToggle": "Confirm your identity to change this option"
 }

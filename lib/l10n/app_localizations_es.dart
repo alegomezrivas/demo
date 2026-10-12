@@ -13,16 +13,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appName => 'Stark Showcase';
 
   @override
-  String get homeTitle => 'Stark Showcase';
-
-  @override
-  String get homeSubtitle =>
-      'Portafolio de ingeniería Flutter con arquitectura limpia';
-
-  @override
-  String get homeGetStarted => 'Conocer más';
-
-  @override
   String get aboutTitle => 'Acerca de';
 
   @override
@@ -136,10 +126,197 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authEmailTaken => 'Ya existe una cuenta con ese correo';
 
   @override
-  String homeGreeting(String name) {
+  String get navDashboard => 'Inicio';
+
+  @override
+  String get navTasks => 'Tareas';
+
+  @override
+  String get navSettings => 'Ajustes';
+
+  @override
+  String get commonRetry => 'Reintentar';
+
+  @override
+  String get commonCancel => 'Cancelar';
+
+  @override
+  String get commonDelete => 'Eliminar';
+
+  @override
+  String get commonSave => 'Guardar';
+
+  @override
+  String dashboardGreeting(String name) {
     return 'Hola, $name';
   }
 
   @override
-  String get homeLogout => 'Cerrar sesión';
+  String get dashboardSubtitle => 'Así va tu trabajo';
+
+  @override
+  String dashboardCompletion(int percent) {
+    return '$percent% completado';
+  }
+
+  @override
+  String get dashboardStatTotal => 'Total';
+
+  @override
+  String get dashboardStatDone => 'Completadas';
+
+  @override
+  String get dashboardStatOverdue => 'Vencidas';
+
+  @override
+  String get dashboardStatHighPriority => 'Prioridad alta pendientes';
+
+  @override
+  String get dashboardViewTasks => 'Ver tareas';
+
+  @override
+  String get dashboardNewTask => 'Nueva tarea';
+
+  @override
+  String get tasksTitle => 'Tareas';
+
+  @override
+  String get tasksSearchLabel => 'Buscar tareas';
+
+  @override
+  String get tasksFilterAll => 'Todas';
+
+  @override
+  String get tasksFilterPending => 'Pendientes';
+
+  @override
+  String get tasksFilterDone => 'Completadas';
+
+  @override
+  String get tasksPriorityAny => 'Cualquier prioridad';
+
+  @override
+  String get priorityLow => 'Baja';
+
+  @override
+  String get priorityMedium => 'Media';
+
+  @override
+  String get priorityHigh => 'Alta';
+
+  @override
+  String get tasksEmpty => 'Aún no tienes tareas';
+
+  @override
+  String get tasksEmptyFiltered => 'Ninguna tarea coincide con los filtros';
+
+  @override
+  String tasksDueDate(String date) {
+    return 'Vence: $date';
+  }
+
+  @override
+  String get tasksOverdue => 'Vencida';
+
+  @override
+  String get tasksDeleteTitle => 'Eliminar tarea';
+
+  @override
+  String tasksDeleteMessage(String title) {
+    return '¿Seguro que quieres eliminar \"$title\"?';
+  }
+
+  @override
+  String get tasksNew => 'Nueva tarea';
+
+  @override
+  String get tasksEdit => 'Editar tarea';
+
+  @override
+  String get tasksFieldTitle => 'Título';
+
+  @override
+  String get tasksFieldDescription => 'Descripción';
+
+  @override
+  String get tasksFieldPriority => 'Prioridad';
+
+  @override
+  String get tasksFieldDueDate => 'Fecha límite';
+
+  @override
+  String get tasksFieldDone => 'Completada';
+
+  @override
+  String get tasksClearDate => 'Quitar fecha';
+
+  @override
+  String get settingsTitle => 'Ajustes';
+
+  @override
+  String get settingsProfile => 'Perfil';
+
+  @override
+  String get settingsAppearance => 'Apariencia';
+
+  @override
+  String get settingsTheme => 'Tema';
+
+  @override
+  String get themeSystem => 'Sistema';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Oscuro';
+
+  @override
+  String get settingsLanguage => 'Idioma';
+
+  @override
+  String get languageSystem => 'Sistema';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get settingsSecurity => 'Seguridad';
+
+  @override
+  String get settingsBiometric => 'Confirmar con biometría';
+
+  @override
+  String get settingsBiometricHint =>
+      'Pide tu huella, rostro o bloqueo de pantalla antes de eliminar tareas o cerrar sesión';
+
+  @override
+  String get settingsBiometricUnavailable =>
+      'Este dispositivo no tiene huella, rostro ni bloqueo de pantalla configurado';
+
+  @override
+  String get settingsAbout => 'Acerca de';
+
+  @override
+  String get settingsLogout => 'Cerrar sesión';
+
+  @override
+  String get biometricReasonDelete =>
+      'Confirma tu identidad para eliminar la tarea';
+
+  @override
+  String get biometricReasonLogout =>
+      'Confirma tu identidad para cerrar sesión';
+
+  @override
+  String validationMaxLength(int length) {
+    return 'No puede superar $length caracteres';
+  }
+
+  @override
+  String get biometricReasonToggle =>
+      'Confirma tu identidad para cambiar esta opción';
 }

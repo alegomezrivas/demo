@@ -13,6 +13,9 @@ class AppTextField extends StatelessWidget {
     this.textInputAction,
     this.obscureText = false,
     this.suffixIcon,
+    this.prefixIcon,
+    this.maxLines = 1,
+    this.textCapitalization = TextCapitalization.none,
     this.autofillHints,
     this.onSubmitted,
     super.key,
@@ -39,6 +42,15 @@ class AppTextField extends StatelessWidget {
   /// Optional trailing widget.
   final Widget? suffixIcon;
 
+  /// Optional leading widget.
+  final Widget? prefixIcon;
+
+  /// Maximum visible lines (1 for single-line input).
+  final int maxLines;
+
+  /// Capitalization applied while typing.
+  final TextCapitalization textCapitalization;
+
   /// Autofill hints for password managers.
   final Iterable<String>? autofillHints;
 
@@ -53,10 +65,16 @@ class AppTextField extends StatelessWidget {
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       obscureText: obscureText,
+      maxLines: obscureText ? 1 : maxLines,
+      textCapitalization: textCapitalization,
       autofillHints: autofillHints,
       style: context.text.body,
       onSubmitted: onSubmitted == null ? null : (_) => onSubmitted?.call(),
-      decoration: InputDecoration(labelText: label, suffixIcon: suffixIcon),
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
+      ),
     );
   }
 }

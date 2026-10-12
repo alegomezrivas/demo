@@ -13,16 +13,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Stark Showcase';
 
   @override
-  String get homeTitle => 'Stark Showcase';
-
-  @override
-  String get homeSubtitle =>
-      'A Flutter engineering portfolio built with clean architecture';
-
-  @override
-  String get homeGetStarted => 'Learn more';
-
-  @override
   String get aboutTitle => 'About';
 
   @override
@@ -135,10 +125,196 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authEmailTaken => 'An account with that email already exists';
 
   @override
-  String homeGreeting(String name) {
+  String get navDashboard => 'Home';
+
+  @override
+  String get navTasks => 'Tasks';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get commonDelete => 'Delete';
+
+  @override
+  String get commonSave => 'Save';
+
+  @override
+  String dashboardGreeting(String name) {
     return 'Hello, $name';
   }
 
   @override
-  String get homeLogout => 'Sign out';
+  String get dashboardSubtitle => 'Here is how your work is going';
+
+  @override
+  String dashboardCompletion(int percent) {
+    return '$percent% completed';
+  }
+
+  @override
+  String get dashboardStatTotal => 'Total';
+
+  @override
+  String get dashboardStatDone => 'Completed';
+
+  @override
+  String get dashboardStatOverdue => 'Overdue';
+
+  @override
+  String get dashboardStatHighPriority => 'High priority open';
+
+  @override
+  String get dashboardViewTasks => 'View tasks';
+
+  @override
+  String get dashboardNewTask => 'New task';
+
+  @override
+  String get tasksTitle => 'Tasks';
+
+  @override
+  String get tasksSearchLabel => 'Search tasks';
+
+  @override
+  String get tasksFilterAll => 'All';
+
+  @override
+  String get tasksFilterPending => 'Pending';
+
+  @override
+  String get tasksFilterDone => 'Completed';
+
+  @override
+  String get tasksPriorityAny => 'Any priority';
+
+  @override
+  String get priorityLow => 'Low';
+
+  @override
+  String get priorityMedium => 'Medium';
+
+  @override
+  String get priorityHigh => 'High';
+
+  @override
+  String get tasksEmpty => 'You have no tasks yet';
+
+  @override
+  String get tasksEmptyFiltered => 'No task matches the filters';
+
+  @override
+  String tasksDueDate(String date) {
+    return 'Due: $date';
+  }
+
+  @override
+  String get tasksOverdue => 'Overdue';
+
+  @override
+  String get tasksDeleteTitle => 'Delete task';
+
+  @override
+  String tasksDeleteMessage(String title) {
+    return 'Are you sure you want to delete \"$title\"?';
+  }
+
+  @override
+  String get tasksNew => 'New task';
+
+  @override
+  String get tasksEdit => 'Edit task';
+
+  @override
+  String get tasksFieldTitle => 'Title';
+
+  @override
+  String get tasksFieldDescription => 'Description';
+
+  @override
+  String get tasksFieldPriority => 'Priority';
+
+  @override
+  String get tasksFieldDueDate => 'Due date';
+
+  @override
+  String get tasksFieldDone => 'Completed';
+
+  @override
+  String get tasksClearDate => 'Clear date';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsProfile => 'Profile';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsTheme => 'Theme';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get languageSystem => 'System';
+
+  @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get settingsSecurity => 'Security';
+
+  @override
+  String get settingsBiometric => 'Confirm with biometrics';
+
+  @override
+  String get settingsBiometricHint =>
+      'Asks for your fingerprint, face or screen lock before deleting tasks or signing out';
+
+  @override
+  String get settingsBiometricUnavailable =>
+      'This device has no fingerprint, face or screen lock set up';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get settingsLogout => 'Sign out';
+
+  @override
+  String get biometricReasonDelete =>
+      'Confirm your identity to delete the task';
+
+  @override
+  String get biometricReasonLogout => 'Confirm your identity to sign out';
+
+  @override
+  String validationMaxLength(int length) {
+    return 'Cannot exceed $length characters';
+  }
+
+  @override
+  String get biometricReasonToggle =>
+      'Confirm your identity to change this option';
 }

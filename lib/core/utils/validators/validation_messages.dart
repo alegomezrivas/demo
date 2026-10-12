@@ -13,6 +13,8 @@ abstract final class ValidationMessages {
       ValidationKeys.phone: (_) => l10n.validationPhone,
       ValidationKeys.minLength: (error) =>
           l10n.validationMinLength(_requiredLength(error)),
+      ValidationKeys.maxLength: (error) =>
+          l10n.validationMaxLength(_requiredLength(error)),
       ValidationKeys.mustMatch: (_) => l10n.validationMustMatch,
     };
   }
