@@ -117,3 +117,32 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# ---- Project-specific (Claude Code, secrets, release artifacts) ----
+# Applications must commit their lockfile (overrides the generic *.lock above)
+!pubspec.lock
+
+# Claude Code personal overrides
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/worktrees/
+
+# Secrets and environment configuration
+.env
+.env.*
+!.env.example
+config/*.json
+!config/*.example.json
+
+# Signing material
+*.keystore
+*.jks
+*.p12
+*.p8
+*.mobileprovision
+**/android/key.properties
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+
+# Obfuscation symbols
+debug-info/
