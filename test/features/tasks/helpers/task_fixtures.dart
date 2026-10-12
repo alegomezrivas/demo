@@ -1,3 +1,4 @@
+import 'package:demo/core/pagination/paged_result.dart';
 import 'package:demo/features/tasks/domain/entities/task_item.dart';
 import 'package:demo/features/tasks/domain/entities/task_priority.dart';
 
@@ -21,3 +22,24 @@ TaskItem buildTask({
     dueDate: dueDate,
   );
 }
+
+/// Builds a page of tasks for use-case stubs.
+PagedResult<TaskItem> buildPage(
+  List<TaskItem> items, {
+  int page = 1,
+  int pageSize = 10,
+  int? total,
+}) {
+  return PagedResult<TaskItem>(
+    items: items,
+    page: page,
+    pageSize: pageSize,
+    total: total ?? items.length,
+  );
+}
+
+/// Generates [count] distinct tasks with ids `start`..`start + count - 1`.
+List<TaskItem> buildTasks(int count, {int start = 0}) => [
+  for (var i = start; i < start + count; i++)
+    buildTask(id: 't$i', title: 'Task $i'),
+];

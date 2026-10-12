@@ -4,7 +4,7 @@ Aplicación Flutter (Android e iOS) pensada como portafolio: demuestra Clean Arc
 Stacked, GoRouter, formularios reactivos, seguridad en red y pruebas unitarias.
 Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exista una API real.
 
-> Estado: **Fase 3** (autenticación de punta a punta sobre la capa core). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
+> Estado: **Fase 4** (tareas, dashboard y ajustes sobre auth y la capa core). Ver el plan completo en [`CLAUDE.md`](CLAUDE.md).
 
 ## Requisitos
 
@@ -84,6 +84,24 @@ Login y registro completos con `reactive_forms`, casos de uso (`Login`, `Registe
 - **Pantallas sensibles**: login y registro activan `ScreenProtection` (con conteo de referencias).
 - **Errores**: mensajes genéricos y localizados (credenciales incorrectas, correo ya registrado, sin conexión...).
 - **Entrada**: validadores en los formularios y `InputSanitizer` en el repositorio (la contraseña nunca se modifica).
+
+## Funcionalidades
+
+La app es un gestor de tareas con tres pestañas (barra de navegación inferior):
+
+| Pestaña | Qué hace |
+|---|---|
+| **Inicio** (`dashboard`) | Saludo, % completado y estadísticas (total, completadas, vencidas, prioridad alta pendientes). Se recarga sola cuando cambian las tareas en otra pestaña. |
+| **Tareas** (`tasks`) | Lista paginada (scroll infinito), búsqueda con *debounce*, filtros por estado y prioridad, completar con el checkbox (optimista, con rollback), borrar con confirmación, crear y editar en un formulario `reactive_forms`. |
+| **Ajustes** (`settings`) | Perfil, tema (sistema/claro/oscuro), idioma (sistema/español/inglés), confirmación biométrica y cierre de sesión. |
+
+- **Preferencias**: se guardan en `shared_preferences` (no son secretos) y se aplican al instante vía `AppPreferences`.
+- **Confirmación biométrica** (opcional): al activarla se pide huella/rostro/PIN antes de **eliminar tareas** y **cerrar sesión**
+  (`SensitiveActionGuard`). Cambiar la opción también exige confirmación. Si el dispositivo no puede autenticar
+  (sin bloqueo de pantalla) no se bloquea al usuario.
+- **Backend mock**: `MockTasksBackend` simula búsqueda, filtros, paginación, CRUD y estadísticas (23 tareas de ejemplo;
+  responde 401 sin token). Prueba los fallos con el header `x-mock-scenario` (ver más abajo).
+- **Nombre de la entidad**: `TaskItem` (no `Task`) para no chocar con el tipo `Task` de `fpdart`.
 
 ## Red y backend mock
 

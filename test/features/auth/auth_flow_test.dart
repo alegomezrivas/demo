@@ -12,6 +12,8 @@ import 'package:demo/core/services/session_service.dart';
 import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart';
 import 'package:demo/features/auth/data/datasources/mock_auth_backend.dart';
 import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart';
+import 'package:demo/features/settings/presentation/app_preferences.dart';
+import 'package:demo/features/tasks/data/datasources/mock_tasks_backend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -54,7 +56,7 @@ void main() {
       router: router,
       config: config,
       session: session,
-      mockRoutes: MockAuthBackend().routes,
+      mockRoutes: [...MockAuthBackend().routes, ...MockTasksBackend().routes],
     );
     locator
       ..unregister<SecureStorage>()
@@ -73,6 +75,7 @@ void main() {
       App(
         routerConfig: locator<GoRouter>(),
         integrityViewModelBuilder: () => IntegrityGateViewModel(integrity),
+        preferences: locator<AppPreferences>(),
       ),
     );
     await tester.pumpAndSettle();
@@ -101,7 +104,7 @@ void main() {
       await boot(tester);
 
       expect(find.text('Iniciar sesión'), findsOneWidget);
-      expect(find.text('Conocer más'), findsNothing);
+      expect(find.text('Inicio'), findsNothing);
     });
 
     testWidgets(
@@ -112,6 +115,9 @@ void main() {
         await signInAsDemo(tester);
         expect(find.text('Hola, Demo User'), findsOneWidget);
 
+        await tester.tap(find.text('Ajustes'));
+        await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(find.text('Cerrar sesión'), 200);
         await tester.tap(find.text('Cerrar sesión'));
         await tester.pumpAndSettle();
 
@@ -134,7 +140,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Correo o contraseña incorrectos'), findsOneWidget);
-      expect(find.text('Conocer más'), findsNothing);
+      expect(find.text('Inicio'), findsNothing);
     });
 
     testWidgets('registers a new account and lands on home', (tester) async {

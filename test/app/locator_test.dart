@@ -6,6 +6,7 @@ import 'package:demo/core/security/biometric_authenticator.dart';
 import 'package:demo/core/security/device_integrity_service.dart';
 import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/core/security/security_policy.dart';
+import 'package:demo/core/security/sensitive_action_guard.dart';
 import 'package:demo/core/security/token_storage.dart';
 import 'package:demo/core/services/go_router_navigation_service.dart';
 import 'package:demo/core/services/navigation_service.dart';
@@ -20,7 +21,13 @@ import 'package:demo/features/auth/domain/usecases/logout_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/register_use_case.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
 import 'package:demo/features/auth/presentation/viewmodels/register_view_model.dart';
-import 'package:demo/features/home/presentation/viewmodels/home_view_model.dart';
+import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
+import 'package:demo/features/settings/domain/repositories/settings_repository.dart';
+import 'package:demo/features/settings/presentation/app_preferences.dart';
+import 'package:demo/features/settings/presentation/viewmodels/settings_view_model.dart';
+import 'package:demo/features/tasks/domain/repositories/task_repository.dart';
+import 'package:demo/features/tasks/presentation/viewmodels/task_form_view_model.dart';
+import 'package:demo/features/tasks/presentation/viewmodels/tasks_view_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -78,13 +85,38 @@ void main() {
       expect(locator<SessionService>(), same(session));
     });
 
+    test('wires the tasks feature', () {
+      expect(locator<TaskRepository>(), same(locator<TaskRepository>()));
+      expect(locator<TasksViewModel>(), isNot(same(locator<TasksViewModel>())));
+      expect(locator<TaskFormViewModel>(), isA<TaskFormViewModel>());
+    });
+
+    test('wires the settings feature and shares live preferences', () {
+      expect(
+        locator<SettingsRepository>(),
+        same(locator<SettingsRepository>()),
+      );
+      expect(locator<AppPreferences>(), same(locator<AppPreferences>()));
+      expect(locator<SettingsViewModel>(), isA<SettingsViewModel>());
+    });
+
+    test('the sensitive-action guard follows the live preference', () async {
+      final guard = locator<SensitiveActionGuard>();
+
+      // Disabled by default: confirmation is never required.
+      expect(await guard.confirm(reason: 'x'), isTrue);
+    });
+
     test('registers the auth ViewModels as factories', () {
       expect(locator<LoginViewModel>(), isNot(same(locator<LoginViewModel>())));
       expect(locator<RegisterViewModel>(), isA<RegisterViewModel>());
     });
 
     test('registers ViewModels as factories (new instance per call)', () {
-      expect(locator<HomeViewModel>(), isNot(same(locator<HomeViewModel>())));
+      expect(
+        locator<DashboardViewModel>(),
+        isNot(same(locator<DashboardViewModel>())),
+      );
       expect(locator<AboutViewModel>(), isA<AboutViewModel>());
       expect(locator<IntegrityGateViewModel>(), isA<IntegrityGateViewModel>());
     });
