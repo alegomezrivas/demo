@@ -42,13 +42,16 @@ void main() {
     test('reports both issues together', () async {
       stub(jailbroken: true, debugged: true);
 
-      expect(await checker.check(), IntegrityIssue.values.toSet());
+      expect(await checker.check(), {
+        IntegrityIssue.rootedOrJailbroken,
+        IntegrityIssue.debuggerAttached,
+      });
     });
 
-    test('treats plugin errors as "no issues" instead of crashing', () async {
+    test('reports a failed detection instead of hiding it', () async {
       when(detector.isJailBroken).thenThrow(PlatformException(code: 'x'));
 
-      expect(await checker.check(), isEmpty);
+      expect(await checker.check(), {IntegrityIssue.checkFailed});
     });
   });
 }

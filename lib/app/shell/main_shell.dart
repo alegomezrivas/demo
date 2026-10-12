@@ -1,17 +1,62 @@
+import 'dart:async';
+
+import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// Scaffold with the bottom navigation shared by the three main tabs.
-class MainShell extends StatelessWidget {
+///
+/// While it is on screen (and therefore also under the full-screen routes
+/// pushed above it) the content is hidden from screenshots and the
+/// app-switcher preview, unless [protectScreens] is false.
+class MainShell extends StatefulWidget {
   /// Creates the shell around the router's [navigationShell].
-  const MainShell({required this.navigationShell, super.key});
+  const MainShell({
+    required this.navigationShell,
+    required this.screenProtection,
+    required this.protectScreens,
+    super.key,
+  });
 
   /// Holds the state of every tab.
   final StatefulNavigationShell navigationShell;
 
+  /// Hides the content from captures and previews.
+  final ScreenProtection screenProtection;
+
+  /// Whether the protection is switched on (`PROTECT_SCREENS`).
+  final bool protectScreens;
+
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.protectScreens) unawaited(_run(widget.screenProtection.enable));
+  }
+
+  @override
+  void dispose() {
+    if (widget.protectScreens) unawaited(_run(widget.screenProtection.disable));
+    super.dispose();
+  }
+
+  /// Protection is best effort: a plugin failure must not break navigation.
+  Future<void> _run(Future<void> Function() action) async {
+    try {
+      await action();
+    } on Exception {
+      // Ignored on purpose.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final navigationShell = widget.navigationShell;
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: navigationShell,

@@ -26,8 +26,15 @@ class DeviceIntegrityService {
     final issues = await _checker.check();
     if (issues.isEmpty) return IntegrityDecision.allow;
     return switch (_policy) {
+      // A failed check is not evidence of tampering, so it never warns.
+      SecurityPolicy.warn when _onlyCheckFailed(issues) =>
+        IntegrityDecision.allow,
       SecurityPolicy.warn => IntegrityDecision.warn,
+      // Strict mode treats an unknown device state as untrusted.
       SecurityPolicy.block => IntegrityDecision.block,
     };
   }
+
+  bool _onlyCheckFailed(Set<IntegrityIssue> issues) =>
+      issues.length == 1 && issues.contains(IntegrityIssue.checkFailed);
 }

@@ -40,4 +40,33 @@ void main() {
       );
     });
   });
+
+  group('DeviceIntegrityService with a failed check', () {
+    test('warn policy does not bother the user', () async {
+      expect(
+        await run(SecurityPolicy.warn, {IntegrityIssue.checkFailed}),
+        IntegrityDecision.allow,
+      );
+    });
+
+    test('block policy treats an unknown device state as untrusted', () async {
+      expect(
+        await run(SecurityPolicy.block, {IntegrityIssue.checkFailed}),
+        IntegrityDecision.block,
+      );
+    });
+
+    test(
+      'warn policy still warns when a real issue accompanies the failure',
+      () async {
+        expect(
+          await run(SecurityPolicy.warn, {
+            IntegrityIssue.checkFailed,
+            IntegrityIssue.rootedOrJailbroken,
+          }),
+          IntegrityDecision.warn,
+        );
+      },
+    );
+  });
 }

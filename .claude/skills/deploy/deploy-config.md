@@ -19,11 +19,15 @@ Real files are git-ignored. Copy `config/dev.example.json` to create them.
   "USE_MOCK_API": "true | false",
   "PINNING_ENABLED": "true | false",
   "PINNING_SHA256": "base64fingerprint1,base64fingerprint2",
-  "ROOT_POLICY": "warn | block"
+  "ROOT_POLICY": "warn | block",
+  "PROTECT_SCREENS": "true | false"
 }
 ```
 
 Release builds must ignore `USE_MOCK_API` (the mock is excluded when `kReleaseMode`).
+Release and profile builds also refuse to start (a `StateError`) when `ENV` is missing or not
+`staging`/`prod`, or when `prod` does not set `PINNING_ENABLED=true`. An unknown `ROOT_POLICY`
+resolves to `block` there. Keep `PROTECT_SCREENS=true` except for demo builds.
 
 ## Build flags
 - Obfuscation: `--obfuscate --split-debug-info=debug-info/<platform>`

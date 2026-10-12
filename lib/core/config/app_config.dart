@@ -13,12 +13,16 @@ enum AppEnvironment {
   prod;
 
   /// Parses [value] (case-insensitive); unknown values fall back to [dev].
-  static AppEnvironment parse(String value) {
+  static AppEnvironment parse(String value) =>
+      tryParse(value) ?? AppEnvironment.dev;
+
+  /// Parses [value] (case-insensitive), or returns null when it is unknown.
+  static AppEnvironment? tryParse(String value) {
     final normalized = value.trim().toLowerCase();
-    return AppEnvironment.values.firstWhere(
-      (env) => env.name == normalized,
-      orElse: () => AppEnvironment.dev,
-    );
+    for (final env in AppEnvironment.values) {
+      if (env.name == normalized) return env;
+    }
+    return null;
   }
 }
 
@@ -35,12 +39,17 @@ class AppConfig {
     required this.pinningEnabled,
     required this.pinnedSha256,
     required this.rootPolicy,
+    this.protectScreens = true,
   });
 
   /// Reads the configuration compiled into the app via `--dart-define`.
   ///
-  /// The mock API can never be active in release builds, whatever the flag says.
-  factory AppConfig.fromEnvironment({bool isRelease = kReleaseMode}) {
+  /// The mock API can never be active in release builds, whatever the flag
+  /// says. Release (and profile) builds also refuse to start with a missing or
+  /// weak configuration; see [AppConfig.fromValues].
+  factory AppConfig.fromEnvironment({
+    bool isRelease = kReleaseMode || kProfileMode,
+  }) {
     return AppConfig.fromValues(
       environment: const String.fromEnvironment('ENV', defaultValue: 'dev'),
       apiBaseUrl: const String.fromEnvironment(
@@ -59,6 +68,14 @@ class AppConfig {
   }
 
   /// Builds a configuration from raw string values.
+  ///
+  /// With [isRelease] the configuration is validated so a build made without
+  /// its `--dart-define-from-file` cannot ship with weak defaults:
+  /// * `ENV` must be `staging` or `prod` (a missing or unknown value throws);
+  /// * `prod` must enable certificate pinning;
+  /// * an unknown `ROOT_POLICY` resolves to the strict `block`.
+  ///
+  /// Throws a [StateError] when a release configuration is invalid.
   factory AppConfig.fromValues({
     required String environment,
     required String apiBaseUrl,
@@ -67,9 +84,23 @@ class AppConfig {
     required String pinnedSha256,
     required String rootPolicy,
     required bool isRelease,
+    bool protectScreens = true,
   }) {
+    final parsedEnvironment = AppEnvironment.tryParse(environment);
+    if (isRelease) {
+      if (parsedEnvironment == null ||
+          parsedEnvironment == AppEnvironment.dev) {
+        throw StateError(
+          'Release builds need ENV=staging or ENV=prod. '
+          'Build with --dart-define-from-file=config/<env>.json.',
+        );
+      }
+      if (parsedEnvironment == AppEnvironment.prod && !pinningEnabled) {
+        throw StateError('Production builds must set PINNING_ENABLED=true.');
+      }
+    }
     return AppConfig(
-      environment: AppEnvironment.parse(environment),
+      environment: parsedEnvironment ?? AppEnvironment.dev,
       apiBaseUrl: apiBaseUrl,
       useMockApi: useMockApi && !isRelease,
       pinningEnabled: pinningEnabled,
@@ -78,7 +109,11 @@ class AppConfig {
           .map((fingerprint) => fingerprint.trim())
           .where((fingerprint) => fingerprint.isNotEmpty)
           .toList(growable: false),
-      rootPolicy: SecurityPolicy.parse(rootPolicy),
+      rootPolicy: SecurityPolicy.parse(
+        rootPolicy,
+        fallback: isRelease ? SecurityPolicy.block : SecurityPolicy.warn,
+      ),
+      protectScreens: protectScreens,
     );
   }
 
@@ -99,4 +134,9 @@ class AppConfig {
 
   /// Reaction to rooted / jailbroken / debugged devices.
   final SecurityPolicy rootPolicy;
+
+  /// Whether the authenticated app hides its content from screenshots and the
+  /// app-switcher preview. Turn it off (`PROTECT_SCREENS=false`) only for
+  /// demo builds that need screenshots.
+  final bool protectScreens;
 }

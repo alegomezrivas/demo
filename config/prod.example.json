@@ -4,5 +4,6 @@
   "USE_MOCK_API": "false",
   "PINNING_ENABLED": "true",
   "PINNING_SHA256": "",
-  "ROOT_POLICY": "block"
+  "ROOT_POLICY": "block",
+  "PROTECT_SCREENS": "true"
 }

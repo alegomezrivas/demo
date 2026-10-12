@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:demo/core/error/exceptions.dart';
 import 'package:demo/core/network/auth_interceptor.dart';
 import 'package:demo/core/network/network_constants.dart';
 import 'package:demo/core/network/session_expired_notifier.dart';
@@ -148,27 +149,106 @@ void main() {
       },
     );
 
-    test('signs out when the refresh fails', () async {
+    DioException refreshFailure(int? status) => DioException(
+      requestOptions: RequestOptions(path: '/auth/refresh'),
+      type: status == null
+          ? DioExceptionType.connectionTimeout
+          : DioExceptionType.badResponse,
+      response: status == null
+          ? null
+          : Response<dynamic>(
+              requestOptions: RequestOptions(path: '/auth/refresh'),
+              statusCode: status,
+            ),
+    );
+
+    for (final status in [401, 403]) {
+      test(
+        'signs out when the refresh token is rejected with $status',
+        () async {
+          when(refresher.refresh(any)).thenThrow(refreshFailure(status));
+          build();
+
+          await expectLater(
+            dio.get<dynamic>('/tasks'),
+            throwsA(isA<DioException>()),
+          );
+          await pump();
+
+          expect(storage.tokens, isNull);
+          expect(expiredCount, 1);
+          expect(adapter.requests, hasLength(1));
+        },
+      );
+    }
+
+    for (final status in <int?>[null, 500, 503]) {
+      test(
+        'keeps the session when the refresh fails transiently (${status ?? 'offline'})',
+        () async {
+          when(refresher.refresh(any)).thenThrow(refreshFailure(status));
+          build();
+
+          await expectLater(
+            dio.get<dynamic>('/tasks'),
+            throwsA(
+              isA<DioException>()
+                  .having(
+                    (e) => e.type,
+                    'type',
+                    DioExceptionType.connectionError,
+                  )
+                  .having(
+                    (e) => e.error,
+                    'error',
+                    isA<NetworkException>().having(
+                      (e) => e.code,
+                      'code',
+                      'refresh_unavailable',
+                    ),
+                  ),
+            ),
+          );
+          await pump();
+
+          expect(storage.tokens, oldTokens);
+          expect(expiredCount, 0);
+        },
+      );
+    }
+
+    test('keeps the session when the refresh response is malformed', () async {
       when(refresher.refresh(any))
-          .thenThrow(DioException(requestOptions: RequestOptions()));
+          .thenThrow(const ServerException(code: 'invalid_refresh_response'));
       build();
 
       await expectLater(
         dio.get<dynamic>('/tasks'),
-        throwsA(
-          isA<DioException>().having(
-            (e) => e.response?.statusCode,
-            'status',
-            401,
-          ),
-        ),
+        throwsA(isA<DioException>()),
       );
       await pump();
 
-      expect(storage.tokens, isNull);
-      expect(expiredCount, 1);
-      expect(adapter.requests, hasLength(1));
+      expect(storage.tokens, oldTokens);
+      expect(expiredCount, 0);
     });
+
+    test(
+      'a later request can still refresh after a transient failure',
+      () async {
+        when(refresher.refresh(any)).thenThrow(refreshFailure(null));
+        build();
+        await expectLater(
+          dio.get<dynamic>('/tasks'),
+          throwsA(isA<DioException>()),
+        );
+        when(refresher.refresh(any)).thenAnswer((_) async => newTokens);
+
+        final response = await dio.get<dynamic>('/tasks');
+
+        expect(response.statusCode, 200);
+        expect(storage.tokens, newTokens);
+      },
+    );
 
     test('signs out when there is no stored session to refresh', () async {
       storage.tokens = null;

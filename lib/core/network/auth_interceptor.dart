@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:demo/core/error/exceptions.dart';
 import 'package:demo/core/network/network_constants.dart';
 import 'package:demo/core/network/session_expired_notifier.dart';
 import 'package:demo/core/network/token_refresher.dart';
@@ -16,8 +17,9 @@ typedef RequestRetrier = Future<Response<dynamic>> Function(
 ///
 /// * Concurrent 401s share a single refresh call.
 /// * A request is retried at most once.
-/// * If the refresh fails (or the retried request is still rejected) the
-///   tokens are cleared and [SessionExpiredNotifier] fires.
+/// * If the refresh token is rejected (or the retried request is still
+///   rejected) the tokens are cleared and [SessionExpiredNotifier] fires.
+/// * Transient failures (offline, timeout, 5xx) keep the session.
 class AuthInterceptor extends Interceptor {
   /// Creates the interceptor.
   AuthInterceptor({
@@ -34,7 +36,7 @@ class AuthInterceptor extends Interceptor {
   final RequestRetrier _retry;
   final SessionExpiredNotifier _session;
 
-  Future<AuthTokens?>? _inFlightRefresh;
+  Future<_Renewal>? _inFlightRefresh;
 
   @override
   Future<void> onRequest(
@@ -69,45 +71,58 @@ class AuthInterceptor extends Interceptor {
       return;
     }
 
-    final tokens = await _renewTokens(options);
-    if (tokens == null) {
-      await _expireSession();
-      handler.next(err);
-      return;
-    }
-
-    try {
-      handler.resolve(await _retry(_withToken(options, tokens)));
-    } on DioException catch (retryError) {
-      handler.next(retryError);
+    switch (await _renewTokens(options)) {
+      case _Renewed(:final tokens):
+        try {
+          handler.resolve(await _retry(_withToken(options, tokens)));
+        } on DioException catch (retryError) {
+          handler.next(retryError);
+        }
+      case _Rejected():
+        await _expireSession();
+        handler.next(err);
+      case _Unavailable():
+        // The refresh endpoint could not be reached or failed: the session
+        // may still be valid, so keep it and report a connectivity problem.
+        handler.next(
+          DioException(
+            requestOptions: options,
+            type: DioExceptionType.connectionError,
+            error: const NetworkException('refresh_unavailable'),
+          ),
+        );
     }
   }
 
   /// Returns the tokens to retry with, refreshing only when needed.
-  Future<AuthTokens?> _renewTokens(RequestOptions failed) async {
+  Future<_Renewal> _renewTokens(RequestOptions failed) async {
     final stored = await _storage.read();
     final usedToken = _bearerOf(failed);
     if (stored != null &&
         usedToken != null &&
         stored.accessToken != usedToken) {
       // Another request already renewed the token; just reuse it.
-      return stored;
+      return _Renewed(stored);
     }
     return await (_inFlightRefresh ??= _refresh().whenComplete(
       () => _inFlightRefresh = null,
     ));
   }
 
-  Future<AuthTokens?> _refresh() async {
+  Future<_Renewal> _refresh() async {
     final stored = await _storage.read();
-    if (stored == null) return null;
+    if (stored == null) return _Rejected();
     try {
       final renewed = await _refresher.refresh(stored.refreshToken);
       await _storage.save(renewed);
-      return renewed;
+      return _Renewed(renewed);
+    } on DioException catch (error) {
+      // Only an explicit rejection of the refresh token ends the session;
+      // timeouts, offline and server errors must not log the user out.
+      final status = error.response?.statusCode;
+      return status == 401 || status == 403 ? _Rejected() : _Unavailable();
     } on Exception {
-      // Any refresh failure (rejected token, network) ends the session.
-      return null;
+      return _Unavailable();
     }
   }
 
@@ -134,3 +149,19 @@ class AuthInterceptor extends Interceptor {
     return null;
   }
 }
+
+/// Outcome of trying to renew the tokens.
+sealed class _Renewal;
+
+/// New tokens are available.
+final class _Renewed extends _Renewal {
+  _Renewed(this.tokens);
+
+  final AuthTokens tokens;
+}
+
+/// The server refused the refresh token: the session is over.
+final class _Rejected extends _Renewal;
+
+/// The refresh could not be completed (network or server problem).
+final class _Unavailable extends _Renewal;

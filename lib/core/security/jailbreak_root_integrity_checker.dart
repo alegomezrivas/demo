@@ -16,9 +16,9 @@ class JailbreakRootIntegrityChecker implements DeviceIntegrityChecker {
         if (await _detector.isDebugged) IntegrityIssue.debuggerAttached,
       };
     } on Exception {
-      // A broken plugin must not brick the app, so detection errors are
-      // treated as "no issues found".
-      return {};
+      // Report the failure instead of hiding it: the policy decides whether an
+      // unknown device state is acceptable (see DeviceIntegrityService).
+      return {IntegrityIssue.checkFailed};
     }
   }
 }

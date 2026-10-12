@@ -29,7 +29,7 @@ class DioClientFactory {
     required this.logger,
     this.mockRoutes = const [],
     this.mockSettings = const MockApiSettings(),
-    this.isRelease = kReleaseMode,
+    this.isRelease = kReleaseMode || kProfileMode,
     this.adapterBuilder,
   });
 

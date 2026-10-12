@@ -6,12 +6,15 @@ enum SecurityPolicy {
   /// Refuse to run the app.
   block;
 
-  /// Parses [value] (case-insensitive); unknown values fall back to [warn].
-  static SecurityPolicy parse(String value) {
+  /// Parses [value] (case-insensitive); unknown values become [fallback].
+  static SecurityPolicy parse(
+    String value, {
+    SecurityPolicy fallback = SecurityPolicy.warn,
+  }) {
     final normalized = value.trim().toLowerCase();
     return SecurityPolicy.values.firstWhere(
       (policy) => policy.name == normalized,
-      orElse: () => SecurityPolicy.warn,
+      orElse: () => fallback,
     );
   }
 }

@@ -89,7 +89,14 @@ Future<void> setupLocator({
     )
     // Security.
     ..registerLazySingleton<SecureStorage>(
-      () => const FlutterSecureStorageService(FlutterSecureStorage()),
+      () => const FlutterSecureStorageService(
+        FlutterSecureStorage(
+          // Keep items on this device only: not in backups or other devices.
+          iOptions: IOSOptions(
+            accessibility: KeychainAccessibility.first_unlock_this_device,
+          ),
+        ),
+      ),
     )
     ..registerLazySingleton<TokenStorage>(
       () => SecureTokenStorage(locator<SecureStorage>()),

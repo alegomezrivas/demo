@@ -1,5 +1,8 @@
+import 'package:demo/app/locator.dart';
 import 'package:demo/app/router/app_routes.dart';
 import 'package:demo/app/shell/main_shell.dart';
+import 'package:demo/core/config/app_config.dart';
+import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/features/about/presentation/views/about_view.dart';
 import 'package:demo/features/auth/presentation/views/login_view.dart';
 import 'package:demo/features/auth/presentation/views/register_view.dart';
@@ -28,8 +31,11 @@ abstract final class AppRouter {
       refreshListenable: refreshListenable,
       routes: <RouteBase>[
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) =>
-              MainShell(navigationShell: navigationShell),
+          builder: (context, state, navigationShell) => MainShell(
+            navigationShell: navigationShell,
+            screenProtection: locator<ScreenProtection>(),
+            protectScreens: locator<AppConfig>().protectScreens,
+          ),
           branches: [
             StatefulShellBranch(
               routes: [

@@ -13,4 +13,17 @@ void main() {
       expect(SecurityPolicy.parse(''), SecurityPolicy.warn);
     });
   });
+
+  group('SecurityPolicy.parse fallback', () {
+    test('uses the given fallback for unknown values only', () {
+      expect(
+        SecurityPolicy.parse('nonsense', fallback: SecurityPolicy.block),
+        SecurityPolicy.block,
+      );
+      expect(
+        SecurityPolicy.parse('warn', fallback: SecurityPolicy.block),
+        SecurityPolicy.warn,
+      );
+    });
+  });
 }

@@ -5,6 +5,9 @@ enum IntegrityIssue {
 
   /// A debugger is attached to the process.
   debuggerAttached,
+
+  /// The detection itself failed, so the device state is unknown.
+  checkFailed,
 }
 
 /// Detects whether the device was tampered with.
