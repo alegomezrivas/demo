@@ -14,11 +14,14 @@ import 'package:stacked/stacked.dart';
 class LoginViewModel extends BaseViewModel {
   /// Creates the ViewModel with its dependencies.
   LoginViewModel({
-    required this._login,
-    required this._navigation,
-    required this._session,
-    required this._screenProtection,
-  });
+    required LoginUseCase login,
+    required NavigationService navigation,
+    required SessionService session,
+    required ScreenProtection screenProtection,
+  }) : _login = login,
+       _navigation = navigation,
+       _session = session,
+       _screenProtection = screenProtection;
 
   /// Name of the e-mail control.
   static const String emailField = 'email';

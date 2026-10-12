@@ -15,11 +15,14 @@ import 'package:stacked/stacked.dart';
 class DashboardViewModel extends BaseViewModel {
   /// Creates the ViewModel with its dependencies.
   DashboardViewModel({
-    required this._getCurrentUser,
-    required this._getStats,
-    required this._navigation,
-    required this._changes,
-  });
+    required GetCurrentUserUseCase getCurrentUser,
+    required GetTaskStatsUseCase getStats,
+    required NavigationService navigation,
+    required DataChangeNotifier changes,
+  }) : _getCurrentUser = getCurrentUser,
+       _getStats = getStats,
+       _navigation = navigation,
+       _changes = changes;
 
   final GetCurrentUserUseCase _getCurrentUser;
   final GetTaskStatsUseCase _getStats;

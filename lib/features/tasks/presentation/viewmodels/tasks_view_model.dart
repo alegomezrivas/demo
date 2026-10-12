@@ -16,16 +16,22 @@ import 'package:stacked/stacked.dart';
 
 /// ViewModel of the task list: search, filters, pagination and quick actions.
 class TasksViewModel extends BaseViewModel {
-  /// Creates the ViewModel; [_searchDebounce] delays searches while typing.
+  /// Creates the ViewModel; [searchDebounce] delays searches while typing.
   TasksViewModel({
-    required this._getTasks,
-    required this._updateTask,
-    required this._deleteTask,
-    required this._guard,
-    required this._navigation,
-    required this._changes,
-    this._searchDebounce = defaultSearchDebounce,
-  });
+    required GetTasksUseCase getTasks,
+    required UpdateTaskUseCase updateTask,
+    required DeleteTaskUseCase deleteTask,
+    required SensitiveActionGuard guard,
+    required NavigationService navigation,
+    required DataChangeNotifier changes,
+    Duration searchDebounce = defaultSearchDebounce,
+  }) : _getTasks = getTasks,
+       _updateTask = updateTask,
+       _deleteTask = deleteTask,
+       _guard = guard,
+       _navigation = navigation,
+       _changes = changes,
+       _searchDebounce = searchDebounce;
 
   /// Default wait after the last keystroke before searching.
   static const Duration defaultSearchDebounce = Duration(milliseconds: 400);

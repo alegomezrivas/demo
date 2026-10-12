@@ -25,9 +25,10 @@ class AuthInterceptor extends Interceptor {
   AuthInterceptor({
     required TokenStorage tokenStorage,
     required TokenRefresher tokenRefresher,
-    required this._retry,
+    required RequestRetrier retry,
     required SessionExpiredNotifier sessionNotifier,
-  }) : _storage = tokenStorage,
+  }) : _retry = retry,
+       _storage = tokenStorage,
        _refresher = tokenRefresher,
        _session = sessionNotifier;
 

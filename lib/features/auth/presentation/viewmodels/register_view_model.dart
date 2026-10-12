@@ -14,11 +14,14 @@ import 'package:stacked/stacked.dart';
 class RegisterViewModel extends BaseViewModel {
   /// Creates the ViewModel with its dependencies.
   RegisterViewModel({
-    required this._register,
-    required this._navigation,
-    required this._session,
-    required this._screenProtection,
-  });
+    required RegisterUseCase register,
+    required NavigationService navigation,
+    required SessionService session,
+    required ScreenProtection screenProtection,
+  }) : _register = register,
+       _navigation = navigation,
+       _session = session,
+       _screenProtection = screenProtection;
 
   /// Name of the display-name control.
   static const String nameField = 'name';

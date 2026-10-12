@@ -10,7 +10,8 @@ import 'package:fpdart/fpdart.dart';
 /// [SettingsRepository] backed by local storage.
 class SettingsRepositoryImpl implements SettingsRepository {
   /// Creates the repository.
-  const SettingsRepositoryImpl({required this._local});
+  const SettingsRepositoryImpl({required SettingsLocalDataSource local})
+    : _local = local;
 
   final SettingsLocalDataSource _local;
 
