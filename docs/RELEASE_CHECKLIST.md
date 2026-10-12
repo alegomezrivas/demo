@@ -1,0 +1,73 @@
+# Checklist de release
+
+Marca cada punto antes de publicar. Los comandos asumen el SDK de Flutter en el `PATH`.
+
+## 1. Calidad (bloqueante)
+
+- [ ] `dart format --set-exit-if-changed .` no cambia nada
+- [ ] `flutter analyze` → *No issues found*
+- [ ] `flutter test --coverage` en verde; `domain/` y `presentation/viewmodels/` ≥ 80 %
+- [ ] `dart run build_runner build --delete-conflicting-outputs` no deja cambios sin commitear
+- [ ] `flutter pub outdated`: ningún paquete descontinuado; las actualizaciones pendientes están revisadas
+- [ ] Sin `TODO`/`FIXME` sin dueño en `lib/`
+
+## 2. Configuración por entorno
+
+`config/prod.json` (ignorado por git; parte de `config/prod.example.json`):
+
+- [ ] `ENV` = `prod`
+- [ ] `API_BASE_URL` apunta a la API real y es `https://`
+- [ ] `USE_MOCK_API` = `false` (en release se ignora de todos modos)
+- [ ] `PINNING_ENABLED` = `true` y `PINNING_SHA256` con las huellas (base64 SHA-256 del certificado) **de producción y de respaldo**
+- [ ] `ROOT_POLICY` = `block` (o `warn` si se decide permitirlo)
+- [ ] El archivo **no** está en git (`git check-ignore config/prod.json`)
+
+> Pinning: la huella es la del certificado completo, así que cambia al renovarlo. Incluye siempre la del
+> certificado siguiente antes de rotar, o la app dejará de conectar.
+
+## 3. Identidad y permisos
+
+- [ ] Nombre visible: `AppConstants.appName`, `lib/l10n/app_*.arb`, `android/app/src/main/res/values/strings.xml`, `ios/Runner/Info.plist`
+- [ ] Iconos y *splash* definitivos (Android `mipmap-*`, iOS `AppIcon.appiconset`)
+- [ ] Id `com.softstark.demo` (o el definitivo) coincide en Android e iOS
+- [ ] `version` / build number incrementados en `pubspec.yaml`
+- [ ] Permisos mínimos: Android solo `INTERNET` y `USE_BIOMETRIC`; iOS `NSFaceIDUsageDescription` redactado
+
+## 4. Firma
+
+- [ ] Android: `android/key.properties` (ignorado) con `keyAlias`, `keyPassword`, `storeFile`, `storePassword`; keystore guardado fuera del repo y con copia de seguridad
+- [ ] El build release **no** usa claves de debug (sin `key.properties` el AAB sale sin firmar)
+- [ ] iOS: equipo de firma y perfiles de aprovisionamiento configurados en Xcode o fastlane
+
+## 5. Build
+
+```bash
+flutter build appbundle --release --obfuscate \
+  --split-debug-info=debug-info/android --dart-define-from-file=config/prod.json
+flutter build ipa --release --obfuscate \
+  --split-debug-info=debug-info/ios --dart-define-from-file=config/prod.json
+```
+
+- [ ] R8 y reducción de recursos activos (ya configurado en `android/app/build.gradle.kts`)
+- [ ] `debug-info/` archivado **fuera** del repo (sirve para simbolizar *crashes*)
+- [ ] Probar en dispositivos reales: login, tareas, ajustes, biometría, captura de pantalla bloqueada, modo avión
+
+## 6. Verificación de seguridad en el binario
+
+- [ ] No hay HTTP en claro: `network_security_config.xml` sin dominios con `cleartextTrafficPermitted="true"`
+- [ ] Con `PINNING_ENABLED=true` y un certificado distinto al pinneado la app **no** conecta
+- [ ] En un dispositivo con root/jailbreak se aplica `ROOT_POLICY`
+- [ ] Revisa los logs de un build release: no deben aparecer tokens ni datos personales
+- [ ] La cuenta demo del mock (`demo@starkshowcase.dev`) **no** funciona contra la API real
+
+## 7. Tiendas
+
+- [ ] Política de privacidad y formulario de seguridad de datos (Play) / *App Privacy* (App Store)
+- [ ] Capturas en ES y EN; descripción y notas de versión
+- [ ] Subida **solo** tras confirmación explícita; etiqueta `v<version>+<build>` tras publicar
+
+## Limitaciones conocidas
+
+- El pinning se evalúa cuando llegan las cabeceras de respuesta (limitación de `dio`): la petición ya se envió, aunque la respuesta se descarta.
+- Si el plugin de detección de root falla, la app lo trata como "sin problemas".
+- Las integraciones nativas (biometría, protección de pantalla, detección de root) están probadas con *mocks*; hay que validarlas en dispositivos reales.
