@@ -7,7 +7,7 @@ GoRouter, reactive forms, network security and thorough unit testing.
 Identifier: `com.softstark.demo`. The backend is a Dio mock until a real API exists.
 
 > Status: **Phase 5** (final review). Full plan in [`CLAUDE.md`](CLAUDE.md); before publishing, follow the
-> [release checklist](docs/RELEASE_CHECKLIST.md) (in Spanish).
+> [release checklist](docs/RELEASE_CHECKLIST.md).
 
 ## Requirements
 

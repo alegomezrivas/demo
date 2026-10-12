@@ -1,45 +1,47 @@
-# Checklist de release
+# Release checklist
 
-Marca cada punto antes de publicar. Los comandos usan FVM (versión fijada en `.fvmrc`); sin FVM, quita el prefijo `fvm`.
+**English** · [Español](RELEASE_CHECKLIST.es.md)
 
-## 1. Calidad (bloqueante)
+Tick every item before publishing. Commands use FVM (version pinned in `.fvmrc`); without FVM, drop the `fvm` prefix.
 
-- [ ] `fvm dart format --set-exit-if-changed .` no cambia nada
+## 1. Quality (blocking)
+
+- [ ] `fvm dart format --set-exit-if-changed .` changes nothing
 - [ ] `fvm flutter analyze` → *No issues found*
-- [ ] `fvm flutter test --coverage` en verde; `domain/` y `presentation/viewmodels/` ≥ 80 %
-- [ ] `fvm dart run build_runner build --delete-conflicting-outputs` no deja cambios sin commitear
-- [ ] `fvm flutter pub outdated`: ningún paquete descontinuado; las actualizaciones pendientes están revisadas
-- [ ] Sin `TODO`/`FIXME` sin dueño en `lib/`
+- [ ] `fvm flutter test --coverage` is green; `domain/` and `presentation/viewmodels/` ≥ 80 %
+- [ ] `fvm dart run build_runner build --delete-conflicting-outputs` leaves no uncommitted changes
+- [ ] `fvm flutter pub outdated`: no discontinued packages; pending updates have been reviewed
+- [ ] No ownerless `TODO`/`FIXME` in `lib/`
 
-## 2. Configuración por entorno
+## 2. Per-environment configuration
 
-`config/prod.json` (ignorado por git; parte de `config/prod.example.json`):
+`config/prod.json` (git-ignored; start from `config/prod.example.json`):
 
 - [ ] `ENV` = `prod`
-- [ ] `API_BASE_URL` apunta a la API real y es `https://`
-- [ ] `USE_MOCK_API` = `false` (en release se ignora de todos modos)
-- [ ] `PINNING_ENABLED` = `true` y `PINNING_SHA256` con las huellas (base64 SHA-256 del certificado) **de producción y de respaldo**
-- [ ] `ROOT_POLICY` = `block` (o `warn` si se decide permitirlo)
-- [ ] `PROTECT_SCREENS` = `true` (solo `false` en builds de demostración)
-- [ ] El archivo **no** está en git (`git check-ignore config/prod.json`)
-- [ ] El build arranca: en release la app lanza un `StateError` si falta `ENV` (o no es `staging`/`prod`) y si `prod` no activa el pinning
+- [ ] `API_BASE_URL` points to the real API and is `https://`
+- [ ] `USE_MOCK_API` = `false` (it is ignored in release anyway)
+- [ ] `PINNING_ENABLED` = `true` and `PINNING_SHA256` holds the fingerprints (base64 SHA-256 of the certificate) **for production and for the backup**
+- [ ] `ROOT_POLICY` = `block` (or `warn` if allowing it is a deliberate decision)
+- [ ] `PROTECT_SCREENS` = `true` (`false` only for demo builds)
+- [ ] The file is **not** in git (`git check-ignore config/prod.json`)
+- [ ] The build starts: in release the app throws a `StateError` if `ENV` is missing (or is not `staging`/`prod`) and if `prod` does not enable pinning
 
-> Pinning: la huella es la del certificado completo, así que cambia al renovarlo. Incluye siempre la del
-> certificado siguiente antes de rotar, o la app dejará de conectar.
+> Pinning: the fingerprint is that of the whole certificate, so it changes when the certificate is renewed. Always
+> include the next certificate's fingerprint before rotating, or the app will stop connecting.
 
-## 3. Identidad y permisos
+## 3. Identity and permissions
 
-- [ ] Nombre visible: `AppConstants.appName`, `lib/l10n/app_*.arb`, `android/app/src/main/res/values/strings.xml`, `ios/Runner/Info.plist`
-- [ ] Iconos y *splash* definitivos (Android `mipmap-*`, iOS `AppIcon.appiconset`)
-- [ ] Id `com.softstark.demo` (o el definitivo) coincide en Android e iOS
-- [ ] `version` / build number incrementados en `pubspec.yaml`
-- [ ] Permisos mínimos: Android solo `INTERNET` y `USE_BIOMETRIC`; iOS `NSFaceIDUsageDescription` redactado
+- [ ] Visible name: `AppConstants.appName`, `lib/l10n/app_*.arb`, `android/app/src/main/res/values/strings.xml`, `ios/Runner/Info.plist`
+- [ ] Final icons and splash screen (Android `mipmap-*`, iOS `AppIcon.appiconset`)
+- [ ] Id `com.softstark.demo` (or the final one) matches on Android and iOS
+- [ ] `version` / build number bumped in `pubspec.yaml`
+- [ ] Minimal permissions: Android only `INTERNET` and `USE_BIOMETRIC`; iOS `NSFaceIDUsageDescription` written
 
-## 4. Firma
+## 4. Signing
 
-- [ ] Android: `android/key.properties` (ignorado) con `keyAlias`, `keyPassword`, `storeFile`, `storePassword`; keystore guardado fuera del repo y con copia de seguridad
-- [ ] El build release **no** usa claves de debug (sin `key.properties` el AAB sale sin firmar)
-- [ ] iOS: equipo de firma y perfiles de aprovisionamiento configurados en Xcode o fastlane
+- [ ] Android: `android/key.properties` (git-ignored) with `keyAlias`, `keyPassword`, `storeFile`, `storePassword`; keystore stored outside the repo and backed up
+- [ ] The release build does **not** use debug keys (without `key.properties` the AAB is produced unsigned)
+- [ ] iOS: signing team and provisioning profiles configured in Xcode or fastlane
 
 ## 5. Build
 
@@ -50,35 +52,35 @@ fvm flutter build ipa --release --obfuscate \
   --split-debug-info=debug-info/ios --dart-define-from-file=config/prod.json
 ```
 
-- [ ] R8 y reducción de recursos activos (ya configurado en `android/app/build.gradle.kts`)
-- [ ] `debug-info/` archivado **fuera** del repo (sirve para simbolizar *crashes*)
-- [ ] Probar en dispositivos reales: login, tareas, ajustes, biometría, captura de pantalla bloqueada, modo avión
+- [ ] R8 and resource shrinking are on (already configured in `android/app/build.gradle.kts`)
+- [ ] `debug-info/` archived **outside** the repo (it is used to symbolicate crashes)
+- [ ] Test on real devices: sign-in, tasks, settings, biometrics, screenshot blocking, airplane mode
 
-## 6. Verificación de seguridad en el binario
+## 6. Security verification on the binary
 
-- [ ] No hay HTTP en claro: `network_security_config.xml` sin dominios con `cleartextTrafficPermitted="true"`
-- [ ] Con `PINNING_ENABLED=true` y un certificado distinto al pinneado la app **no** conecta
-- [ ] En un dispositivo con root/jailbreak se aplica `ROOT_POLICY`
-- [ ] Revisa los logs de un build release: no deben aparecer tokens ni datos personales
-- [ ] La cuenta demo del mock (`demo@starkshowcase.dev`) **no** funciona contra la API real
+- [ ] No cleartext HTTP: `network_security_config.xml` has no domain with `cleartextTrafficPermitted="true"`
+- [ ] With `PINNING_ENABLED=true` and a certificate different from the pinned one, the app does **not** connect
+- [ ] On a rooted/jailbroken device, `ROOT_POLICY` is applied
+- [ ] Check the logs of a release build: no tokens or personal data may appear
+- [ ] The mock's demo account (`demo@starkshowcase.dev`) does **not** work against the real API
 
-## 7. Tiendas
+## 7. Stores
 
-- [ ] Política de privacidad y formulario de seguridad de datos (Play) / *App Privacy* (App Store)
-- [ ] Capturas en ES y EN; descripción y notas de versión
-- [ ] Subida **solo** tras confirmación explícita; etiqueta `v<version>+<build>` tras publicar
+- [ ] Privacy policy and data safety form (Play) / *App Privacy* (App Store)
+- [ ] Screenshots in ES and EN; description and release notes
+- [ ] Upload **only** after explicit confirmation; tag `v<version>+<build>` after publishing
 
-## 8. Bloqueantes antes de producción con una API real
+## 8. Blockers before production with a real API
 
-- [ ] **Pinning SPKI en el *handshake***: fijar el hash de la clave pública (no del certificado completo) con ≥ 2 huellas (actual + respaldo) y validarlo durante el TLS, no al recibir las cabeceras
-- [ ] **Prueba de humo del build release** con R8 + `--obfuscate` en Android e iOS reales (los plugins `jailbreak_root_detection` y `screen_protector` pueden necesitar reglas en `proguard-rules.pro`)
-- [ ] Decidir si hace falta atestación (Play Integrity / App Attest) además de la detección de root
-- [ ] Revisar la compatibilidad de `get_it` 9 y `cupertino_icons` 2 (hay versiones mayores disponibles) con `fvm flutter pub outdated`
+- [ ] **SPKI pinning in the handshake**: pin the public-key hash (not the whole certificate) with ≥ 2 fingerprints (current + backup) and validate it during TLS, not when the response headers arrive
+- [ ] **Release build smoke test** with R8 + `--obfuscate` on real Android and iOS devices (the `jailbreak_root_detection` and `screen_protector` plugins may need rules in `proguard-rules.pro`)
+- [ ] Decide whether attestation (Play Integrity / App Attest) is needed on top of root detection
+- [ ] Review compatibility with `get_it` 9 and `cupertino_icons` 2 (major versions are available) using `fvm flutter pub outdated`
 
-## Limitaciones conocidas
+## Known limitations
 
-- El pinning se evalúa cuando llegan las cabeceras de respuesta (limitación de `dio`): la petición ya se envió, aunque la respuesta se descarta.
-- La detección de root/jailbreak es evitable; con `ROOT_POLICY=warn` un fallo de la detección se ignora y con `block` se trata como dispositivo no confiable.
-- El ajuste de confirmación biométrica vive en `shared_preferences` y puede alterarse en un dispositivo con root.
-- Las integraciones nativas (biometría, protección de pantalla, detección de root) están probadas con *mocks*; hay que validarlas en dispositivos reales.
-- No hay build de Android/iOS verificado en el entorno de desarrollo (sin Android SDK ni Xcode).
+- Pinning is evaluated when the response headers arrive (a `dio` limitation): the request has already been sent, although the response is discarded.
+- Root/jailbreak detection can be bypassed; with `ROOT_POLICY=warn` a detection failure is ignored, and with `block` it is treated as an untrusted device.
+- The biometric confirmation setting lives in `shared_preferences` and can be altered on a rooted device.
+- Native integrations (biometrics, screen protection, root detection) are tested with *mocks*; they must be validated on real devices.
+- No Android/iOS build has been verified in the development environment (no Android SDK or Xcode).

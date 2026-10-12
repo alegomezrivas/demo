@@ -7,7 +7,7 @@ Stacked, GoRouter, formularios reactivos, seguridad en red y pruebas unitarias.
 Identificador: `com.softstark.demo`. El backend es un mock de Dio hasta que exista una API real.
 
 > Estado: **Fase 5** (revisión final). Plan completo en [`CLAUDE.md`](CLAUDE.md); antes de publicar sigue
-> el [checklist de release](docs/RELEASE_CHECKLIST.md).
+> el [checklist de release](docs/RELEASE_CHECKLIST.es.md).
 
 ## Requisitos
 
@@ -206,5 +206,5 @@ Para reproducir el *gate* de cobertura en local: `fvm flutter test --coverage &&
   no una garantía. Para algo más fuerte hace falta atestación (Play Integrity / App Attest).
 - **Ajuste de biometría** en `shared_preferences`: en un dispositivo con root puede modificarse; solo protege contra uso casual.
 - **No se pudo compilar en Android/iOS** en el entorno de desarrollo (sin Android SDK ni Xcode): falta una prueba de
-  humo de un build release con R8 y ofuscación (ver `docs/RELEASE_CHECKLIST.md`).
+  humo de un build release con R8 y ofuscación (ver `docs/RELEASE_CHECKLIST.es.md`).
 - Las pruebas de plugins nativos usan *mocks*: valídalas en dispositivos reales.
