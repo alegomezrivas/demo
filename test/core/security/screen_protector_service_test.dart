@@ -26,7 +26,8 @@ void main() {
     test(
       'enable blocks screenshots and hides the app-switcher preview',
       () async {
-        await const ScreenProtectorService().enable();
+        final service = ScreenProtectorService();
+        await service.enable();
 
         expect(calls, [
           'preventScreenshotOn',
@@ -37,13 +38,45 @@ void main() {
     );
 
     test('disable turns every protection off', () async {
-      await const ScreenProtectorService().disable();
+      final service = ScreenProtectorService();
+      await service.enable();
+      calls.clear();
+
+      await service.disable();
 
       expect(calls, [
         'preventScreenshotOff',
         'protectDataLeakageOff',
         'protectDataLeakageWithBlurOff',
       ]);
+    });
+
+    test('keeps the protection while another screen still needs it', () async {
+      final service = ScreenProtectorService();
+      await service.enable();
+      await service.enable();
+      calls.clear();
+
+      await service.disable();
+      expect(calls, isEmpty);
+
+      await service.disable();
+      expect(calls, contains('preventScreenshotOff'));
+    });
+
+    test('enabling twice calls the plugin only once', () async {
+      final service = ScreenProtectorService();
+
+      await service.enable();
+      await service.enable();
+
+      expect(calls.where((c) => c == 'preventScreenshotOn'), hasLength(1));
+    });
+
+    test('an unbalanced disable does nothing', () async {
+      await ScreenProtectorService().disable();
+
+      expect(calls, isEmpty);
     });
   });
 }

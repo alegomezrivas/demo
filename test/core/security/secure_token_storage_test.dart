@@ -1,23 +1,8 @@
 import 'package:demo/core/security/auth_tokens.dart';
-import 'package:demo/core/security/secure_storage.dart';
 import 'package:demo/core/security/secure_token_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class InMemorySecureStorage implements SecureStorage {
-  final Map<String, String> values = {};
-
-  @override
-  Future<String?> read(String key) async => values[key];
-
-  @override
-  Future<void> write(String key, String value) async => values[key] = value;
-
-  @override
-  Future<void> delete(String key) async => values.remove(key);
-
-  @override
-  Future<void> deleteAll() async => values.clear();
-}
+import '../../helpers/in_memory_secure_storage.dart';
 
 void main() {
   late InMemorySecureStorage backing;

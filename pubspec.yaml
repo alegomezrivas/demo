@@ -23,6 +23,7 @@ dependencies:
   jailbreak_root_detection: ^1.2.3
   json_annotation: ^4.12.0
   local_auth: ^3.0.2
+  meta: ^1.19.0
   reactive_forms: ^18.2.2
   screen_protector: ^1.5.3
   stacked: ^3.5.0
