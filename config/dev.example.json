@@ -1,0 +1,9 @@
+{
+  "ENV": "dev",
+  "API_BASE_URL": "https://api.example.com",
+  "USE_MOCK_API": "true",
+  "PINNING_ENABLED": "false",
+  "PINNING_SHA256": "",
+  "ROOT_POLICY": "warn",
+  "PROTECT_SCREENS": "true"
+}

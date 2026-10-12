@@ -1,0 +1,144 @@
+{
+  "@@locale": "es",
+  "appName": "Stark Showcase",
+  "@appName": {
+    "description": "Visible application name"
+  },
+  "aboutTitle": "Acerca de",
+  "aboutBody": "Aplicación de demostración que muestra Clean Architecture, Stacked, GoRouter, formularios reactivos y pruebas unitarias.",
+  "commonBack": "Volver",
+  "validationRequired": "Este campo es obligatorio",
+  "validationEmail": "Ingresa un correo electrónico válido",
+  "validationStrongPassword": "Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo",
+  "validationPhone": "Ingresa un teléfono válido",
+  "validationMinLength": "Debe tener al menos {length} caracteres",
+  "@validationMinLength": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "validationMustMatch": "Los valores no coinciden",
+  "errorGeneric": "Algo salió mal. Inténtalo de nuevo.",
+  "errorNetwork": "No hay conexión. Revisa tu red e inténtalo de nuevo.",
+  "errorServer": "El servicio no está disponible por ahora. Inténtalo más tarde.",
+  "errorUnauthorized": "Tu sesión expiró. Inicia sesión de nuevo.",
+  "integrityWarning": "Este dispositivo parece modificado (root/jailbreak o depuración). Algunas protecciones de seguridad podrían no ser efectivas.",
+  "integrityBlockedTitle": "Dispositivo no compatible",
+  "integrityBlockedMessage": "Por seguridad, la aplicación no puede ejecutarse en dispositivos modificados.",
+  "commonDismiss": "Entendido",
+  "authLoginTitle": "Iniciar sesión",
+  "authLoginSubtitle": "Accede con tu cuenta para continuar",
+  "authEmailLabel": "Correo electrónico",
+  "authPasswordLabel": "Contraseña",
+  "authLoginButton": "Entrar",
+  "authNoAccount": "¿No tienes cuenta?",
+  "authGoToRegister": "Crear cuenta",
+  "authRegisterTitle": "Crear cuenta",
+  "authRegisterSubtitle": "Completa tus datos para registrarte",
+  "authNameLabel": "Nombre",
+  "authPhoneLabel": "Teléfono (opcional)",
+  "authConfirmPasswordLabel": "Confirmar contraseña",
+  "authRegisterButton": "Registrarme",
+  "authHaveAccount": "¿Ya tienes cuenta?",
+  "authGoToLogin": "Iniciar sesión",
+  "authTogglePassword": "Mostrar u ocultar contraseña",
+  "authInvalidCredentials": "Correo o contraseña incorrectos",
+  "authEmailTaken": "Ya existe una cuenta con ese correo",
+  "navDashboard": "Inicio",
+  "navTasks": "Tareas",
+  "navSettings": "Ajustes",
+  "commonRetry": "Reintentar",
+  "commonCancel": "Cancelar",
+  "commonDelete": "Eliminar",
+  "commonSave": "Guardar",
+  "dashboardGreeting": "Hola, {name}",
+  "@dashboardGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardSubtitle": "Así va tu trabajo",
+  "dashboardCompletion": "{percent}% completado",
+  "@dashboardCompletion": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardStatTotal": "Total",
+  "dashboardStatDone": "Completadas",
+  "dashboardStatOverdue": "Vencidas",
+  "dashboardStatHighPriority": "Prioridad alta pendientes",
+  "dashboardViewTasks": "Ver tareas",
+  "dashboardNewTask": "Nueva tarea",
+  "tasksTitle": "Tareas",
+  "tasksSearchLabel": "Buscar tareas",
+  "tasksFilterAll": "Todas",
+  "tasksFilterPending": "Pendientes",
+  "tasksFilterDone": "Completadas",
+  "tasksPriorityAny": "Cualquier prioridad",
+  "priorityLow": "Baja",
+  "priorityMedium": "Media",
+  "priorityHigh": "Alta",
+  "tasksEmpty": "Aún no tienes tareas",
+  "tasksEmptyFiltered": "Ninguna tarea coincide con los filtros",
+  "tasksDueDate": "Vence: {date}",
+  "@tasksDueDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksOverdue": "Vencida",
+  "tasksDeleteTitle": "Eliminar tarea",
+  "tasksDeleteMessage": "¿Seguro que quieres eliminar \"{title}\"?",
+  "@tasksDeleteMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "tasksNew": "Nueva tarea",
+  "tasksEdit": "Editar tarea",
+  "tasksFieldTitle": "Título",
+  "tasksFieldDescription": "Descripción",
+  "tasksFieldPriority": "Prioridad",
+  "tasksFieldDueDate": "Fecha límite",
+  "tasksFieldDone": "Completada",
+  "tasksClearDate": "Quitar fecha",
+  "settingsTitle": "Ajustes",
+  "settingsProfile": "Perfil",
+  "settingsAppearance": "Apariencia",
+  "settingsTheme": "Tema",
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+  "settingsLanguage": "Idioma",
+  "languageSystem": "Sistema",
+  "languageSpanish": "Español",
+  "languageEnglish": "English",
+  "settingsSecurity": "Seguridad",
+  "settingsBiometric": "Confirmar con biometría",
+  "settingsBiometricHint": "Pide tu huella, rostro o bloqueo de pantalla antes de eliminar tareas o cerrar sesión",
+  "settingsBiometricUnavailable": "Este dispositivo no tiene huella, rostro ni bloqueo de pantalla configurado",
+  "settingsAbout": "Acerca de",
+  "settingsLogout": "Cerrar sesión",
+  "biometricReasonDelete": "Confirma tu identidad para eliminar la tarea",
+  "biometricReasonLogout": "Confirma tu identidad para cerrar sesión",
+  "validationMaxLength": "No puede superar {length} caracteres",
+  "@validationMaxLength": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "biometricReasonToggle": "Confirma tu identidad para cambiar esta opción"
+}

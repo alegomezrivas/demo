@@ -146,3 +146,7 @@ config/*.json
 
 # Obfuscation symbols
 debug-info/
+
+# IDE
+.idea/
+*.iml

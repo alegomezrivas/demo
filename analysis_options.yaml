@@ -1,0 +1,24 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - "lib/l10n/app_localizations*.dart"
+    - build/**
+    - android/**
+    - ios/**
+
+linter:
+  rules:
+    # The UI is localized through ARB files, public docs are enforced selectively.
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    unnecessary_type_name_in_constructor: false
+    # Keep explicit closures over tear-offs when they read better.
+    unnecessary_lambdas: false
