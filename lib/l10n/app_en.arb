@@ -1,0 +1,10 @@
+{
+  "@@locale": "en",
+  "appName": "Stark Showcase",
+  "homeTitle": "Stark Showcase",
+  "homeSubtitle": "A Flutter engineering portfolio built with clean architecture",
+  "homeGetStarted": "Learn more",
+  "aboutTitle": "About",
+  "aboutBody": "Demo application showcasing Clean Architecture, Stacked, GoRouter, reactive forms and unit tests.",
+  "commonBack": "Back"
+}

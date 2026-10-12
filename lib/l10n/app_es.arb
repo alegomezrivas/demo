@@ -1,0 +1,11 @@
+{
+  "@@locale": "es",
+  "appName": "Stark Showcase",
+  "@appName": {"description": "Visible application name"},
+  "homeTitle": "Stark Showcase",
+  "homeSubtitle": "Portafolio de ingeniería Flutter con arquitectura limpia",
+  "homeGetStarted": "Conocer más",
+  "aboutTitle": "Acerca de",
+  "aboutBody": "Aplicación de demostración que muestra Clean Architecture, Stacked, GoRouter, formularios reactivos y pruebas unitarias.",
+  "commonBack": "Volver"
+}
