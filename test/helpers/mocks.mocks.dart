@@ -5,12 +5,15 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'dart:async' as _i8;
+import 'dart:typed_data' as _i21;
 
 import 'package:demo/core/network/token_refresher.dart' as _i15;
 import 'package:demo/core/security/auth_tokens.dart' as _i5;
 import 'package:demo/core/security/device_integrity_checker.dart' as _i17;
 import 'package:demo/core/security/device_integrity_service.dart' as _i18;
 import 'package:demo/core/security/token_storage.dart' as _i16;
+import 'package:demo/core/services/image_processor.dart' as _i22;
+import 'package:demo/core/services/image_source_service.dart' as _i20;
 import 'package:demo/core/services/navigation_service.dart' as _i7;
 import 'package:flutter/foundation.dart' as _i9;
 import 'package:flutter/services.dart' as _i4;
@@ -901,4 +904,35 @@ class MockImagePicker extends _i1.Mock implements _i19.ImagePicker {
             returnValueForMissingStub: false,
           )
           as bool);
+}
+
+/// A class which mocks [ImageSourceService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockImageSourceService extends _i1.Mock
+    implements _i20.ImageSourceService {
+  @override
+  _i8.Future<_i21.Uint8List?> pick(_i20.PhotoSource? source) =>
+      (super.noSuchMethod(
+            Invocation.method(#pick, [source]),
+            returnValue: _i8.Future<_i21.Uint8List?>.value(),
+            returnValueForMissingStub: _i8.Future<_i21.Uint8List?>.value(),
+          )
+          as _i8.Future<_i21.Uint8List?>);
+}
+
+/// A class which mocks [ImageProcessor].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockImageProcessor extends _i1.Mock implements _i22.ImageProcessor {
+  @override
+  _i8.Future<_i21.Uint8List> toAvatarJpeg(_i21.Uint8List? source) =>
+      (super.noSuchMethod(
+            Invocation.method(#toAvatarJpeg, [source]),
+            returnValue: _i8.Future<_i21.Uint8List>.value(_i21.Uint8List(0)),
+            returnValueForMissingStub: _i8.Future<_i21.Uint8List>.value(
+              _i21.Uint8List(0),
+            ),
+          )
+          as _i8.Future<_i21.Uint8List>);
 }

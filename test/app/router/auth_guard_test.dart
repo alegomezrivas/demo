@@ -18,6 +18,7 @@ void main() {
       refreshListenable: session,
       routes: [
         GoRoute(path: AppRoutes.home, builder: (_, _) => page('home')),
+        GoRoute(path: AppRoutes.welcome, builder: (_, _) => page('welcome')),
         GoRoute(path: AppRoutes.login, builder: (_, _) => page('login')),
         GoRoute(path: AppRoutes.about, builder: (_, _) => page('about')),
       ],
@@ -30,16 +31,16 @@ void main() {
   }
 
   group('AuthGuard', () {
-    testWidgets('sends signed-out users to login from private routes', (
+    testWidgets('sends signed-out users to welcome from private routes', (
       tester,
     ) async {
       await pumpApp(tester);
-      expect(find.text('login'), findsOneWidget);
+      expect(find.text('welcome'), findsOneWidget);
 
       router.go(AppRoutes.about);
       await tester.pumpAndSettle();
 
-      expect(find.text('login'), findsOneWidget);
+      expect(find.text('welcome'), findsOneWidget);
     });
 
     testWidgets('moves to home as soon as the session starts', (tester) async {
@@ -66,14 +67,14 @@ void main() {
       expect(find.text('about'), findsOneWidget);
     });
 
-    testWidgets('returns to login when the session ends', (tester) async {
+    testWidgets('returns to welcome when the session ends', (tester) async {
       session.markSignedIn();
       await pumpApp(tester);
 
       session.markSignedOut();
       await tester.pumpAndSettle();
 
-      expect(find.text('login'), findsOneWidget);
+      expect(find.text('welcome'), findsOneWidget);
     });
   });
 }

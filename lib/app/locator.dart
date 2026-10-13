@@ -18,6 +18,8 @@ import 'package:demo/core/security/session_token_storage.dart';
 import 'package:demo/core/security/token_storage.dart';
 import 'package:demo/core/services/data_change_notifier.dart';
 import 'package:demo/core/services/go_router_navigation_service.dart';
+import 'package:demo/core/services/image_processor.dart';
+import 'package:demo/core/services/image_source_service.dart';
 import 'package:demo/core/services/navigation_service.dart';
 import 'package:demo/core/services/session_service.dart';
 import 'package:demo/core/utils/logging/app_logger.dart';
@@ -135,6 +137,9 @@ Future<void> setupLocator({
       () => LocalAuthBiometricAuthenticator(LocalAuthentication()),
     )
     ..registerLazySingleton<ScreenProtection>(ScreenProtectorService.new)
+    // Profile picture.
+    ..registerLazySingleton<ImageSourceService>(ImagePickerSourceService.new)
+    ..registerLazySingleton<ImageProcessor>(() => const JpegAvatarProcessor())
     // Network.
     ..registerLazySingleton<SessionExpiredNotifier>(SessionExpiredNotifier.new)
     ..registerLazySingleton<Dio>(

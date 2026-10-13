@@ -15,7 +15,7 @@ class AuthGuard {
   const AuthGuard(
     this._session, {
     SignUpProgress? signUpProgress,
-    this.signedOutLocation = AppRoutes.login,
+    this.signedOutLocation = AppRoutes.welcome,
   }) : _progress = signUpProgress;
 
   static const Set<String> _publicRoutes = {

@@ -122,6 +122,40 @@ void main() {
     });
   });
 
+  group('remember me', () {
+    test('is checked by default and remembers the session', () async {
+      when(login(any)).thenAnswer((_) async => right(user));
+      fill();
+
+      await viewModel.submit();
+
+      final params = verify(login(captureAny)).captured.single as LoginParams;
+      expect(params.rememberSession, isTrue);
+      expect(session.isPersistent, isTrue);
+    });
+
+    test('unchecked keeps the session out of storage', () async {
+      when(login(any)).thenAnswer((_) async => right(user));
+      fill();
+      viewModel.form.control(LoginViewModel.rememberField).value = false;
+
+      await viewModel.submit();
+
+      final params = verify(login(captureAny)).captured.single as LoginParams;
+      expect(params.rememberSession, isFalse);
+      expect(session.isAuthenticated, isTrue);
+      expect(session.isPersistent, isFalse);
+    });
+  });
+
+  group('navigation', () {
+    test('goToSignUp opens the welcome screen', () {
+      viewModel.goToSignUp();
+
+      verify(navigation.go(AppRoutes.welcome)).called(1);
+    });
+  });
+
   group('UI state', () {
     test('toggles password visibility and notifies', () {
       var notified = 0;

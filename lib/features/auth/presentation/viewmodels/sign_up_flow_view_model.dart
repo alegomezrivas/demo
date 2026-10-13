@@ -129,7 +129,12 @@ class SignUpFlowViewModel extends BaseViewModel {
   }
 
   /// Goes back one step.
-  void back() => _navigation.pop();
+  void back() {
+    // An error belongs to the step that raised it, not to the one before.
+    _state = _state.copyWith(clearFailure: true);
+    _navigation.pop();
+    notifyListeners();
+  }
 
   /// Opens the sign-in screen.
   void goToLogin() => _navigation.go(AppRoutes.login);
@@ -308,7 +313,7 @@ class SignUpFlowViewModel extends BaseViewModel {
     final failed = await _run(() async {
       final result = await _uploadAvatar(jpeg);
       return result.fold((failure) => failure, (user) {
-        _state = _state.copyWith(user: user);
+        _state = _state.copyWith(user: user, avatar: jpeg);
         return null;
       });
     });
@@ -411,6 +416,7 @@ class SignUpFlowViewModel extends BaseViewModel {
   }
 
   void _advance(SignUpStep step) {
+    _state = _state.copyWith(clearFailure: true);
     _progress.unlock(step);
     unawaited(_navigation.push<void>(step.route));
     notifyListeners();

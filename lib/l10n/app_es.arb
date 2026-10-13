@@ -34,13 +34,6 @@
   "authLoginButton": "Entrar",
   "authNoAccount": "¿No tienes cuenta?",
   "authGoToRegister": "Crear cuenta",
-  "authRegisterTitle": "Crear cuenta",
-  "authRegisterSubtitle": "Completa tus datos para registrarte",
-  "authNameLabel": "Nombre",
-  "authConfirmPasswordLabel": "Confirmar contraseña",
-  "authRegisterButton": "Registrarme",
-  "authHaveAccount": "¿Ya tienes cuenta?",
-  "authGoToLogin": "Iniciar sesión",
   "authTogglePassword": "Mostrar u ocultar contraseña",
   "authInvalidCredentials": "Correo o contraseña incorrectos",
   "authEmailTaken": "Ya existe una cuenta con ese correo",
@@ -165,5 +158,84 @@
   "authUsernameTaken": "Ese nombre de usuario ya está en uso",
   "authVerificationExpired": "La verificación del correo caducó. Empieza de nuevo.",
   "authImageInvalid": "No pudimos usar esa imagen. Prueba con otra.",
-  "authImageTooLarge": "La imagen es demasiado grande"
+  "authImageTooLarge": "La imagen es demasiado grande",
+  "welcomeTitle": "Organiza tus tareas, sin ruido",
+  "welcomeSubtitle": "Crea una cuenta en unos pasos y lleva todo en un solo lugar.",
+  "welcomeStart": "Empezar",
+  "welcomeHaveAccount": "Ya tengo cuenta",
+  "welcomeIllustrationLabel": "Ilustración de tareas completadas",
+  "signUpNext": "Siguiente",
+  "signUpEmailTitle": "¿Cuál es tu correo electrónico?",
+  "signUpEmailDescription": "Te enviaremos un código para confirmar que es tuyo.",
+  "signUpCodeTitle": "Escribe el código de confirmación",
+  "signUpCodeDescription": "Ingresa el código de 6 dígitos que enviamos a {email}.",
+  "@signUpCodeDescription": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signUpCodeNotReceived": "No recibí el código",
+  "signUpCodeResendIn": "Podrás pedir otro código en {seconds} s",
+  "@signUpCodeResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "signUpPasswordTitle": "Crea una contraseña",
+  "signUpPasswordDescription": "Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo.",
+  "authRememberSession": "Recordar sesión",
+  "authRememberSessionHint": "Si lo desactivas, tendrás que iniciar sesión cada vez que abras la app.",
+  "signUpNameTitle": "¿Cómo te llamas?",
+  "signUpNameDescription": "Agrega tu nombre para que otras personas te reconozcan.",
+  "authFullNameLabel": "Nombre completo",
+  "signUpUsernameTitle": "Elige un nombre de usuario",
+  "signUpUsernameDescription": "Será tu identificador público.",
+  "authUsernameLabel": "Nombre de usuario",
+  "usernameChecking": "Comprobando disponibilidad…",
+  "usernameAvailable": "{username} está disponible",
+  "@usernameAvailable": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameUnknown": "No pudimos comprobarlo ahora. Puedes continuar.",
+  "signUpTermsTitle": "Acepta los términos y políticas",
+  "signUpTermsDescription": "Al crear tu cuenta aceptas los términos de uso y la política de privacidad de esta demostración.",
+  "signUpTermsAccept": "Acepto",
+  "signUpTermsRead": "Leer los términos y políticas",
+  "termsScreenTitle": "Términos y políticas",
+  "termsDemoNotice": "Texto de ejemplo para esta demostración. No es un documento legal.",
+  "termsUseTitle": "Uso de la app",
+  "termsUseBody": "Esta app es una demostración técnica. Puedes crear tareas de prueba y borrarlas cuando quieras. No la uses para guardar información importante.",
+  "termsPrivacyTitle": "Privacidad",
+  "termsPrivacyBody": "Solo guardamos los datos que escribes al crear tu cuenta: correo, nombre, nombre de usuario y, si quieres, una foto. Nunca guardamos tu contraseña en texto plano.",
+  "termsDataTitle": "Tus datos",
+  "termsDataBody": "Los datos de la demostración viven en memoria y se borran cuando el servidor se reinicia. No los compartimos con nadie.",
+  "signUpAvatarTitle": "Agrega una foto de perfil",
+  "signUpAvatarDescription": "Añade una foto para que te reconozcan. Puedes omitir este paso.",
+  "signUpAvatarAdd": "Agregar una foto",
+  "signUpAvatarSkip": "Omitir",
+  "photoSheetTitle": "Agregar foto de perfil",
+  "photoFromGallery": "Elegir de la galería",
+  "photoFromCamera": "Tomar una foto",
+  "photoGalleryDenied": "Necesitamos permiso para acceder a tus fotos. Puedes activarlo en los ajustes del sistema.",
+  "photoCameraDenied": "Necesitamos permiso para usar la cámara. Puedes activarlo en los ajustes del sistema.",
+  "photoCropTitle": "Recorta tu foto",
+  "photoCropDone": "Listo",
+  "signUpDoneTitle": "Te damos la bienvenida, @{username}",
+  "@signUpDoneTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "signUpDoneDescription": "Tu cuenta está lista. Empieza a organizar tus tareas.",
+  "signUpDoneButton": "Continuar"
 }

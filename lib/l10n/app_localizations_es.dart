@@ -89,27 +89,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authGoToRegister => 'Crear cuenta';
 
   @override
-  String get authRegisterTitle => 'Crear cuenta';
-
-  @override
-  String get authRegisterSubtitle => 'Completa tus datos para registrarte';
-
-  @override
-  String get authNameLabel => 'Nombre';
-
-  @override
-  String get authConfirmPasswordLabel => 'Confirmar contraseña';
-
-  @override
-  String get authRegisterButton => 'Registrarme';
-
-  @override
-  String get authHaveAccount => '¿Ya tienes cuenta?';
-
-  @override
-  String get authGoToLogin => 'Iniciar sesión';
-
-  @override
   String get authTogglePassword => 'Mostrar u ocultar contraseña';
 
   @override
@@ -369,4 +348,180 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get authImageTooLarge => 'La imagen es demasiado grande';
+
+  @override
+  String get welcomeTitle => 'Organiza tus tareas, sin ruido';
+
+  @override
+  String get welcomeSubtitle =>
+      'Crea una cuenta en unos pasos y lleva todo en un solo lugar.';
+
+  @override
+  String get welcomeStart => 'Empezar';
+
+  @override
+  String get welcomeHaveAccount => 'Ya tengo cuenta';
+
+  @override
+  String get welcomeIllustrationLabel => 'Ilustración de tareas completadas';
+
+  @override
+  String get signUpNext => 'Siguiente';
+
+  @override
+  String get signUpEmailTitle => '¿Cuál es tu correo electrónico?';
+
+  @override
+  String get signUpEmailDescription =>
+      'Te enviaremos un código para confirmar que es tuyo.';
+
+  @override
+  String get signUpCodeTitle => 'Escribe el código de confirmación';
+
+  @override
+  String signUpCodeDescription(String email) {
+    return 'Ingresa el código de 6 dígitos que enviamos a $email.';
+  }
+
+  @override
+  String get signUpCodeNotReceived => 'No recibí el código';
+
+  @override
+  String signUpCodeResendIn(int seconds) {
+    return 'Podrás pedir otro código en $seconds s';
+  }
+
+  @override
+  String get signUpPasswordTitle => 'Crea una contraseña';
+
+  @override
+  String get signUpPasswordDescription =>
+      'Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo.';
+
+  @override
+  String get authRememberSession => 'Recordar sesión';
+
+  @override
+  String get authRememberSessionHint =>
+      'Si lo desactivas, tendrás que iniciar sesión cada vez que abras la app.';
+
+  @override
+  String get signUpNameTitle => '¿Cómo te llamas?';
+
+  @override
+  String get signUpNameDescription =>
+      'Agrega tu nombre para que otras personas te reconozcan.';
+
+  @override
+  String get authFullNameLabel => 'Nombre completo';
+
+  @override
+  String get signUpUsernameTitle => 'Elige un nombre de usuario';
+
+  @override
+  String get signUpUsernameDescription => 'Será tu identificador público.';
+
+  @override
+  String get authUsernameLabel => 'Nombre de usuario';
+
+  @override
+  String get usernameChecking => 'Comprobando disponibilidad…';
+
+  @override
+  String usernameAvailable(String username) {
+    return '$username está disponible';
+  }
+
+  @override
+  String get usernameUnknown =>
+      'No pudimos comprobarlo ahora. Puedes continuar.';
+
+  @override
+  String get signUpTermsTitle => 'Acepta los términos y políticas';
+
+  @override
+  String get signUpTermsDescription =>
+      'Al crear tu cuenta aceptas los términos de uso y la política de privacidad de esta demostración.';
+
+  @override
+  String get signUpTermsAccept => 'Acepto';
+
+  @override
+  String get signUpTermsRead => 'Leer los términos y políticas';
+
+  @override
+  String get termsScreenTitle => 'Términos y políticas';
+
+  @override
+  String get termsDemoNotice =>
+      'Texto de ejemplo para esta demostración. No es un documento legal.';
+
+  @override
+  String get termsUseTitle => 'Uso de la app';
+
+  @override
+  String get termsUseBody =>
+      'Esta app es una demostración técnica. Puedes crear tareas de prueba y borrarlas cuando quieras. No la uses para guardar información importante.';
+
+  @override
+  String get termsPrivacyTitle => 'Privacidad';
+
+  @override
+  String get termsPrivacyBody =>
+      'Solo guardamos los datos que escribes al crear tu cuenta: correo, nombre, nombre de usuario y, si quieres, una foto. Nunca guardamos tu contraseña en texto plano.';
+
+  @override
+  String get termsDataTitle => 'Tus datos';
+
+  @override
+  String get termsDataBody =>
+      'Los datos de la demostración viven en memoria y se borran cuando el servidor se reinicia. No los compartimos con nadie.';
+
+  @override
+  String get signUpAvatarTitle => 'Agrega una foto de perfil';
+
+  @override
+  String get signUpAvatarDescription =>
+      'Añade una foto para que te reconozcan. Puedes omitir este paso.';
+
+  @override
+  String get signUpAvatarAdd => 'Agregar una foto';
+
+  @override
+  String get signUpAvatarSkip => 'Omitir';
+
+  @override
+  String get photoSheetTitle => 'Agregar foto de perfil';
+
+  @override
+  String get photoFromGallery => 'Elegir de la galería';
+
+  @override
+  String get photoFromCamera => 'Tomar una foto';
+
+  @override
+  String get photoGalleryDenied =>
+      'Necesitamos permiso para acceder a tus fotos. Puedes activarlo en los ajustes del sistema.';
+
+  @override
+  String get photoCameraDenied =>
+      'Necesitamos permiso para usar la cámara. Puedes activarlo en los ajustes del sistema.';
+
+  @override
+  String get photoCropTitle => 'Recorta tu foto';
+
+  @override
+  String get photoCropDone => 'Listo';
+
+  @override
+  String signUpDoneTitle(String username) {
+    return 'Te damos la bienvenida, @$username';
+  }
+
+  @override
+  String get signUpDoneDescription =>
+      'Tu cuenta está lista. Empieza a organizar tus tareas.';
+
+  @override
+  String get signUpDoneButton => 'Continuar';
 }

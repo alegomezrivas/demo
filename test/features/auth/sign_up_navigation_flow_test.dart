@@ -61,7 +61,6 @@ void main() {
       redirect: AuthGuard(
         session,
         signUpProgress: progress,
-        signedOutLocation: AppRoutes.welcome,
       ).redirect,
       refreshListenable: session,
       routes: [

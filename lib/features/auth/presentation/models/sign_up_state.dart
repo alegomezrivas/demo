@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:demo/core/error/failures.dart';
 import 'package:demo/features/auth/domain/entities/user.dart';
 import 'package:demo/features/auth/presentation/models/username_status.dart';
@@ -14,6 +16,7 @@ class SignUpState {
     this.user,
     this.usernameStatus = UsernameStatus.idle,
     this.failure,
+    this.avatar,
   });
 
   /// E-mail whose code was sent (normalized as typed, trimmed).
@@ -31,6 +34,9 @@ class SignUpState {
   /// Last failure of the current step, if any.
   final Failure? failure;
 
+  /// The picture that was uploaded, for the final welcome; null if skipped.
+  final Uint8List? avatar;
+
   /// Whether the e-mail was confirmed.
   bool get isEmailVerified => verificationToken != null;
 
@@ -46,6 +52,7 @@ class SignUpState {
     User? user,
     UsernameStatus? usernameStatus,
     Failure? failure,
+    Uint8List? avatar,
     bool clearVerificationToken = false,
     bool clearFailure = false,
   }) {
@@ -57,6 +64,7 @@ class SignUpState {
       user: user ?? this.user,
       usernameStatus: usernameStatus ?? this.usernameStatus,
       failure: clearFailure ? null : (failure ?? this.failure),
+      avatar: avatar ?? this.avatar,
     );
   }
 }
