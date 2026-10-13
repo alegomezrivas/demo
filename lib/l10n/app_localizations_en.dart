@@ -523,4 +523,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signUpDoneButton => 'Continue';
+
+  @override
+  String get settingsBiometricNeedsRememberedSession =>
+      'Biometric confirmation is only available when the session is remembered. Sign out and sign in again with “Remember me” on.';
 }

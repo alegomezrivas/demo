@@ -76,13 +76,20 @@ class SettingsView extends StatelessWidget {
                     ),
                     SizedBox(height: context.spacing.lg),
                     _SectionTitle(l10n.settingsSecurity),
-                    Card(
-                      child: ReactiveSwitchListTile(
-                        formControlName: SettingsViewModel.biometricField,
-                        title: Text(l10n.settingsBiometric),
-                        subtitle: Text(l10n.settingsBiometricHint),
+                    if (viewModel.offersBiometric)
+                      Card(
+                        child: ReactiveSwitchListTile(
+                          formControlName: SettingsViewModel.biometricField,
+                          title: Text(l10n.settingsBiometric),
+                          subtitle: Text(l10n.settingsBiometricHint),
+                        ),
+                      )
+                    else
+                      Text(
+                        l10n.settingsBiometricNeedsRememberedSession,
+                        key: const Key('biometric_needs_remembered_session'),
+                        style: context.text.bodySmall,
                       ),
-                    ),
                     if (viewModel.biometricUnavailable)
                       Padding(
                         padding: EdgeInsets.only(top: context.spacing.sm),

@@ -524,4 +524,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get signUpDoneButton => 'Continuar';
+
+  @override
+  String get settingsBiometricNeedsRememberedSession =>
+      'La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado.';
 }

@@ -112,6 +112,14 @@ void main() {
       );
     });
 
+    test('offers biometrics only for a remembered session', () {
+      session.markSignedIn();
+      expect(viewModel.offersBiometric, isTrue);
+
+      session.markSignedIn(persistent: false);
+      expect(viewModel.offersBiometric, isFalse);
+    });
+
     test('keeps the profile empty when loading fails', () async {
       when(
         getCurrentUser(any),

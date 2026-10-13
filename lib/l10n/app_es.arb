@@ -237,5 +237,6 @@
     }
   },
   "signUpDoneDescription": "Tu cuenta está lista. Empieza a organizar tus tareas.",
-  "signUpDoneButton": "Continuar"
+  "signUpDoneButton": "Continuar",
+  "settingsBiometricNeedsRememberedSession": "La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado."
 }

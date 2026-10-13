@@ -1,6 +1,7 @@
 import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/features/auth/presentation/utils/auth_failure_message.dart';
+import 'package:demo/features/auth/presentation/widgets/animated_message.dart';
 import 'package:demo/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -18,17 +19,24 @@ class StepErrorText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = failure;
-    if (current == null) return const SizedBox.shrink();
-    return Padding(
-      padding: EdgeInsets.only(top: context.spacing.md),
-      child: Semantics(
-        liveRegion: true,
-        child: Text(
-          current.authMessage(AppLocalizations.of(context)),
-          key: const Key('step_error'),
-          style: context.text.bodySmall.copyWith(color: context.colors.error),
-        ),
-      ),
+    final message = current?.authMessage(AppLocalizations.of(context));
+    return AnimatedMessage(
+      child: message == null
+          ? null
+          : Padding(
+              key: ValueKey(message),
+              padding: EdgeInsets.only(top: context.spacing.md),
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  message,
+                  key: const Key('step_error'),
+                  style: context.text.bodySmall.copyWith(
+                    color: context.colors.error,
+                  ),
+                ),
+              ),
+            ),
     );
   }
 }

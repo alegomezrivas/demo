@@ -1027,6 +1027,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Continuar'**
   String get signUpDoneButton;
+
+  /// No description provided for @settingsBiometricNeedsRememberedSession.
+  ///
+  /// In es, this message translates to:
+  /// **'La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado.'**
+  String get settingsBiometricNeedsRememberedSession;
 }
 
 class _AppLocalizationsDelegate

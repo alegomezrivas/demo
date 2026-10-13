@@ -150,6 +150,35 @@ void main() {
       },
     );
 
+    testWidgets(
+      'hides the biometric option when the session is not remembered',
+      (
+        tester,
+      ) async {
+        session.markSignedIn(persistent: false);
+        await pumpView(tester);
+
+        expect(find.byType(Switch), findsNothing);
+        expect(
+          find.byKey(const Key('biometric_needs_remembered_session')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('offers the biometric option when the session is remembered', (
+      tester,
+    ) async {
+      session.markSignedIn();
+      await pumpView(tester);
+
+      expect(find.byType(Switch), findsOneWidget);
+      expect(
+        find.byKey(const Key('biometric_needs_remembered_session')),
+        findsNothing,
+      );
+    });
+
     testWidgets('opens the about screen', (tester) async {
       await pumpView(tester);
 

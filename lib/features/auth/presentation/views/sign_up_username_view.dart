@@ -7,6 +7,7 @@ import 'package:demo/core/widgets/app_text_field.dart';
 import 'package:demo/features/auth/presentation/forms/sign_up_forms.dart';
 import 'package:demo/features/auth/presentation/models/username_status.dart';
 import 'package:demo/features/auth/presentation/viewmodels/sign_up_flow_view_model.dart';
+import 'package:demo/features/auth/presentation/widgets/animated_message.dart';
 import 'package:demo/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -100,8 +101,15 @@ class _StatusLine extends StatelessWidget {
       UsernameStatus.taken => (l10n.authUsernameTaken, colors.error),
       UsernameStatus.unknown => (l10n.usernameUnknown, colors.textSecondary),
     };
-    if (text == null) return const SizedBox.shrink();
+    return AnimatedMessage(
+      child: text == null ? null : _line(context, text, color),
+    );
+  }
+
+  Widget _line(BuildContext context, String text, Color color) {
+    final colors = context.colors;
     return Padding(
+      key: ValueKey('$status$text'),
       padding: EdgeInsets.only(top: context.spacing.sm),
       child: Semantics(
         liveRegion: true,

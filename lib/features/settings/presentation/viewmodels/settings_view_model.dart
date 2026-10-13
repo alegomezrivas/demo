@@ -84,6 +84,12 @@ class SettingsViewModel extends BaseViewModel {
   /// The signed-in user, once loaded.
   User? get user => _user;
 
+  /// Whether the biometric option can be offered.
+  ///
+  /// A session that is not remembered lives in memory only, so there is no
+  /// stored session for biometrics to protect and the option is hidden.
+  bool get offersBiometric => _session.isPersistent;
+
   /// True after the user tried to enable biometrics on an unsupported device.
   bool get biometricUnavailable => _biometricUnavailable;
 
