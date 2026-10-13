@@ -36,7 +36,7 @@ Requires Node.js 22 or newer.
 ```bash
 cd backend
 npm ci
-cp env.example .env        # PowerShell: Copy-Item env.example .env
+cp .env.example .env       # PowerShell: Copy-Item .env.example .env
 # Generate a secret and paste it as JWT_ACCESS_SECRET in .env:
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 npm run dev
@@ -48,8 +48,7 @@ The server listens on **http://localhost:5556** (override with `PORT`).
 - Interactive docs (Swagger UI): <http://localhost:5556/docs>
 - OpenAPI document: <http://localhost:5556/openapi.json>
 
-> `.env` is ignored by git. The template is called `env.example` (without the leading dot) in
-> this repository; rename it to `.env.example` if you prefer the conventional name.
+> `.env` is ignored by git; `.env.example` is the committed template and never holds real secrets.
 
 ## Test accounts
 

@@ -37,7 +37,7 @@ Requiere Node.js 22 o superior.
 ```bash
 cd backend
 npm ci
-cp env.example .env        # PowerShell: Copy-Item env.example .env
+cp .env.example .env       # PowerShell: Copy-Item .env.example .env
 # Genera un secreto y pégalo como JWT_ACCESS_SECRET en .env:
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 npm run dev
@@ -49,8 +49,7 @@ El servidor escucha en **http://localhost:5556** (cámbialo con `PORT`).
 - Documentación interactiva (Swagger UI): <http://localhost:5556/docs>
 - Documento OpenAPI: <http://localhost:5556/openapi.json>
 
-> `.env` está ignorado por git. En este repositorio la plantilla se llama `env.example` (sin el punto
-> inicial); renómbrala a `.env.example` si prefieres el nombre habitual.
+> `.env` está ignorado por git; `.env.example` es la plantilla versionada y nunca contiene secretos reales.
 
 ## Cuentas de prueba
 
