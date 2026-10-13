@@ -9,16 +9,30 @@ class SessionService extends ChangeNotifier {
     : _isAuthenticated = isAuthenticated;
 
   bool _isAuthenticated;
+  bool _isPersistent = true;
   StreamSubscription<void>? _expiredSubscription;
 
   /// Whether a session is active.
   bool get isAuthenticated => _isAuthenticated;
 
+  /// Whether the active session survives an app restart.
+  ///
+  /// False when the person chose not to be remembered: tokens are then held in
+  /// memory only, so features that need a stored session (such as unlocking
+  /// with biometrics) must not be offered.
+  bool get isPersistent => _isPersistent;
+
   /// Marks the user as signed in.
-  void markSignedIn() => _update(true);
+  void markSignedIn({bool persistent = true}) {
+    _isPersistent = persistent;
+    _update(true);
+  }
 
   /// Marks the user as signed out.
-  void markSignedOut() => _update(false);
+  void markSignedOut() {
+    _isPersistent = true;
+    _update(false);
+  }
 
   /// Signs the user out whenever [sessionExpired] emits.
   void attach(Stream<void> sessionExpired) {

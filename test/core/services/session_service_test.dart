@@ -4,6 +4,41 @@ import 'package:demo/core/services/session_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('SessionService persistence', () {
+    test('is persistent by default', () {
+      expect(SessionService().isPersistent, isTrue);
+      expect((SessionService()..markSignedIn()).isPersistent, isTrue);
+    });
+
+    test('records a session that is not remembered', () {
+      final session = SessionService()..markSignedIn(persistent: false);
+
+      expect(session.isAuthenticated, isTrue);
+      expect(session.isPersistent, isFalse);
+    });
+
+    test('goes back to persistent when signing out', () {
+      final session = SessionService()
+        ..markSignedIn(persistent: false)
+        ..markSignedOut();
+
+      expect(session.isPersistent, isTrue);
+    });
+
+    test('goes back to persistent when the session expires', () async {
+      final controller = StreamController<void>.broadcast();
+      final session = SessionService()
+        ..markSignedIn(persistent: false)
+        ..attach(controller.stream);
+
+      controller.add(null);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(session.isPersistent, isTrue);
+      await controller.close();
+    });
+  });
+
   group('SessionService', () {
     test('starts signed out by default', () {
       expect(SessionService().isAuthenticated, isFalse);
