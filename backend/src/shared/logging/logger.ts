@@ -6,9 +6,13 @@ export type { Logger } from 'pino';
 /** Paths whose values must never reach the logs. */
 const REDACTED_PATHS = [
   'password',
+  'code',
+  'verificationToken',
   'refreshToken',
   'accessToken',
   '*.password',
+  '*.code',
+  '*.verificationToken',
   '*.refreshToken',
   '*.accessToken',
   'req.headers.authorization',

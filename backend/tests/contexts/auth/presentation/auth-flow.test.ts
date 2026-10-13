@@ -12,6 +12,7 @@ import {
   buildTestContext,
   DEMO_CREDENTIALS,
   loginAs,
+  signUp,
   TEST_SECRET,
   type TestContext,
 } from '../../../helpers/test-app.js';
@@ -149,10 +150,8 @@ describe('authenticate middleware', () => {
   });
 
   it('rejects a valid token whose user no longer exists', async () => {
-    const created = await request(ctx.app)
-      .post('/auth/register')
-      .send({ name: 'Gone', email: 'gone@example.com', password: 'Str0ng!Pass' })
-      .expect(201);
+    const created = await signUp(ctx.app, { email: 'gone@example.com', username: 'gone' });
+    expect(created.status).toBe(201);
     const { accessToken } = created.body as { accessToken: string };
     expect((await probeWith(`Bearer ${accessToken}`)).status).toBe(200);
 
@@ -168,10 +167,9 @@ describe('authenticate middleware', () => {
 describe('container.reset', () => {
   it('restores the seed users and drops registered ones and sessions', async () => {
     const session = await loginAs(ctx.app);
-    await request(ctx.app)
-      .post('/auth/register')
-      .send({ name: 'Temp', email: 'temp@example.com', password: 'Str0ng!Pass' })
-      .expect(201);
+    expect((await signUp(ctx.app, { email: 'temp@example.com', username: 'temp' })).status).toBe(
+      201,
+    );
 
     await ctx.container.reset();
 

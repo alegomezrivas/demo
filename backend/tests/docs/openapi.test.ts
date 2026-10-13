@@ -34,6 +34,12 @@ describe('OpenAPI document', () => {
         'GET /health',
         'POST /auth/login',
         'POST /auth/register',
+        'POST /auth/signup/email',
+        'POST /auth/signup/code/resend',
+        'POST /auth/signup/verify',
+        'GET /auth/username-available',
+        'GET /users/me/avatar',
+        'PUT /users/me/avatar',
         'POST /auth/refresh',
         'POST /auth/logout',
         'GET /tasks',
@@ -64,7 +70,13 @@ describe('OpenAPI document', () => {
       'refreshToken',
     ]);
     expect(schemas.TaskInput).toMatchObject({ additionalProperties: false });
-    expect(schemas.RegisterRequest?.properties).toHaveProperty('password');
+    expect(Object.keys(schemas.RegisterRequest?.properties ?? {})).toEqual([
+      'verificationToken',
+      'name',
+      'username',
+      'password',
+    ]);
+    expect(Object.keys(schemas.AuthResponse?.properties ?? {})).toContain('user');
   });
 
   it('derives the list query parameters from the validation schema', () => {

@@ -1,22 +1,28 @@
 import type { Express } from 'express';
 import request from 'supertest';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { SIGNUP_POLICY } from '../../../../src/contexts/auth/application/signup-policy.js';
 import {
   authResponseSchema,
   tokenPairResponseSchema,
+  usernameAvailabilityResponseSchema,
+  verificationResponseSchema,
 } from '../../../../src/contexts/auth/presentation/http/auth-schemas.js';
 import {
   buildTestContext,
+  CONFIRMATION_CODE,
+  confirmEmail,
   DEMO_CREDENTIALS,
   loginAs,
+  signUp,
   type TestContext,
 } from '../../../helpers/test-app.js';
 
 const NEW_USER = {
   name: 'Lucía Pérez',
   email: 'lucia@example.com',
+  username: 'lucia.perez',
   password: 'Str0ng!Pass',
-  phone: '+34600123456',
 };
 
 let ctx: TestContext;
@@ -36,7 +42,8 @@ describe('POST /auth/login', () => {
       id: 'user-0',
       name: 'Demo User',
       email: 'demo@starkshowcase.dev',
-      phone: null,
+      username: 'demo',
+      hasAvatar: false,
     });
     expect(body.accessToken.split('.')).toHaveLength(3);
   });
@@ -101,14 +108,16 @@ describe('POST /auth/login', () => {
 
 describe('POST /auth/register', () => {
   it('creates the account (201) and the new user can log in', async () => {
-    const response = await request(app).post('/auth/register').send(NEW_USER);
+    const response = await signUp(app, NEW_USER);
     expect(response.status).toBe(201);
     const body = authResponseSchema.parse(response.body);
     expect(body.user).toMatchObject({
       name: NEW_USER.name,
       email: NEW_USER.email,
-      phone: NEW_USER.phone,
+      username: NEW_USER.username,
+      hasAvatar: false,
     });
+    expect(body.user).not.toHaveProperty('phone');
 
     const login = await request(app)
       .post('/auth/login')
@@ -116,48 +125,93 @@ describe('POST /auth/register', () => {
     expect(login.status).toBe(200);
   });
 
-  it('stores phone as null when it is omitted or null', async () => {
-    const omitted = await request(app)
-      .post('/auth/register')
-      .send({ name: 'A', email: 'omitted@example.com', password: 'Str0ng!Pass' });
-    const explicit = await request(app)
-      .post('/auth/register')
-      .send({ name: 'B', email: 'explicit@example.com', password: 'Str0ng!Pass', phone: null });
-    expect(omitted.status).toBe(201);
-    expect(explicit.status).toBe(201);
-    expect(authResponseSchema.parse(omitted.body).user.phone).toBeNull();
-    expect(authResponseSchema.parse(explicit.body).user.phone).toBeNull();
-  });
-
-  it('normalizes the e-mail and trims the name', async () => {
-    const response = await request(app)
-      .post('/auth/register')
-      .send({ name: '  Trim Me  ', email: ' Mixed.Case@Example.COM ', password: 'Str0ng!Pass' });
+  it('normalizes the e-mail, the username and trims the name', async () => {
+    const response = await signUp(app, {
+      name: '  Trim Me  ',
+      email: ' Mixed.Case@Example.COM ',
+      username: '  Mixed.Name ',
+    });
     expect(response.status).toBe(201);
     expect(response.body).toMatchObject({
-      user: { name: 'Trim Me', email: 'mixed.case@example.com' },
+      user: { name: 'Trim Me', email: 'mixed.case@example.com', username: 'mixed.name' },
     });
   });
 
-  it('answers 409 email_taken for a duplicate, ignoring case', async () => {
-    const response = await request(app)
-      .post('/auth/register')
-      .send({ ...NEW_USER, email: NEW_USER.email.toUpperCase() });
-    expect(response.status).toBe(409);
-    expect(response.body).toMatchObject({ code: 'email_taken' });
+  it('takes the e-mail from the verification token, not from the body', async () => {
+    const verificationToken = await confirmEmail(app, 'bound@example.com');
+    const response = await request(app).post('/auth/register').send({
+      verificationToken,
+      name: 'Bound',
+      username: 'bound',
+      password: 'Str0ng!Pass',
+      email: 'other@example.com',
+    });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: 'validation_error' });
   });
 
-  it('answers 409 for the seeded e-mail', async () => {
-    const response = await request(app)
+  it('answers 409 username_taken, ignoring case, and keeps the token usable', async () => {
+    const verificationToken = await confirmEmail(app, 'second@example.com');
+    const taken = await request(app).post('/auth/register').send({
+      verificationToken,
+      name: 'Dup',
+      username: NEW_USER.username.toUpperCase(),
+      password: 'Str0ng!Pass',
+    });
+    expect(taken.status).toBe(409);
+    expect(taken.body).toMatchObject({ code: 'username_taken' });
+
+    const retry = await request(app).post('/auth/register').send({
+      verificationToken,
+      name: 'Dup',
+      username: 'second_try',
+      password: 'Str0ng!Pass',
+    });
+    expect(retry.status).toBe(201);
+  });
+
+  it('accepts a verification token only once', async () => {
+    const verificationToken = await confirmEmail(app, 'once@example.com');
+    const body = { verificationToken, name: 'Once', username: 'once', password: 'Str0ng!Pass' };
+    await request(app).post('/auth/register').send(body).expect(201);
+
+    const again = await request(app)
       .post('/auth/register')
-      .send({ ...NEW_USER, email: DEMO_CREDENTIALS.email });
-    expect(response.status).toBe(409);
+      .send({ ...body, username: 'once_again' });
+    expect(again.status).toBe(422);
+    expect(again.body).toMatchObject({ code: 'invalid_verification_token' });
+  });
+
+  it('rejects an unknown token', async () => {
+    const response = await request(app).post('/auth/register').send({
+      verificationToken: 'made-up',
+      name: 'Nope',
+      username: 'nope',
+      password: 'Str0ng!Pass',
+    });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: 'invalid_verification_token' });
+  });
+
+  it('rejects an expired token', async () => {
+    const verificationToken = await confirmEmail(app, 'late@example.com');
+    ctx.clock.advanceSeconds(SIGNUP_POLICY.grantTtlSeconds + 1);
+    const response = await request(app).post('/auth/register').send({
+      verificationToken,
+      name: 'Late',
+      username: 'late',
+      password: 'Str0ng!Pass',
+    });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: 'invalid_verification_token' });
   });
 
   it('reports every broken password rule per field', async () => {
-    const response = await request(app)
-      .post('/auth/register')
-      .send({ name: 'Weak', email: 'weak@example.com', password: 'abc' });
+    const response = await signUp(app, {
+      email: 'weak@example.com',
+      username: 'weak',
+      password: 'abc',
+    });
     expect(response.status).toBe(422);
     expect(response.body).toMatchObject({ code: 'validation_error' });
     const issues = (response.body as { details: { field: string; issue: string }[] }).details
@@ -170,32 +224,204 @@ describe('POST /auth/register', () => {
   });
 
   it('never echoes the submitted password in the error', async () => {
-    const response = await request(app)
-      .post('/auth/register')
-      .send({ name: 'Weak', email: 'weak2@example.com', password: 'secretvalue' });
+    const response = await signUp(app, {
+      email: 'weak2@example.com',
+      username: 'weak2',
+      password: 'secretvalue',
+    });
     expect(response.status).toBe(422);
     expect(JSON.stringify(response.body)).not.toContain('secretvalue');
   });
 
+  const valid = {
+    verificationToken: 't',
+    name: 'A',
+    username: 'valid_name',
+    password: 'Str0ng!Pass',
+  };
   it.each([
-    ['missing name', { email: 'a@example.com', password: 'Str0ng!Pass' }],
-    ['blank name', { name: '   ', email: 'a@example.com', password: 'Str0ng!Pass' }],
-    ['too long name', { name: 'n'.repeat(101), email: 'a@example.com', password: 'Str0ng!Pass' }],
-    ['invalid e-mail', { name: 'A', email: 'nope', password: 'Str0ng!Pass' }],
-    ['invalid phone', { name: 'A', email: 'a@example.com', password: 'Str0ng!Pass', phone: '12' }],
-    [
-      'empty phone string',
-      { name: 'A', email: 'a@example.com', password: 'Str0ng!Pass', phone: '' },
-    ],
-    [
-      'unknown field',
-      { name: 'A', email: 'a@example.com', password: 'Str0ng!Pass', role: 'admin' },
-    ],
+    ['missing name', { ...valid, name: undefined }],
+    ['blank name', { ...valid, name: '   ' }],
+    ['too long name', { ...valid, name: 'n'.repeat(101) }],
+    ['missing username', { ...valid, username: undefined }],
+    ['too short username', { ...valid, username: 'ab' }],
+    ['too long username', { ...valid, username: 'a'.repeat(31) }],
+    ['username with spaces', { ...valid, username: 'two words' }],
+    ['username with symbols', { ...valid, username: 'bad@name' }],
+    ['username ending with a dot', { ...valid, username: 'name.' }],
+    ['username starting with a dot', { ...valid, username: '.name' }],
+    ['missing token', { ...valid, verificationToken: undefined }],
+    ['removed phone field', { ...valid, phone: '+34600123456' }],
+    ['removed birthdate field', { ...valid, birthdate: '2000-01-01' }],
+    ['unknown field', { ...valid, admin: true }],
     ['no body', undefined],
   ])('answers 422 for %s', async (_name, body) => {
     const response = await request(app).post('/auth/register').send(body);
     expect(response.status).toBe(422);
     expect(response.body).toMatchObject({ code: 'validation_error' });
+  });
+
+  it('answers 409 email_taken if the address got registered meanwhile', async () => {
+    const verificationToken = await confirmEmail(app, 'race@example.com');
+    await signUp(app, { email: 'race@example.com', username: 'race_one' });
+    const response = await request(app).post('/auth/register').send({
+      verificationToken,
+      name: 'Race',
+      username: 'race_two',
+      password: 'Str0ng!Pass',
+    });
+    expect(response.status).toBe(409);
+    expect(response.body).toMatchObject({ code: 'email_taken' });
+  });
+});
+
+describe('sign-up: sending the code', () => {
+  it('answers 204 with no body', async () => {
+    const response = await request(app)
+      .post('/auth/signup/email')
+      .send({ email: 'new@example.com' });
+    expect(response.status).toBe(204);
+    expect(response.text).toBe('');
+  });
+
+  it('answers 409 email_taken for registered addresses, ignoring case', async () => {
+    const response = await request(app)
+      .post('/auth/signup/email')
+      .send({ email: DEMO_CREDENTIALS.email.toUpperCase() });
+    expect(response.status).toBe(409);
+    expect(response.body).toMatchObject({ code: 'email_taken' });
+  });
+
+  it.each([
+    ['invalid e-mail', { email: 'nope' }],
+    ['missing e-mail', {}],
+    ['extra field', { email: 'a@example.com', extra: 1 }],
+  ])('answers 422 for %s', async (_name, body) => {
+    expect((await request(app).post('/auth/signup/email').send(body)).status).toBe(422);
+  });
+
+  it('refuses to resend too soon, then allows it after the cooldown', async () => {
+    const email = 'resend@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+
+    const early = await request(app).post('/auth/signup/code/resend').send({ email });
+    expect(early.status).toBe(429);
+    expect(early.body).toMatchObject({ code: 'resend_too_soon' });
+
+    ctx.clock.advanceSeconds(SIGNUP_POLICY.resendCooldownSeconds);
+    await request(app).post('/auth/signup/code/resend').send({ email }).expect(204);
+  });
+
+  it('resends even if no code was requested before', async () => {
+    await request(app)
+      .post('/auth/signup/code/resend')
+      .send({ email: 'fresh@example.com' })
+      .expect(204);
+  });
+
+  it('answers 409 when resending to a registered address', async () => {
+    const response = await request(app)
+      .post('/auth/signup/code/resend')
+      .send({ email: DEMO_CREDENTIALS.email });
+    expect(response.status).toBe(409);
+  });
+});
+
+describe('sign-up: confirming the code', () => {
+  const post = (body: object) => request(app).post('/auth/signup/verify').send(body);
+
+  it('returns a verification token for the right code', async () => {
+    const email = 'verify@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+    const response = await post({ email, code: CONFIRMATION_CODE });
+    expect(response.status).toBe(200);
+    expect(
+      verificationResponseSchema.parse(response.body).verificationToken.length,
+    ).toBeGreaterThan(20);
+  });
+
+  it('rejects a wrong code with invalid_code', async () => {
+    const email = 'wrong@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+    const response = await post({ email, code: '000000' });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: 'invalid_code' });
+  });
+
+  it('answers an unknown e-mail like a wrong code', async () => {
+    const response = await post({ email: 'unknown@example.com', code: CONFIRMATION_CODE });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: 'invalid_code' });
+  });
+
+  it('accepts a code only once', async () => {
+    const email = 'single@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+    await post({ email, code: CONFIRMATION_CODE }).then((r) => {
+      expect(r.status).toBe(200);
+    });
+    expect((await post({ email, code: CONFIRMATION_CODE })).status).toBe(422);
+  });
+
+  it('expires the code after ten minutes', async () => {
+    const email = 'expire@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+    ctx.clock.advanceSeconds(SIGNUP_POLICY.codeTtlSeconds);
+    const response = await post({ email, code: CONFIRMATION_CODE });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: 'code_expired' });
+  });
+
+  it('discards the code after too many wrong guesses, even if the next one is right', async () => {
+    const email = 'brute@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+    for (let i = 1; i < SIGNUP_POLICY.maxFailedAttempts; i += 1) {
+      expect((await post({ email, code: '000000' })).status).toBe(422);
+    }
+    const last = await post({ email, code: '000000' });
+    expect(last.status).toBe(429);
+    expect(last.body).toMatchObject({ code: 'too_many_attempts' });
+
+    const afterwards = await post({ email, code: CONFIRMATION_CODE });
+    expect(afterwards.status).toBe(422);
+    expect(afterwards.body).toMatchObject({ code: 'invalid_code' });
+  });
+
+  it('a new code resets the failed attempts', async () => {
+    const email = 'reset-attempts@example.com';
+    await request(app).post('/auth/signup/email').send({ email }).expect(204);
+    await post({ email, code: '000000' });
+    ctx.clock.advanceSeconds(SIGNUP_POLICY.resendCooldownSeconds);
+    await request(app).post('/auth/signup/code/resend').send({ email }).expect(204);
+    expect((await post({ email, code: CONFIRMATION_CODE })).status).toBe(200);
+  });
+
+  it.each([
+    ['short code', { email: 'a@example.com', code: '123' }],
+    ['non-numeric code', { email: 'a@example.com', code: 'abcdef' }],
+    ['missing code', { email: 'a@example.com' }],
+  ])('answers 422 for %s', async (_name, body) => {
+    expect((await post(body)).status).toBe(422);
+  });
+});
+
+describe('GET /auth/username-available', () => {
+  it('reports free and taken usernames, ignoring case', async () => {
+    const free = await request(app).get('/auth/username-available?username=free_name');
+    expect(free.status).toBe(200);
+    expect(usernameAvailabilityResponseSchema.parse(free.body)).toEqual({ available: true });
+
+    const taken = await request(app).get('/auth/username-available?username=DEMO');
+    expect(usernameAvailabilityResponseSchema.parse(taken.body)).toEqual({ available: false });
+  });
+
+  it.each(['', 'ab', 'bad name', 'x'.repeat(31)])('answers 422 for %j', async (username) => {
+    const response = await request(app).get('/auth/username-available').query({ username });
+    expect(response.status).toBe(422);
+  });
+
+  it('answers 422 without the parameter', async () => {
+    expect((await request(app).get('/auth/username-available')).status).toBe(422);
   });
 });
 

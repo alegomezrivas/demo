@@ -124,7 +124,10 @@ export function mockSimulation(options: MockSimulationOptions): RequestHandler {
       req.on('close', () => {
         clearTimeout(timer);
       });
-    } else if (req.baseUrl === '/tasks' && (await shouldExpireOnce(req.headers.authorization))) {
+    } else if (
+      (req.baseUrl === '/tasks' || req.baseUrl === '/users') &&
+      (await shouldExpireOnce(req.headers.authorization))
+    ) {
       res.status(401).json({ code: 'token_expired', message: 'Simulated expired access token.' });
     } else {
       next();

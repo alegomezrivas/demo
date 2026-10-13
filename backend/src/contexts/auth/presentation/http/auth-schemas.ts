@@ -15,8 +15,13 @@ export const passwordPolicySchema = z
 
 const emailSchema = z.string().trim().toLowerCase().pipe(z.email().max(254));
 
-/** 7-15 digits with an optional leading plus, as sent by the app. */
-const phoneSchema = z.string().regex(/^\+?[0-9]{7,15}$/);
+/** Public identifier: 3-30 of `a-z 0-9 . _`, never starting or ending with a dot. */
+export const USERNAME_PATTERN = /^[a-z0-9_](?:[a-z0-9._]{1,28})[a-z0-9_]$/;
+
+export const usernameSchema = z.string().trim().toLowerCase().regex(USERNAME_PATTERN);
+
+/** Six digits, as typed by the person. */
+const codeSchema = z.string().regex(/^[0-9]{6}$/);
 
 // ---- Requests (strict: unknown keys are rejected) ----
 
@@ -26,11 +31,20 @@ export const loginRequestSchema = z.strictObject({
   password: z.string().min(1).max(PASSWORD_MAX_LENGTH),
 });
 
+/** Step 1 and "send again": the address that will receive the code. */
+export const signUpEmailRequestSchema = z.strictObject({ email: emailSchema });
+
+/** Step 2: the address plus the code received. */
+export const verifyCodeRequestSchema = z.strictObject({ email: emailSchema, code: codeSchema });
+
+export const usernameQuerySchema = z.strictObject({ username: usernameSchema });
+
+/** Final step: the e-mail comes from the confirmed `verificationToken`, never from the body. */
 export const registerRequestSchema = z.strictObject({
+  verificationToken: z.string().min(1).max(256),
   name: z.string().trim().min(1).max(100),
-  email: emailSchema,
+  username: usernameSchema,
   password: passwordPolicySchema,
-  phone: phoneSchema.nullish(),
 });
 
 const refreshTokenSchema = z.string().min(1).max(512);
@@ -44,8 +58,13 @@ export const userResponseSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   email: z.string(),
-  phone: z.string().nullable(),
+  username: z.string(),
+  hasAvatar: z.boolean(),
 });
+
+export const verificationResponseSchema = z.strictObject({ verificationToken: z.string() });
+
+export const usernameAvailabilityResponseSchema = z.strictObject({ available: z.boolean() });
 
 export const authResponseSchema = z.strictObject({
   user: userResponseSchema,

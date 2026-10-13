@@ -5,6 +5,7 @@ import type { Container } from './composition.js';
 import type { AppConfig } from './config/env.js';
 import { authRouter } from './contexts/auth/presentation/http/auth-router.js';
 import { authenticate } from './contexts/auth/presentation/http/authenticate.js';
+import { userRouter } from './contexts/users/presentation/http/user-router.js';
 import { taskRouter } from './contexts/tasks/presentation/http/task-router.js';
 import { docsRouter } from './docs/docs-router.js';
 import { buildOpenApiDocument } from './docs/openapi.js';
@@ -50,12 +51,12 @@ export function createApp({ config, logger, container, simulation }: AppDependen
 
   const limiters = createRateLimiters(config);
   app.use(limiters.general);
-  app.use(['/auth/login', '/auth/register'], limiters.credentials);
+  app.use(['/auth/login', '/auth/register', '/auth/signup'], limiters.credentials);
   app.use('/auth/refresh', limiters.refresh);
 
   if (config.mockSimulationEnabled) {
     app.use(
-      ['/auth', '/tasks'],
+      ['/auth', '/tasks', '/users'],
       mockSimulation({
         accessTokens: container.accessTokens,
         ...(simulation?.timeoutHoldMs === undefined
@@ -66,7 +67,9 @@ export function createApp({ config, logger, container, simulation }: AppDependen
   }
 
   app.use('/auth', noStore, authRouter(container.auth));
-  app.use('/tasks', taskRouter(container.tasks, authenticate(container.authenticate)));
+  const requireSession = authenticate(container.authenticate);
+  app.use('/tasks', taskRouter(container.tasks, requireSession));
+  app.use('/users', noStore, userRouter(container.users, requireSession));
   if (config.resetEndpointEnabled) app.use(resetRouter(() => container.reset()));
 
   app.use(notFoundHandler);

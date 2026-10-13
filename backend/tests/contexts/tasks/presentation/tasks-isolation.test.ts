@@ -5,7 +5,7 @@ import {
   taskPageResponseSchema,
   taskStatsResponseSchema,
 } from '../../../../src/contexts/tasks/presentation/http/task-schemas.js';
-import { buildTestContext, loginAs, type TestContext } from '../../../helpers/test-app.js';
+import { buildTestContext, loginAs, signUp, type TestContext } from '../../../helpers/test-app.js';
 
 let ctx: TestContext;
 let app: Express;
@@ -72,10 +72,8 @@ describe('data isolation between users', () => {
   });
 
   it('starts new accounts with no tasks and no statistics', async () => {
-    const created = await request(app)
-      .post('/auth/register')
-      .send({ name: 'Nueva', email: 'nueva@example.com', password: 'Str0ng!Pass' })
-      .expect(201);
+    const created = await signUp(app, { email: 'nueva@example.com', username: 'nueva' });
+    expect(created.status).toBe(201);
     const fresh = (created.body as { accessToken: string }).accessToken;
 
     expect(await totalOf(fresh)).toBe(0);

@@ -31,21 +31,68 @@ La app envía el email en minúsculas, recortado y limpio de HTML. La contraseñ
 | 401    | `{ "code": "invalid_credentials" }` | Usuario inexistente o contraseña errónea (mismo mensaje en ambos casos) |
 | 422    | `{ "code": "validation_error" }`    | Body inválido                                                           |
 
-#### `POST /auth/register`
+#### Alta de cuenta (3 pasos)
 
-Request:
+El registro confirma primero el email con un código; la cuenta solo se crea con la prueba de esa confirmación. **Cambio incompatible** respecto a la versión anterior de `POST /auth/register` (sin `phone` ni fecha de nacimiento, sin versiones paralelas).
+
+**Paso 1 — `POST /auth/signup/email`** · Request `{ "email": "string" }`
+
+| Status | Body                             | Cuándo                               |
+| ------ | -------------------------------- | ------------------------------------ |
+| 204    | —                                | Código enviado                       |
+| 409    | `{ "code": "email_taken" }`      | Email ya registrado                  |
+| 422    | `{ "code": "validation_error" }` | Email inválido o campos desconocidos |
+| 429    | `{ "code": "rate_limited" }`     | Límite de peticiones (sección 4.6)   |
+
+**Reenviar — `POST /auth/signup/code/resend`** · mismo request. Sustituye el código anterior (y reinicia los intentos). Mínimo 30 s entre envíos al mismo email: antes → **429 `resend_too_soon`**. Mismas respuestas 204/409/422.
+
+**Paso 2 — `POST /auth/signup/verify`** · Request `{ "email": "string", "code": "123456" }` (`code`: exactamente 6 dígitos)
+
+| Status | Body                                | Cuándo                                                        |
+| ------ | ----------------------------------- | ------------------------------------------------------------- |
+| 200    | `{ "verificationToken": "string" }` | Código correcto (de un solo uso)                              |
+| 422    | `{ "code": "invalid_code" }`        | Código erróneo o email sin código pendiente (misma respuesta) |
+| 422    | `{ "code": "code_expired" }`        | Pasaron 10 minutos desde el envío                             |
+| 429    | `{ "code": "too_many_attempts" }`   | 5.º fallo: el código se descarta; hay que pedir otro          |
+
+`verificationToken` es una cadena opaca, válida 30 minutos y de un solo uso; el servidor solo guarda su hash.
+
+**`GET /auth/username-available?username=<valor>`** → `200 { "available": true | false }` (sin distinguir mayúsculas). Valor inválido → 422.
+
+**Paso 3 — `POST /auth/register`**
 
 ```json
-{ "name": "string", "email": "string", "password": "string", "phone": "string | null" }
+{ "verificationToken": "string", "name": "string", "username": "string", "password": "string" }
 ```
 
-`phone` es opcional: la app lo omite o lo envía como `null` si está vacío; si existe llega solo con dígitos y un `+` inicial (7–15 dígitos). `name` llega recortado, máximo 100 caracteres.
+El email **sale del token**, nunca del cuerpo. El cuerpo es estricto: `phone`, `birthdate`, `email` o cualquier campo desconocido → 422. `name` se recorta (1–100). `username` se pasa a minúsculas: 3–30 caracteres de `a-z 0-9 . _`, sin punto al inicio ni al final.
 
-| Status | Body                             | Cuándo                                                     |
-| ------ | -------------------------------- | ---------------------------------------------------------- |
-| 201    | `AuthResponse`                   | Cuenta creada                                              |
-| 409    | `{ "code": "email_taken" }`      | Email ya registrado (la app muestra un mensaje específico) |
-| 422    | `{ "code": "validation_error" }` | Campos obligatorios vacíos o inválidos                     |
+| Status | Body                                       | Cuándo                                                             |
+| ------ | ------------------------------------------ | ------------------------------------------------------------------ |
+| 201    | `AuthResponse`                             | Cuenta creada                                                      |
+| 409    | `{ "code": "username_taken" }`             | Usuario ocupado (el token **sigue siendo válido** para reintentar) |
+| 409    | `{ "code": "email_taken" }`                | El email se registró entretanto                                    |
+| 422    | `{ "code": "invalid_verification_token" }` | Token desconocido, caducado o ya usado                             |
+| 422    | `{ "code": "validation_error" }`           | Campos inválidos (contraseña: ver 4.2)                             |
+
+### Users (requieren bearer)
+
+La imagen solo la lee su propietario: el id sale siempre del token, no hay ruta con id.
+
+#### `PUT /users/me/avatar`
+
+Cuerpo: bytes JPEG sin procesar, **máximo 200 KB** (`Content-Type: image/jpeg`, aunque el servidor no se fía de él). El formato se valida por su contenido (marcadores JPEG de inicio `FF D8 FF` y fin `FF D9`).
+
+| Status | Body                              | Cuándo                                  |
+| ------ | --------------------------------- | --------------------------------------- |
+| 204    | —                                 | Imagen guardada (sustituye la anterior) |
+| 401    | `{ "code": "unauthorized" }`      | Sin sesión                              |
+| 413    | `{ "code": "payload_too_large" }` | Más de 200 KB                           |
+| 422    | `{ "code": "invalid_image" }`     | No es un JPEG (o cuerpo vacío)          |
+
+#### `GET /users/me/avatar`
+
+200 con los bytes, `Content-Type: image/jpeg`, `X-Content-Type-Options: nosniff` y `Cache-Control: private, no-store`. 404 `avatar_not_found` si no hay imagen; 401 sin sesión. La imagen vive en memoria y se pierde al reiniciar.
 
 #### `POST /auth/refresh`
 
@@ -143,13 +190,19 @@ Reemplazo completo con el mismo `TaskInput`. 200 → `Task`. 404 → `not_found`
 
 ```json
 {
-  "user": { "id": "string", "name": "string", "email": "string", "phone": "string | null" },
+  "user": {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "username": "string",
+    "hasAvatar": false
+  },
   "accessToken": "string",
   "refreshToken": "string"
 }
 ```
 
-`user.phone` se envía siempre; es `null` cuando no existe. No se devuelve nunca la contraseña ni su hash.
+`user.hasAvatar` indica si hay imagen descargable en `GET /users/me/avatar`. Ya no existe `phone`. No se devuelve nunca la contraseña ni su hash.
 
 ### `Task`
 
@@ -228,7 +281,7 @@ Si llegan ambos headers, `X-Mock-Error` tiene prioridad. Un valor desconocido se
 - **Detección de reutilización:** si se presenta un refresh token ya consumido, se revoca toda su familia (también el token legítimo más reciente) y responde 401 `invalid_refresh_token`.
 - **401 en rutas protegidas:** `unauthorized` (cabecera ausente, mal formada o token inválido) y `token_expired` (JWT caducado). La app trata ambos igual: refresh y un reintento.
 - **Contraseñas:** argon2id. En `login` se verifica siempre un hash (aunque el usuario no exista) para igualar tiempos.
-- **Códigos de error de `register`:** `details` por campo con `issue` entre `too_small`, `too_big`, `invalid_format`, `invalid_type`, `unrecognized_keys`, `missing_uppercase`, `missing_lowercase`, `missing_digit`, `missing_symbol`.
+- **Códigos de error de `register`** (`details` del 422 `validation_error`): `details` por campo con `issue` entre `too_small`, `too_big`, `invalid_format`, `invalid_type`, `unrecognized_keys`, `missing_uppercase`, `missing_lowercase`, `missing_digit`, `missing_symbol`.
 
 ## 4.4 Detalles de tareas implementados
 
@@ -237,20 +290,20 @@ Si llegan ambos headers, `X-Mock-Error` tiene prioridad. Un valor desconocido se
 - **Consulta de `GET /tasks`:** `status=all` también se acepta (equivale a omitirlo); parámetros desconocidos se ignoran; `q` admite hasta 100 caracteres (más → 422); `page`/`pageSize` solo admiten enteros de hasta 9 dígitos (si no → 422) y se recortan a `page ≥ 1`, `1 ≤ pageSize ≤ 100`.
 - **Orden:** `createdAt` descendente y, si empatan, `id` descendente, para que la paginación sea estable.
 - **Cuerpo de crear/actualizar:** estricto; `id`, `createdAt` y propietario no se pueden enviar. `dueDate` acepta cualquier instante ISO 8601 (la app envía UTC con hasta microsegundos) y se devuelve normalizado a milisegundos (`...123Z`). `title` se recorta; `description` no.
-- **`POST /__reset`:** responde 204 sin cuerpo y restaura usuarios y tareas semilla e invalida todas las sesiones. No requiere autenticación y no existe en producción (404).
+- **`POST /__reset`:** responde 204 sin cuerpo y restaura usuarios y tareas semilla, descarta imágenes de perfil y códigos pendientes e invalida todas las sesiones. No requiere autenticación y no existe en producción (404).
 
 ## 4.5 Simulación implementada (solo desarrollo y staging)
 
-- Se aplica a `/auth/*` y `/tasks/*`. `/health`, `/openapi.json`, `/docs` y `/__reset` quedan fuera.
+- Se aplica a `/auth/*`, `/users/*` y `/tasks/*`. `/health`, `/openapi.json`, `/docs` y `/__reset` quedan fuera.
 - `X-Mock-Latency`: entero de 0 a 60 000 ms (más se recorta; valores no numéricos se ignoran). Se aplica antes que el error.
 - `X-Mock-Error: 500|401|403|404|422` responde con `{ code, message }` (`internal_error`, `unauthorized`, `forbidden`, `not_found`, `validation_error`) sin tocar datos.
 - `X-Mock-Error: timeout` mantiene la conexión abierta 60 s (más que el `receiveTimeout` de 30 s de la app) y la corta sin responder.
-- `X-Mock-Error: 401-once` solo actúa en `/tasks/*`: la primera petición con un access token **emitido por login o registro** recibe 401 `token_expired`; ese token queda marcado y las siguientes pasan. Los tokens **emitidos por un refresh** (claim `rfr`) siempre pasan, de modo que la app puede conservar la cabecera en el reintento tras el refresh sin entrar en bucle. Un nuevo login vuelve a activar el 401 una vez.
+- `X-Mock-Error: 401-once` solo actúa en `/tasks/*` y `/users/*`: la primera petición con un access token **emitido por login o registro** recibe 401 `token_expired`; ese token queda marcado y las siguientes pasan. Los tokens **emitidos por un refresh** (claim `rfr`) siempre pasan, de modo que la app puede conservar la cabecera en el reintento tras el refresh sin entrar en bucle. Un nuevo login vuelve a activar el 401 una vez.
 - En producción (`MOCK_SIMULATION_ENABLED` forzado a `false`) los tres headers se ignoran y no aparecen en `/docs`.
 
 ## 4.6 Límites de peticiones
 
-Por IP y ventana (`RATE_LIMIT_WINDOW_SECONDS`, 60 s por defecto): 300 en general, 10 compartidas entre `POST /auth/login` y `/auth/register`, 20 en `POST /auth/refresh`. Al superarlos: **429** `{ "code": "rate_limited", "message": ... }` con `Retry-After` y `RateLimit-*`. `/health` y `/docs` no cuentan. Detrás de un proxy hay que activar `TRUST_PROXY=true` o todas las peticiones compartirán IP.
+Por IP y ventana (`RATE_LIMIT_WINDOW_SECONDS`, 60 s por defecto): 300 en general, 10 compartidas entre `POST /auth/login`, `/auth/register` y `/auth/signup/*` (enviar, reenviar y verificar), 20 en `POST /auth/refresh`. Al superarlos: **429** `{ "code": "rate_limited", "message": ... }` con `Retry-After` y `RateLimit-*`. `/health` y `/docs` no cuentan. Detrás de un proxy hay que activar `TRUST_PROXY=true` o todas las peticiones compartirán IP.
 
 ## 4.7 Documentación
 
@@ -264,12 +317,15 @@ Por IP y ventana (`RATE_LIMIT_WINDOW_SECONDS`, 60 s por defecto): 300 en general
   - Valores no numéricos en `page`/`pageSize` o enums desconocidos en `status`/`priority`: **422 `validation_error`**.
   - Rangos: `page` < 1 → 1; `pageSize` < 1 → 1 y > 100 → 100 (límites silenciosos). Los valores efectivos se devuelven en `page` y `pageSize`.
 - **Errores genéricos del servidor.** JSON mal formado → 400 `invalid_json`; cuerpo demasiado grande → 413 `payload_too_large`; ruta desconocida → 404 `not_found`; error inesperado → 500 `internal_error` (sin detalles internos).
-- **Usuario semilla:** `demo@starkshowcase.dev` / `Demo1234!`.
+- **Usuarios semilla:** `demo@starkshowcase.dev` / `Demo1234!` (usuario `demo`) y `ana@starkshowcase.dev` / `Ana12345!` (usuario `ana`).
+- **Código de confirmación.** El backend no envía correos. `FIXED_CONFIRMATION_CODE` (6 dígitos) es el código que acepta cualquier email: fuera de producción vale `123456` por defecto; en producción solo existe si se define a propósito (sin él los códigos son aleatorios y nadie puede registrarse). Con un código fijo en producción se registra un aviso al arrancar (sin imprimir el código). Enviar correos reales es una mejora futura: basta implementar el puerto `ConfirmationCodeSender`.
+- **Intentos.** Un código dura 10 minutos y se descarta tras 5 fallos; el reenvío tiene 30 s de espera por email. Los límites por IP de la sección 4.6 siguen aplicando a los tres endpoints.
+- **Aviso de la instancia pública.** Con el código conocido, cualquiera puede registrarse en una instancia pública; los datos viven en memoria y se pierden al reiniciar. Es una demo.
 
 ## 5. Hallazgos que afectan al diseño
 
 1. **La app solo acepta HTTPS.** `HttpsEnforcerInterceptor` rechaza cualquier URL `http://` y Android tiene `usesCleartextTraffic="false"` con `network_security_config` sin excepciones. Por tanto `http://10.0.2.2:<puerto>` **no funcionará** tal cual contra el backend local. Decisión en la sección 6.
-2. **No hay endpoint de logout, de perfil ni de settings.** El logout de la app es local (borra tokens). `restoreSession` lee el usuario guardado en el dispositivo.
+2. **No hay endpoint de perfil ni de settings** (solo la imagen en `/users/me/avatar`). `restoreSession` lee el usuario guardado en el dispositivo.
 3. **Los tokens son opacos para la app.** Se pueden emitir JWT reales sin cambios en Flutter.
 4. **El servidor es la fuente del refresh token** y la app guarda ambos tokens en `flutter_secure_storage`.
 5. **El mock de la app no valida la fortaleza de la contraseña** (solo no vacía), pero el formulario sí exige 8+ caracteres con mayúscula, minúscula, dígito y símbolo.
@@ -284,5 +340,6 @@ Por IP y ventana (`RATE_LIMIT_WINDOW_SECONDS`, 60 s por defecto): 300 en general
 4. **`POST /auth/logout`** idempotente (sección 4.1); la app ya lo llama al cerrar sesión.
 5. **Tareas por usuario**, con 404 para recursos ajenos (sección 4.2).
 6. **Política de contraseña** en `register` (sección 4.2).
-7. **Query inválida:** 422 para tipos/enums y límites silenciosos para rangos (sección 4.2).
-8. **Ubicación:** `backend/` dentro de este repositorio; `render.yaml` usará `rootDir: backend`.
+7. **Alta en tres pasos** con código de confirmación, sin teléfono ni fecha de nacimiento, e imagen de perfil en memoria (solo JPEG ≤ 200 KB).
+8. **Query inválida:** 422 para tipos/enums y límites silenciosos para rangos (sección 4.2).
+9. **Ubicación:** `backend/` dentro de este repositorio; `render.yaml` usará `rootDir: backend`.
