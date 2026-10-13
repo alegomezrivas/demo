@@ -27,7 +27,12 @@ void main() {
   late SessionService session;
   late AppPreferences preferences;
   late SettingsViewModel viewModel;
-  const user = User(id: '1', name: 'Ana', email: 'ana@test.com');
+  const user = User(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
 
   setUp(() {
     getCurrentUser = MockGetCurrentUserUseCase();
@@ -105,6 +110,14 @@ void main() {
         viewModel.form.control(SettingsViewModel.biometricField).value,
         isTrue,
       );
+    });
+
+    test('offers biometrics only for a remembered session', () {
+      session.markSignedIn();
+      expect(viewModel.offersBiometric, isTrue);
+
+      session.markSignedIn(persistent: false);
+      expect(viewModel.offersBiometric, isFalse);
     });
 
     test('keeps the profile empty when loading fails', () async {

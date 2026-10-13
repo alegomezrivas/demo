@@ -1,12 +1,10 @@
-import 'package:demo/core/error/exceptions.dart';
-import 'package:demo/core/error/failure_mapper.dart';
 import 'package:demo/core/error/failures.dart';
+import 'package:demo/core/error/guarded_call.dart';
 import 'package:demo/core/utils/input_sanitizer.dart';
 import 'package:demo/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:demo/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:demo/features/auth/data/models/auth_response_dto.dart';
 import 'package:demo/features/auth/data/models/login_request_dto.dart';
-import 'package:demo/features/auth/data/models/register_request_dto.dart';
 import 'package:demo/features/auth/data/models/user_dto.dart';
 import 'package:demo/features/auth/domain/entities/user.dart';
 import 'package:demo/features/auth/domain/repositories/auth_repository.dart';
@@ -37,39 +35,19 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> login({
     required String email,
     required String password,
+    bool rememberSession = true,
   }) {
-    return _guard(() async {
+    return guardedCall(() async {
       final response = await _remote.login(
         LoginRequestDto(email: InputSanitizer.email(email), password: password),
       );
-      return _persist(response);
-    });
-  }
-
-  @override
-  Future<Either<Failure, User>> register({
-    required String name,
-    required String email,
-    required String password,
-    String? phone,
-  }) {
-    return _guard(() async {
-      final cleanPhone = phone == null ? null : InputSanitizer.phone(phone);
-      final response = await _remote.register(
-        RegisterRequestDto(
-          name: InputSanitizer.text(name, maxLength: 100),
-          email: InputSanitizer.email(email),
-          password: password,
-          phone: (cleanPhone?.isEmpty ?? true) ? null : cleanPhone,
-        ),
-      );
-      return _persist(response);
+      return _persist(response, remember: rememberSession);
     });
   }
 
   @override
   Future<Either<Failure, Unit>> logout() {
-    return _guard(() async {
+    return guardedCall(() async {
       await _revokeOnServer();
       await _local.clear();
       return unit;
@@ -78,7 +56,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, User?>> restoreSession() {
-    return _guard(() async => (await _local.readUser())?.toEntity());
+    return guardedCall(() async => (await _local.readUser())?.toEntity());
   }
 
   /// Tells the server to revoke the session, on a best-effort basis.
@@ -98,18 +76,15 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  Future<User> _persist(AuthResponseDto response) async {
-    await _local.saveSession(tokens: response.tokens, user: response.user);
+  Future<User> _persist(
+    AuthResponseDto response, {
+    required bool remember,
+  }) async {
+    await _local.saveSession(
+      tokens: response.tokens,
+      user: response.user,
+      persist: remember,
+    );
     return response.user.toEntity();
-  }
-
-  Future<Either<Failure, T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return right(await action());
-    } on AppException catch (error) {
-      return left(FailureMapper.fromError(error));
-    } on Exception catch (error) {
-      return left(FailureMapper.fromError(error));
-    }
   }
 }

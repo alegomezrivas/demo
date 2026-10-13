@@ -29,6 +29,9 @@ class LoginViewModel extends BaseViewModel {
   /// Name of the password control.
   static const String passwordField = 'password';
 
+  /// Name of the "remember me" control.
+  static const String rememberField = 'rememberSession';
+
   final LoginUseCase _login;
   final NavigationService _navigation;
   final SessionService _session;
@@ -45,6 +48,7 @@ class LoginViewModel extends BaseViewModel {
   late final FormGroup form = FormGroup({
     emailField: _email,
     passwordField: _password,
+    rememberField: FormControl<bool>(value: true),
   });
 
   bool _obscurePassword = true;
@@ -82,22 +86,28 @@ class LoginViewModel extends BaseViewModel {
 
     _failure = null;
     setBusy(true);
+    final remember = form.control(rememberField).value;
+    final rememberSession = remember is bool && remember;
     final result = await _login(
-      LoginParams(email: _email.value ?? '', password: _password.value ?? ''),
+      LoginParams(
+        email: _email.value ?? '',
+        password: _password.value ?? '',
+        rememberSession: rememberSession,
+      ),
     );
     setBusy(false);
 
     result.fold((failure) {
       _failure = failure;
       notifyListeners();
-    }, (_) => _onSignedIn());
+    }, (_) => _onSignedIn(persistent: rememberSession));
   }
 
-  /// Opens the sign-up screen.
-  void goToRegister() => unawaited(_navigation.push<void>(AppRoutes.register));
+  /// Opens the welcome screen, where an account can be created.
+  void goToWelcome() => _navigation.go(AppRoutes.welcome);
 
-  void _onSignedIn() {
-    _session.markSignedIn();
+  void _onSignedIn({required bool persistent}) {
+    _session.markSignedIn(persistent: persistent);
     _navigation.go(AppRoutes.home);
   }
 

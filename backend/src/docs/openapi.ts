@@ -6,7 +6,12 @@ import {
   logoutRequestSchema,
   refreshRequestSchema,
   registerRequestSchema,
+  signUpEmailRequestSchema,
   tokenPairResponseSchema,
+  usernameAvailabilityResponseSchema,
+  usernameQuerySchema,
+  verificationResponseSchema,
+  verifyCodeRequestSchema,
 } from '../contexts/auth/presentation/http/auth-schemas.js';
 import {
   listQuerySchema,
@@ -52,6 +57,15 @@ function listParameters(): Json[] {
     required: false,
     schema,
   }));
+}
+
+/** Schema of the `username` query parameter, from the same schema the route validates. */
+function usernameParameterSchema(): Json {
+  const properties = (toSchema(usernameQuerySchema, 'input')['properties'] ?? {}) as Record<
+    string,
+    Json
+  >;
+  return properties['username'] ?? { type: 'string' };
 }
 
 /** Builds the OpenAPI 3 document served at `/openapi.json` and rendered at `/docs`. */
@@ -104,21 +118,96 @@ export function buildOpenApiDocument(config: AppConfig): Json {
         },
       },
     },
-    '/auth/register': {
+    '/auth/signup/email': {
       post: {
         tags: ['Auth'],
-        summary: 'Create an account',
+        summary: 'Sign-up step 1: send a confirmation code to an e-mail',
         description:
-          'The password must have 8-128 characters with upper case, lower case, a digit and a symbol.',
+          'The demo sends no e-mail: the code is the fixed `FIXED_CONFIRMATION_CODE` (`123456` outside production unless configured).',
         parameters: simulation,
-        requestBody: { required: true, content: json('RegisterRequest') },
+        requestBody: { required: true, content: json('SignUpEmailRequest') },
         responses: {
-          '201': { description: 'Account created.', content: json('AuthResponse') },
+          '204': { description: 'Code sent.' },
           '409': {
             description: 'E-mail already registered (`email_taken`).',
             content: json('ErrorBody'),
           },
           '422': refResponse('ValidationError'),
+          '429': refResponse('TooManyRequests'),
+        },
+      },
+    },
+    '/auth/signup/code/resend': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Send the confirmation code again',
+        description: 'Throttled per e-mail: 30 seconds between sends (`resend_too_soon`).',
+        parameters: simulation,
+        requestBody: { required: true, content: json('SignUpEmailRequest') },
+        responses: {
+          '204': { description: 'Code sent again; the previous one stops working.' },
+          '409': {
+            description: 'E-mail already registered (`email_taken`).',
+            content: json('ErrorBody'),
+          },
+          '422': refResponse('ValidationError'),
+          '429': refResponse('TooManyRequests'),
+        },
+      },
+    },
+    '/auth/signup/verify': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Sign-up step 2: confirm the code',
+        description:
+          'Codes last 10 minutes and are discarded after 5 wrong guesses (`too_many_attempts`, 429). On success the response carries the single-use `verificationToken` (valid 30 minutes) that `register` needs.',
+        parameters: simulation,
+        requestBody: { required: true, content: json('VerifyCodeRequest') },
+        responses: {
+          '200': { description: 'E-mail confirmed.', content: json('VerificationResponse') },
+          '422': {
+            description: 'Wrong code (`invalid_code`) or expired code (`code_expired`).',
+            content: json('ErrorBody'),
+          },
+          '429': refResponse('TooManyRequests'),
+        },
+      },
+    },
+    '/auth/username-available': {
+      get: {
+        tags: ['Auth'],
+        summary: 'Tell whether a username is free',
+        parameters: [
+          ...simulation,
+          { name: 'username', in: 'query', required: true, schema: usernameParameterSchema() },
+        ],
+        responses: {
+          '200': { description: 'Availability.', content: json('UsernameAvailability') },
+          '422': refResponse('ValidationError'),
+          '429': refResponse('TooManyRequests'),
+        },
+      },
+    },
+    '/auth/register': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Sign-up final step: create the account',
+        description:
+          'Needs the `verificationToken` from `/auth/signup/verify`; the e-mail comes from it. The password must have 8-128 characters with upper case, lower case, a digit and a symbol. The username is lower-cased and must be 3-30 characters of `a-z 0-9 . _`.',
+        parameters: simulation,
+        requestBody: { required: true, content: json('RegisterRequest') },
+        responses: {
+          '201': { description: 'Account created.', content: json('AuthResponse') },
+          '409': {
+            description:
+              'E-mail already registered (`email_taken`) or username taken (`username_taken`).',
+            content: json('ErrorBody'),
+          },
+          '422': {
+            description:
+              'Invalid input, or an unknown/expired token (`invalid_verification_token`).',
+            content: json('ErrorBody'),
+          },
           '429': refResponse('TooManyRequests'),
         },
       },
@@ -152,6 +241,53 @@ export function buildOpenApiDocument(config: AppConfig): Json {
         responses: {
           '204': { description: 'Session revoked (or there was nothing to revoke).' },
           '422': refResponse('ValidationError'),
+          '429': refResponse('TooManyRequests'),
+        },
+      },
+    },
+    '/users/me/avatar': {
+      put: {
+        tags: ['Users'],
+        summary: 'Replace the profile picture',
+        description:
+          'Raw JPEG bytes, at most 200 KB. The format is checked by its content, never by the declared Content-Type.',
+        security: secured,
+        parameters: simulation,
+        requestBody: {
+          required: true,
+          content: { 'image/jpeg': { schema: { type: 'string', format: 'binary' } } },
+        },
+        responses: {
+          '204': { description: 'Picture stored.' },
+          '401': refResponse('Unauthorized'),
+          '413': {
+            description: 'Body larger than 200 KB (`payload_too_large`).',
+            content: json('ErrorBody'),
+          },
+          '422': {
+            description: 'Not a JPEG (`invalid_image`).',
+            content: json('ErrorBody'),
+          },
+          '429': refResponse('TooManyRequests'),
+        },
+      },
+      get: {
+        tags: ['Users'],
+        summary: 'Download your own profile picture',
+        description:
+          'Only the owner can read it. Served as `image/jpeg` with `X-Content-Type-Options: nosniff` and `Cache-Control: private, no-store`.',
+        security: secured,
+        parameters: simulation,
+        responses: {
+          '200': {
+            description: 'The picture.',
+            content: { 'image/jpeg': { schema: { type: 'string', format: 'binary' } } },
+          },
+          '401': refResponse('Unauthorized'),
+          '404': {
+            description: 'No picture yet (`avatar_not_found`).',
+            content: json('ErrorBody'),
+          },
           '429': refResponse('TooManyRequests'),
         },
       },
@@ -292,7 +428,7 @@ export function buildOpenApiDocument(config: AppConfig): Json {
       description:
         'Mock-data backend for the Stark Showcase Flutter app. Every success body matches the models of the app; every error body is `{ code, message, details? }`.',
     },
-    tags: [{ name: 'System' }, { name: 'Auth' }, { name: 'Tasks' }],
+    tags: [{ name: 'System' }, { name: 'Auth' }, { name: 'Users' }, { name: 'Tasks' }],
     paths,
     components: {
       securitySchemes: {
@@ -302,6 +438,10 @@ export function buildOpenApiDocument(config: AppConfig): Json {
       schemas: {
         ErrorBody: toSchema(errorBodySchema, 'output'),
         LoginRequest: toSchema(loginRequestSchema, 'input'),
+        SignUpEmailRequest: toSchema(signUpEmailRequestSchema, 'input'),
+        VerifyCodeRequest: toSchema(verifyCodeRequestSchema, 'input'),
+        VerificationResponse: toSchema(verificationResponseSchema, 'output'),
+        UsernameAvailability: toSchema(usernameAvailabilityResponseSchema, 'output'),
         RegisterRequest: toSchema(registerRequestSchema, 'input'),
         RefreshRequest: toSchema(refreshRequestSchema, 'input'),
         LogoutRequest: toSchema(logoutRequestSchema, 'input'),

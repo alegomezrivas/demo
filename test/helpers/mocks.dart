@@ -2,8 +2,11 @@ import 'package:demo/core/network/token_refresher.dart';
 import 'package:demo/core/security/device_integrity_checker.dart';
 import 'package:demo/core/security/device_integrity_service.dart';
 import 'package:demo/core/security/token_storage.dart';
+import 'package:demo/core/services/image_processor.dart';
+import 'package:demo/core/services/image_source_service.dart';
 import 'package:demo/core/services/navigation_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jailbreak_root_detection/jailbreak_root_detection.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mockito/annotations.dart';
@@ -19,5 +22,8 @@ export 'mocks.mocks.dart';
   MockSpec<TokenStorage>(),
   MockSpec<DeviceIntegrityChecker>(),
   MockSpec<DeviceIntegrityService>(),
+  MockSpec<ImagePicker>(),
+  MockSpec<ImageSourceService>(),
+  MockSpec<ImageProcessor>(),
 ])
 void main() {}

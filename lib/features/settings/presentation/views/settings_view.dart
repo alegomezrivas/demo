@@ -1,7 +1,7 @@
 import 'package:demo/app/locator.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/core/utils/failure_message.dart';
-import 'package:demo/core/widgets/app_button.dart';
+import 'package:demo/core/widgets/app_primary_button.dart';
 import 'package:demo/features/settings/domain/entities/app_language.dart';
 import 'package:demo/features/settings/domain/entities/app_theme_mode.dart';
 import 'package:demo/features/settings/presentation/utils/settings_labels.dart';
@@ -76,13 +76,20 @@ class SettingsView extends StatelessWidget {
                     ),
                     SizedBox(height: context.spacing.lg),
                     _SectionTitle(l10n.settingsSecurity),
-                    Card(
-                      child: ReactiveSwitchListTile(
-                        formControlName: SettingsViewModel.biometricField,
-                        title: Text(l10n.settingsBiometric),
-                        subtitle: Text(l10n.settingsBiometricHint),
+                    if (viewModel.offersBiometric)
+                      Card(
+                        child: ReactiveSwitchListTile(
+                          formControlName: SettingsViewModel.biometricField,
+                          title: Text(l10n.settingsBiometric),
+                          subtitle: Text(l10n.settingsBiometricHint),
+                        ),
+                      )
+                    else
+                      Text(
+                        l10n.settingsBiometricNeedsRememberedSession,
+                        key: const Key('biometric_needs_remembered_session'),
+                        style: context.text.bodySmall,
                       ),
-                    ),
                     if (viewModel.biometricUnavailable)
                       Padding(
                         padding: EdgeInsets.only(top: context.spacing.sm),
@@ -117,7 +124,7 @@ class SettingsView extends StatelessWidget {
                 ),
               ],
               SizedBox(height: context.spacing.lg),
-              AppButton(
+              AppPrimaryButton(
                 label: l10n.settingsLogout,
                 onPressed: () =>
                     viewModel.logout(reason: l10n.biometricReasonLogout),

@@ -7,7 +7,6 @@
   "validationRequired": "This field is required",
   "validationEmail": "Enter a valid email address",
   "validationStrongPassword": "Use at least 8 characters with upper case, lower case, a number and a symbol",
-  "validationPhone": "Enter a valid phone number",
   "validationMinLength": "Must be at least {length} characters",
   "@validationMinLength": {
     "placeholders": {
@@ -30,16 +29,6 @@
   "authEmailLabel": "Email",
   "authPasswordLabel": "Password",
   "authLoginButton": "Sign in",
-  "authNoAccount": "Don't have an account?",
-  "authGoToRegister": "Create account",
-  "authRegisterTitle": "Create account",
-  "authRegisterSubtitle": "Fill in your details to sign up",
-  "authNameLabel": "Name",
-  "authPhoneLabel": "Phone (optional)",
-  "authConfirmPasswordLabel": "Confirm password",
-  "authRegisterButton": "Sign up",
-  "authHaveAccount": "Already have an account?",
-  "authGoToLogin": "Sign in",
   "authTogglePassword": "Show or hide password",
   "authInvalidCredentials": "Incorrect email or password",
   "authEmailTaken": "An account with that email already exists",
@@ -137,5 +126,113 @@
       }
     }
   },
-  "biometricReasonToggle": "Confirm your identity to change this option"
+  "biometricReasonToggle": "Confirm your identity to change this option",
+  "commonClear": "Clear",
+  "commonClose": "Close",
+  "commonEdit": "Edit",
+  "fieldValidIndicator": "Valid",
+  "otpSemanticsLabel": "Confirmation code, {entered} of {total} digits",
+  "avatarSemanticsEmpty": "No profile picture",
+  "avatarSemanticsFilled": "Profile picture",
+  "@otpSemanticsLabel": {
+    "placeholders": {
+      "entered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "validationCode": "Enter the 6-digit code",
+  "validationUsername": "Use 3 to 30 letters, numbers, dots or underscores, with no dot at the start or end",
+  "authCodeInvalid": "That code is not correct",
+  "authCodeExpired": "The code expired. Request a new one.",
+  "authCodeTooManyAttempts": "Too many attempts. Request a new code.",
+  "authResendTooSoon": "Wait a moment before requesting another code",
+  "authUsernameTaken": "That username is already taken",
+  "authVerificationExpired": "E-mail verification expired. Start again.",
+  "authImageInvalid": "We couldn't use that picture. Try another one.",
+  "authImageTooLarge": "The picture is too large",
+  "welcomeTitle": "Organize your tasks, noise-free",
+  "welcomeSubtitle": "Create an account in a few steps and keep everything in one place.",
+  "welcomeStart": "Get started",
+  "welcomeHaveAccount": "I already have an account",
+  "welcomeIllustrationLabel": "Illustration of completed tasks",
+  "signUpNext": "Next",
+  "signUpEmailTitle": "What's your e-mail address?",
+  "signUpEmailDescription": "We'll send you a code to confirm it's yours.",
+  "signUpCodeTitle": "Enter the confirmation code",
+  "signUpCodeDescription": "Enter the 6-digit code we sent to {email}.",
+  "@signUpCodeDescription": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signUpCodeNotReceived": "I didn't get the code",
+  "signUpCodeResendIn": "You can request another code in {seconds} s",
+  "@signUpCodeResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "signUpPasswordTitle": "Create a password",
+  "signUpPasswordDescription": "Use at least 8 characters with upper case, lower case, a number and a symbol.",
+  "authRememberSession": "Remember me",
+  "authRememberSessionHint": "If you turn it off, you'll have to sign in every time you open the app.",
+  "signUpNameTitle": "What's your name?",
+  "signUpNameDescription": "Add your name so people can recognize you.",
+  "authFullNameLabel": "Full name",
+  "signUpUsernameTitle": "Choose a username",
+  "signUpUsernameDescription": "It will be your public handle.",
+  "authUsernameLabel": "Username",
+  "usernameChecking": "Checking availability…",
+  "usernameAvailable": "{username} is available",
+  "@usernameAvailable": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameUnknown": "We couldn't check it right now. You can continue.",
+  "signUpTermsTitle": "Accept the terms and policies",
+  "signUpTermsDescription": "By creating your account you accept the terms of use and the privacy policy of this demo.",
+  "signUpTermsAccept": "I agree",
+  "signUpTermsRead": "Read the terms and policies",
+  "termsScreenTitle": "Terms and policies",
+  "termsDemoNotice": "Sample text for this demo. It is not a legal document.",
+  "termsUseTitle": "Using the app",
+  "termsUseBody": "This app is a technical demo. You can create test tasks and delete them whenever you want. Do not use it to store important information.",
+  "termsPrivacyTitle": "Privacy",
+  "termsPrivacyBody": "We only store what you type when you create your account: e-mail, name, username and, if you want, a picture. We never store your password in plain text.",
+  "termsDataTitle": "Your data",
+  "termsDataBody": "Demo data lives in memory and is erased when the server restarts. We do not share it with anyone.",
+  "signUpAvatarTitle": "Add a profile picture",
+  "signUpAvatarDescription": "Add a picture so people recognize you. You can skip this step.",
+  "signUpAvatarAdd": "Add a picture",
+  "signUpAvatarSkip": "Skip",
+  "photoSheetTitle": "Add profile picture",
+  "photoFromGallery": "Choose from gallery",
+  "photoFromCamera": "Take a photo",
+  "photoGalleryDenied": "We need permission to access your photos. You can turn it on in the system settings.",
+  "photoCameraDenied": "We need permission to use the camera. You can turn it on in the system settings.",
+  "photoCropTitle": "Crop your picture",
+  "photoCropDone": "Done",
+  "signUpDoneTitle": "Welcome, @{username}",
+  "@signUpDoneTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "signUpDoneDescription": "Your account is ready. Start organizing your tasks.",
+  "signUpDoneButton": "Continue",
+  "settingsBiometricNeedsRememberedSession": "Biometric confirmation is only available when the session is remembered. Sign out and sign in again with “Remember me” on.",
+  "authNoAccountCreate": "Don't have an account? Create account"
 }

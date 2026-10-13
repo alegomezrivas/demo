@@ -39,8 +39,14 @@ void main() {
     session = SessionService(isAuthenticated: true);
     preferences = AppPreferences();
     when(getCurrentUser(any)).thenAnswer(
-      (_) async =>
-          right(const User(id: '1', name: 'Ana Pérez', email: 'ana@test.com')),
+      (_) async => right(
+        const User(
+          id: '1',
+          name: 'Ana Pérez',
+          email: 'ana@test.com',
+          username: 'ana',
+        ),
+      ),
     );
     when(saveSettings(any)).thenAnswer((_) async => right(unit));
     when(logout(any)).thenAnswer((_) async => right(unit));
@@ -143,6 +149,35 @@ void main() {
         expect(preferences.biometricConfirmation, isFalse);
       },
     );
+
+    testWidgets(
+      'hides the biometric option when the session is not remembered',
+      (
+        tester,
+      ) async {
+        session.markSignedIn(persistent: false);
+        await pumpView(tester);
+
+        expect(find.byType(Switch), findsNothing);
+        expect(
+          find.byKey(const Key('biometric_needs_remembered_session')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('offers the biometric option when the session is remembered', (
+      tester,
+    ) async {
+      session.markSignedIn();
+      await pumpView(tester);
+
+      expect(find.byType(Switch), findsOneWidget);
+      expect(
+        find.byKey(const Key('biometric_needs_remembered_session')),
+        findsNothing,
+      );
+    });
 
     testWidgets('opens the about screen', (tester) async {
       await pumpView(tester);

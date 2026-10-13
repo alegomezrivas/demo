@@ -3,7 +3,13 @@ import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { createLogger } from '../src/shared/logging/logger.js';
 import { errorBodySchema } from '../src/shared/http/error-schemas.js';
-import { buildTestContext, buildTestApp, DEMO_CREDENTIALS, loginAs } from './helpers/test-app.js';
+import {
+  buildTestContext,
+  buildTestApp,
+  DEMO_CREDENTIALS,
+  loginAs,
+  signUp,
+} from './helpers/test-app.js';
 
 function captureLogs(): { stream: Writable; text: () => string } {
   const lines: string[] = [];
@@ -21,10 +27,12 @@ describe('logging', () => {
     const logs = captureLogs();
     const { app } = await buildTestContext({}, { logger: createLogger('debug', logs.stream) });
 
-    const registered = await request(app)
-      .post('/auth/register')
-      .send({ name: 'Log Test', email: 'log@example.com', password: 'Sup3r!Secret' })
-      .expect(201);
+    const registered = await signUp(app, {
+      email: 'log@example.com',
+      username: 'logtest',
+      password: 'Sup3r!Secret',
+    });
+    expect(registered.status).toBe(201);
     const { accessToken, refreshToken } = registered.body as {
       accessToken: string;
       refreshToken: string;
@@ -134,7 +142,7 @@ describe('response hygiene', () => {
       .post('/auth/register')
       .set('Content-Type', 'application/json')
       .send(
-        '{"name":"A","email":"p@example.com","password":"Str0ng!Pass","__proto__":{"admin":true}}',
+        '{"verificationToken":"x","name":"A","username":"proto","password":"Str0ng!Pass","__proto__":{"admin":true}}',
       );
     expect(response.status).toBe(422);
     expect(({} as Record<string, unknown>)['admin']).toBeUndefined();

@@ -12,7 +12,8 @@ abstract class UserDto with _$UserDto {
     required String id,
     required String name,
     required String email,
-    String? phone,
+    required String username,
+    @Default(false) bool hasAvatar,
   }) = _UserDto;
 
   /// Parses the backend JSON.
@@ -24,12 +25,19 @@ abstract class UserDto with _$UserDto {
     id: user.id,
     name: user.name,
     email: user.email,
-    phone: user.phone,
+    username: user.username,
+    hasAvatar: user.hasAvatar,
   );
 }
 
 /// Mapping to the domain layer.
 extension UserDtoMapper on UserDto {
   /// Converts this DTO to a domain [User].
-  User toEntity() => User(id: id, name: name, email: email, phone: phone);
+  User toEntity() => User(
+    id: id,
+    name: name,
+    email: email,
+    username: username,
+    hasAvatar: hasAvatar,
+  );
 }

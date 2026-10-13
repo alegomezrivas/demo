@@ -4,34 +4,58 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'dart:async' as _i4;
+import 'dart:async' as _i6;
+import 'dart:typed_data' as _i18;
 
-import 'package:demo/core/error/failures.dart' as _i6;
-import 'package:demo/core/security/auth_tokens.dart' as _i13;
-import 'package:demo/core/security/screen_protection.dart' as _i20;
-import 'package:demo/core/usecases/use_case.dart' as _i18;
+import 'package:demo/core/error/failures.dart' as _i8;
+import 'package:demo/core/security/auth_tokens.dart' as _i22;
+import 'package:demo/core/security/screen_protection.dart' as _i33;
+import 'package:demo/core/usecases/use_case.dart' as _i31;
 import 'package:demo/features/auth/data/datasources/auth_local_data_source.dart'
-    as _i12;
+    as _i21;
 import 'package:demo/features/auth/data/datasources/auth_remote_data_source.dart'
-    as _i9;
-import 'package:demo/features/auth/data/models/auth_response_dto.dart' as _i2;
-import 'package:demo/features/auth/data/models/login_request_dto.dart' as _i10;
-import 'package:demo/features/auth/data/models/register_request_dto.dart'
     as _i11;
-import 'package:demo/features/auth/data/models/user_dto.dart' as _i14;
-import 'package:demo/features/auth/domain/entities/user.dart' as _i7;
-import 'package:demo/features/auth/domain/repositories/auth_repository.dart'
-    as _i3;
-import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart'
-    as _i19;
-import 'package:demo/features/auth/domain/usecases/login_use_case.dart' as _i15;
-import 'package:demo/features/auth/domain/usecases/logout_use_case.dart'
+import 'package:demo/features/auth/data/datasources/avatar_remote_data_source.dart'
     as _i17;
-import 'package:demo/features/auth/domain/usecases/register_use_case.dart'
+import 'package:demo/features/auth/data/datasources/sign_up_remote_data_source.dart'
+    as _i14;
+import 'package:demo/features/auth/data/models/auth_response_dto.dart' as _i2;
+import 'package:demo/features/auth/data/models/complete_sign_up_request_dto.dart'
+    as _i13;
+import 'package:demo/features/auth/data/models/email_request_dto.dart' as _i15;
+import 'package:demo/features/auth/data/models/login_request_dto.dart' as _i12;
+import 'package:demo/features/auth/data/models/user_dto.dart' as _i23;
+import 'package:demo/features/auth/data/models/username_availability_dto.dart'
+    as _i4;
+import 'package:demo/features/auth/data/models/verification_response_dto.dart'
+    as _i3;
+import 'package:demo/features/auth/data/models/verify_code_request_dto.dart'
     as _i16;
-import 'package:fpdart/fpdart.dart' as _i5;
+import 'package:demo/features/auth/domain/entities/user.dart' as _i9;
+import 'package:demo/features/auth/domain/repositories/auth_repository.dart'
+    as _i5;
+import 'package:demo/features/auth/domain/repositories/avatar_repository.dart'
+    as _i20;
+import 'package:demo/features/auth/domain/repositories/sign_up_repository.dart'
+    as _i19;
+import 'package:demo/features/auth/domain/usecases/check_username_availability_use_case.dart'
+    as _i27;
+import 'package:demo/features/auth/domain/usecases/complete_sign_up_use_case.dart'
+    as _i28;
+import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart'
+    as _i32;
+import 'package:demo/features/auth/domain/usecases/login_use_case.dart' as _i24;
+import 'package:demo/features/auth/domain/usecases/logout_use_case.dart'
+    as _i30;
+import 'package:demo/features/auth/domain/usecases/send_confirmation_code_use_case.dart'
+    as _i25;
+import 'package:demo/features/auth/domain/usecases/upload_avatar_use_case.dart'
+    as _i29;
+import 'package:demo/features/auth/domain/usecases/verify_confirmation_code_use_case.dart'
+    as _i26;
+import 'package:fpdart/fpdart.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i8;
+import 'package:mockito/src/dummies.dart' as _i10;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -54,342 +78,703 @@ class _FakeAuthResponseDto_0 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeVerificationResponseDto_1 extends _i1.SmartFake
+    implements _i3.VerificationResponseDto {
+  _FakeVerificationResponseDto_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeUsernameAvailabilityDto_2 extends _i1.SmartFake
+    implements _i4.UsernameAvailabilityDto {
+  _FakeUsernameAvailabilityDto_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [AuthRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
+class MockAuthRepository extends _i1.Mock implements _i5.AuthRepository {
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i7.User>> login({
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User>> login({
     required String? email,
     required String? password,
+    bool? rememberSession = true,
   }) =>
       (super.noSuchMethod(
-            Invocation.method(#login, [], {#email: email, #password: password}),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
+            Invocation.method(#login, [], {
+              #email: email,
+              #password: password,
+              #rememberSession: rememberSession,
+            }),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
                 this,
                 Invocation.method(#login, [], {
                   #email: email,
                   #password: password,
+                  #rememberSession: rememberSession,
                 }),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
                     this,
                     Invocation.method(#login, [], {
                       #email: email,
                       #password: password,
+                      #rememberSession: rememberSession,
                     }),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i7.User>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User>>);
 
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i7.User>> register({
-    required String? name,
-    required String? email,
-    required String? password,
-    String? phone,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#register, [], {
-              #name: name,
-              #email: email,
-              #password: password,
-              #phone: phone,
-            }),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
-                this,
-                Invocation.method(#register, [], {
-                  #name: name,
-                  #email: email,
-                  #password: password,
-                  #phone: phone,
-                }),
-              ),
-            ),
-            returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
-                    this,
-                    Invocation.method(#register, [], {
-                      #name: name,
-                      #email: email,
-                      #password: password,
-                      #phone: phone,
-                    }),
-                  ),
-                ),
-          )
-          as _i4.Future<_i5.Either<_i6.Failure, _i7.User>>);
-
-  @override
-  _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>> logout() =>
+  _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>> logout() =>
       (super.noSuchMethod(
             Invocation.method(#logout, []),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i5.Unit>>(
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
                 this,
                 Invocation.method(#logout, []),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i5.Unit>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
                     this,
                     Invocation.method(#logout, []),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>);
 
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i7.User?>> restoreSession() =>
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User?>> restoreSession() =>
       (super.noSuchMethod(
             Invocation.method(#restoreSession, []),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i7.User?>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User?>>(
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User?>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User?>>(
                 this,
                 Invocation.method(#restoreSession, []),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i7.User?>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User?>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User?>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User?>>(
                     this,
                     Invocation.method(#restoreSession, []),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i7.User?>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User?>>);
 }
 
 /// A class which mocks [AuthRemoteDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAuthRemoteDataSource extends _i1.Mock
-    implements _i9.AuthRemoteDataSource {
+    implements _i11.AuthRemoteDataSource {
   @override
-  _i4.Future<_i2.AuthResponseDto> login(_i10.LoginRequestDto? request) =>
+  _i6.Future<_i2.AuthResponseDto> login(_i12.LoginRequestDto? request) =>
       (super.noSuchMethod(
             Invocation.method(#login, [request]),
-            returnValue: _i4.Future<_i2.AuthResponseDto>.value(
+            returnValue: _i6.Future<_i2.AuthResponseDto>.value(
               _FakeAuthResponseDto_0(
                 this,
                 Invocation.method(#login, [request]),
               ),
             ),
-            returnValueForMissingStub: _i4.Future<_i2.AuthResponseDto>.value(
+            returnValueForMissingStub: _i6.Future<_i2.AuthResponseDto>.value(
               _FakeAuthResponseDto_0(
                 this,
                 Invocation.method(#login, [request]),
               ),
             ),
           )
-          as _i4.Future<_i2.AuthResponseDto>);
+          as _i6.Future<_i2.AuthResponseDto>);
 
   @override
-  _i4.Future<_i2.AuthResponseDto> register(_i11.RegisterRequestDto? request) =>
+  _i6.Future<_i2.AuthResponseDto> register(
+    _i13.CompleteSignUpRequestDto? request,
+  ) =>
       (super.noSuchMethod(
             Invocation.method(#register, [request]),
-            returnValue: _i4.Future<_i2.AuthResponseDto>.value(
+            returnValue: _i6.Future<_i2.AuthResponseDto>.value(
               _FakeAuthResponseDto_0(
                 this,
                 Invocation.method(#register, [request]),
               ),
             ),
-            returnValueForMissingStub: _i4.Future<_i2.AuthResponseDto>.value(
+            returnValueForMissingStub: _i6.Future<_i2.AuthResponseDto>.value(
               _FakeAuthResponseDto_0(
                 this,
                 Invocation.method(#register, [request]),
               ),
             ),
           )
-          as _i4.Future<_i2.AuthResponseDto>);
+          as _i6.Future<_i2.AuthResponseDto>);
 
   @override
-  _i4.Future<void> logout(String? refreshToken) =>
+  _i6.Future<void> logout(String? refreshToken) =>
       (super.noSuchMethod(
             Invocation.method(#logout, [refreshToken]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
+}
+
+/// A class which mocks [SignUpRemoteDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSignUpRemoteDataSource extends _i1.Mock
+    implements _i14.SignUpRemoteDataSource {
+  @override
+  _i6.Future<void> sendCode(_i15.EmailRequestDto? request) =>
+      (super.noSuchMethod(
+            Invocation.method(#sendCode, [request]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> resendCode(_i15.EmailRequestDto? request) =>
+      (super.noSuchMethod(
+            Invocation.method(#resendCode, [request]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<_i3.VerificationResponseDto> verifyCode(
+    _i16.VerifyCodeRequestDto? request,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#verifyCode, [request]),
+            returnValue: _i6.Future<_i3.VerificationResponseDto>.value(
+              _FakeVerificationResponseDto_1(
+                this,
+                Invocation.method(#verifyCode, [request]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i3.VerificationResponseDto>.value(
+                  _FakeVerificationResponseDto_1(
+                    this,
+                    Invocation.method(#verifyCode, [request]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i3.VerificationResponseDto>);
+
+  @override
+  _i6.Future<_i4.UsernameAvailabilityDto> isUsernameAvailable(
+    String? username,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#isUsernameAvailable, [username]),
+            returnValue: _i6.Future<_i4.UsernameAvailabilityDto>.value(
+              _FakeUsernameAvailabilityDto_2(
+                this,
+                Invocation.method(#isUsernameAvailable, [username]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i4.UsernameAvailabilityDto>.value(
+                  _FakeUsernameAvailabilityDto_2(
+                    this,
+                    Invocation.method(#isUsernameAvailable, [username]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i4.UsernameAvailabilityDto>);
+}
+
+/// A class which mocks [AvatarRemoteDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockAvatarRemoteDataSource extends _i1.Mock
+    implements _i17.AvatarRemoteDataSource {
+  @override
+  _i6.Future<void> upload(_i18.Uint8List? jpeg) =>
+      (super.noSuchMethod(
+            Invocation.method(#upload, [jpeg]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+}
+
+/// A class which mocks [SignUpRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSignUpRepository extends _i1.Mock implements _i19.SignUpRepository {
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>> sendConfirmationCode(
+    String? email,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#sendConfirmationCode, [email]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
+                this,
+                Invocation.method(#sendConfirmationCode, [email]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
+                    this,
+                    Invocation.method(#sendConfirmationCode, [email]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>);
+
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>> resendConfirmationCode(
+    String? email,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#resendConfirmationCode, [email]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
+                this,
+                Invocation.method(#resendConfirmationCode, [email]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
+                    this,
+                    Invocation.method(#resendConfirmationCode, [email]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>);
+
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, String>> verifyConfirmationCode({
+    required String? email,
+    required String? code,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#verifyConfirmationCode, [], {
+              #email: email,
+              #code: code,
+            }),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, String>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, String>>(
+                this,
+                Invocation.method(#verifyConfirmationCode, [], {
+                  #email: email,
+                  #code: code,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, String>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, String>>(
+                    this,
+                    Invocation.method(#verifyConfirmationCode, [], {
+                      #email: email,
+                      #code: code,
+                    }),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, String>>);
+
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, bool>> isUsernameAvailable(
+    String? username,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#isUsernameAvailable, [username]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, bool>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, bool>>(
+                this,
+                Invocation.method(#isUsernameAvailable, [username]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, bool>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, bool>>(
+                    this,
+                    Invocation.method(#isUsernameAvailable, [username]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, bool>>);
+
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User>> completeSignUp({
+    required String? verificationToken,
+    required String? name,
+    required String? username,
+    required String? password,
+    bool? rememberSession = true,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#completeSignUp, [], {
+              #verificationToken: verificationToken,
+              #name: name,
+              #username: username,
+              #password: password,
+              #rememberSession: rememberSession,
+            }),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                this,
+                Invocation.method(#completeSignUp, [], {
+                  #verificationToken: verificationToken,
+                  #name: name,
+                  #username: username,
+                  #password: password,
+                  #rememberSession: rememberSession,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                    this,
+                    Invocation.method(#completeSignUp, [], {
+                      #verificationToken: verificationToken,
+                      #name: name,
+                      #username: username,
+                      #password: password,
+                      #rememberSession: rememberSession,
+                    }),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User>>);
+}
+
+/// A class which mocks [AvatarRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockAvatarRepository extends _i1.Mock implements _i20.AvatarRepository {
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User>> uploadAvatar(
+    _i18.Uint8List? jpeg,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#uploadAvatar, [jpeg]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                this,
+                Invocation.method(#uploadAvatar, [jpeg]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                    this,
+                    Invocation.method(#uploadAvatar, [jpeg]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User>>);
 }
 
 /// A class which mocks [AuthLocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAuthLocalDataSource extends _i1.Mock
-    implements _i12.AuthLocalDataSource {
+    implements _i21.AuthLocalDataSource {
   @override
-  _i4.Future<void> saveSession({
-    required _i13.AuthTokens? tokens,
-    required _i14.UserDto? user,
+  _i6.Future<void> saveSession({
+    required _i22.AuthTokens? tokens,
+    required _i23.UserDto? user,
+    bool? persist = true,
   }) =>
       (super.noSuchMethod(
-            Invocation.method(#saveSession, [], {#tokens: tokens, #user: user}),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            Invocation.method(#saveSession, [], {
+              #tokens: tokens,
+              #user: user,
+              #persist: persist,
+            }),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i4.Future<_i14.UserDto?> readUser() =>
+  _i6.Future<void> updateUser(_i23.UserDto? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUser, [user]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<_i23.UserDto?> readUser() =>
       (super.noSuchMethod(
             Invocation.method(#readUser, []),
-            returnValue: _i4.Future<_i14.UserDto?>.value(),
-            returnValueForMissingStub: _i4.Future<_i14.UserDto?>.value(),
+            returnValue: _i6.Future<_i23.UserDto?>.value(),
+            returnValueForMissingStub: _i6.Future<_i23.UserDto?>.value(),
           )
-          as _i4.Future<_i14.UserDto?>);
+          as _i6.Future<_i23.UserDto?>);
 
   @override
-  _i4.Future<String?> readRefreshToken() =>
+  _i6.Future<String?> readRefreshToken() =>
       (super.noSuchMethod(
             Invocation.method(#readRefreshToken, []),
-            returnValue: _i4.Future<String?>.value(),
-            returnValueForMissingStub: _i4.Future<String?>.value(),
+            returnValue: _i6.Future<String?>.value(),
+            returnValueForMissingStub: _i6.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i6.Future<String?>);
 
   @override
-  _i4.Future<void> clear() =>
+  _i6.Future<void> clear() =>
       (super.noSuchMethod(
             Invocation.method(#clear, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 }
 
 /// A class which mocks [LoginUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLoginUseCase extends _i1.Mock implements _i15.LoginUseCase {
+class MockLoginUseCase extends _i1.Mock implements _i24.LoginUseCase {
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i7.User>> call(
-    _i15.LoginParams? params,
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User>> call(
+    _i24.LoginParams? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i7.User>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User>>);
 }
 
-/// A class which mocks [RegisterUseCase].
+/// A class which mocks [SendConfirmationCodeUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockRegisterUseCase extends _i1.Mock implements _i16.RegisterUseCase {
+class MockSendConfirmationCodeUseCase extends _i1.Mock
+    implements _i25.SendConfirmationCodeUseCase {
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i7.User>> call(
-    _i16.RegisterParams? params,
+  _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>> call(
+    _i25.SendCodeParams? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i7.User>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i7.User>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>);
+}
+
+/// A class which mocks [VerifyConfirmationCodeUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockVerifyConfirmationCodeUseCase extends _i1.Mock
+    implements _i26.VerifyConfirmationCodeUseCase {
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, String>> call(
+    _i26.VerifyCodeParams? params,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [params]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, String>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, String>>(
+                this,
+                Invocation.method(#call, [params]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, String>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, String>>(
+                    this,
+                    Invocation.method(#call, [params]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, String>>);
+}
+
+/// A class which mocks [CheckUsernameAvailabilityUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCheckUsernameAvailabilityUseCase extends _i1.Mock
+    implements _i27.CheckUsernameAvailabilityUseCase {
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, bool>> call(String? username) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [username]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, bool>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, bool>>(
+                this,
+                Invocation.method(#call, [username]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, bool>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, bool>>(
+                    this,
+                    Invocation.method(#call, [username]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, bool>>);
+}
+
+/// A class which mocks [CompleteSignUpUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCompleteSignUpUseCase extends _i1.Mock
+    implements _i28.CompleteSignUpUseCase {
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User>> call(
+    _i28.CompleteSignUpParams? params,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [params]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                this,
+                Invocation.method(#call, [params]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                    this,
+                    Invocation.method(#call, [params]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User>>);
+}
+
+/// A class which mocks [UploadAvatarUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUploadAvatarUseCase extends _i1.Mock
+    implements _i29.UploadAvatarUseCase {
+  @override
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User>> call(_i18.Uint8List? jpeg) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [jpeg]),
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                this,
+                Invocation.method(#call, [jpeg]),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User>>(
+                    this,
+                    Invocation.method(#call, [jpeg]),
+                  ),
+                ),
+          )
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User>>);
 }
 
 /// A class which mocks [LogoutUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLogoutUseCase extends _i1.Mock implements _i17.LogoutUseCase {
+class MockLogoutUseCase extends _i1.Mock implements _i30.LogoutUseCase {
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>> call(_i18.NoParams? params) =>
+  _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>> call(_i31.NoParams? params) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i5.Unit>>(
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i5.Unit>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i7.Unit>>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i5.Unit>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i7.Unit>>);
 }
 
 /// A class which mocks [GetCurrentUserUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetCurrentUserUseCase extends _i1.Mock
-    implements _i19.GetCurrentUserUseCase {
+    implements _i32.GetCurrentUserUseCase {
   @override
-  _i4.Future<_i5.Either<_i6.Failure, _i7.User?>> call(_i18.NoParams? params) =>
+  _i6.Future<_i7.Either<_i8.Failure, _i9.User?>> call(_i31.NoParams? params) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i4.Future<_i5.Either<_i6.Failure, _i7.User?>>.value(
-              _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User?>>(
+            returnValue: _i6.Future<_i7.Either<_i8.Failure, _i9.User?>>.value(
+              _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User?>>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
             returnValueForMissingStub:
-                _i4.Future<_i5.Either<_i6.Failure, _i7.User?>>.value(
-                  _i8.dummyValue<_i5.Either<_i6.Failure, _i7.User?>>(
+                _i6.Future<_i7.Either<_i8.Failure, _i9.User?>>.value(
+                  _i10.dummyValue<_i7.Either<_i8.Failure, _i9.User?>>(
                     this,
                     Invocation.method(#call, [params]),
                   ),
                 ),
           )
-          as _i4.Future<_i5.Either<_i6.Failure, _i7.User?>>);
+          as _i6.Future<_i7.Either<_i8.Failure, _i9.User?>>);
 }
 
 /// A class which mocks [ScreenProtection].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockScreenProtection extends _i1.Mock implements _i20.ScreenProtection {
+class MockScreenProtection extends _i1.Mock implements _i33.ScreenProtection {
   @override
-  _i4.Future<void> enable() =>
+  _i6.Future<void> enable() =>
       (super.noSuchMethod(
             Invocation.method(#enable, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i4.Future<void> disable() =>
+  _i6.Future<void> disable() =>
       (super.noSuchMethod(
             Invocation.method(#disable, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i6.Future<void>);
 }

@@ -1,6 +1,6 @@
 import { createApp } from './app.js';
 import { createContainer } from './composition.js';
-import { ConfigError, loadConfig, type AppConfig } from './config/env.js';
+import { ConfigError, loadConfig, startupWarnings, type AppConfig } from './config/env.js';
 import { createLogger } from './shared/logging/logger.js';
 
 function readConfig(): AppConfig {
@@ -18,6 +18,7 @@ function readConfig(): AppConfig {
 async function main(): Promise<void> {
   const config = readConfig();
   const logger = createLogger(config.logLevel);
+  for (const warning of startupWarnings(config)) logger.warn(warning);
   const container = await createContainer(config);
   const server = createApp({ config, logger, container }).listen(config.port, () => {
     logger.info({ port: config.port, env: config.env }, 'server listening');

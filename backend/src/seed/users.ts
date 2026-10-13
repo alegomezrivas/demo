@@ -7,14 +7,14 @@ export const SEED_USERS = [
     id: 'user-0',
     name: 'Demo User',
     email: 'demo@starkshowcase.dev',
-    phone: null,
+    username: 'demo',
     password: 'Demo1234!',
   },
   {
     id: 'user-1',
     name: 'Ana Gómez',
     email: 'ana@starkshowcase.dev',
-    phone: '+34600111222',
+    username: 'ana',
     password: 'Ana12345!',
   },
 ] as const;

@@ -1,7 +1,7 @@
 import 'package:demo/app/locator.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/core/utils/failure_message.dart';
-import 'package:demo/core/widgets/app_button.dart';
+import 'package:demo/core/widgets/app_primary_button.dart';
 import 'package:demo/core/widgets/error_view.dart';
 import 'package:demo/core/widgets/stat_card.dart';
 import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
@@ -53,7 +53,7 @@ class DashboardView extends StatelessWidget {
                     SizedBox(height: context.spacing.lg),
                     if (stats != null) _Stats(stats: stats, l10n: l10n),
                     SizedBox(height: context.spacing.lg),
-                    AppButton(
+                    AppPrimaryButton(
                       label: l10n.dashboardViewTasks,
                       onPressed: viewModel.openTasks,
                     ),

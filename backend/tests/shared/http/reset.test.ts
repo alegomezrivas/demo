@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { buildTestContext, DEMO_CREDENTIALS, loginAs } from '../../helpers/test-app.js';
+import { buildTestContext, DEMO_CREDENTIALS, loginAs, signUp } from '../../helpers/test-app.js';
 
 describe('POST /__reset', () => {
   it('restores seed users and tasks after changes', async () => {
@@ -17,10 +17,7 @@ describe('POST /__reset', () => {
       .set(...bearer)
       .send({ title: 'Extra', description: '', priority: 'low', isDone: false })
       .expect(201);
-    await request(app)
-      .post('/auth/register')
-      .send({ name: 'Temp', email: 'temp@example.com', password: 'Str0ng!Pass' })
-      .expect(201);
+    expect((await signUp(app, { email: 'temp@example.com', username: 'temp' })).status).toBe(201);
 
     const reset = await request(app).post('/__reset');
     expect(reset.status).toBe(204);

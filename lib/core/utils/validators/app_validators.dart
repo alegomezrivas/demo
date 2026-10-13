@@ -10,8 +10,6 @@ abstract final class AppValidators {
     r"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
     r'(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$',
   );
-  static final RegExp _phoneSeparators = RegExp(r'[\s\-().]');
-  static final RegExp _phone = RegExp(r'^\+?[0-9]{7,15}$');
 
   /// Minimum password length enforced by [strongPassword].
   static const int minPasswordLength = 8;
@@ -48,13 +46,6 @@ abstract final class AppValidators {
       if (!value.contains(RegExp('[^A-Za-z0-9]'))) 'symbol',
     ];
     return missing.isEmpty ? null : {ValidationKeys.strongPassword: missing};
-  });
-
-  /// Fails when the value is not a 7-15 digit phone number (optional `+`).
-  static final Validator<dynamic> phone = Validators.delegate((control) {
-    final value = _text(control).replaceAll(_phoneSeparators, '');
-    if (value.isEmpty) return null;
-    return _phone.hasMatch(value) ? null : {ValidationKeys.phone: true};
   });
 
   /// Fails when two controls of a group differ; the error lands on [matchName].

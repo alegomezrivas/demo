@@ -86,3 +86,36 @@ export async function loginAs(
   const body = response.body as Session;
   return { accessToken: body.accessToken, refreshToken: body.refreshToken };
 }
+
+/** The code every e-mail accepts outside production (see `FIXED_CONFIRMATION_CODE`). */
+export const CONFIRMATION_CODE = '123456';
+
+/** Runs sign-up steps 1 and 2 for [email] and returns the `verificationToken`. */
+export async function confirmEmail(app: Express, email: string): Promise<string> {
+  await request(app).post('/auth/signup/email').send({ email }).expect(204);
+  const verified = await request(app)
+    .post('/auth/signup/verify')
+    .send({ email, code: CONFIRMATION_CODE })
+    .expect(200);
+  return (verified.body as { verificationToken: string }).verificationToken;
+}
+
+export interface NewAccount {
+  readonly email: string;
+  readonly username: string;
+  readonly name?: string;
+  readonly password?: string;
+}
+
+/** Full sign-up (confirm the e-mail, then register); returns the register response. */
+export async function signUp(app: Express, account: NewAccount): Promise<request.Response> {
+  const verificationToken = await confirmEmail(app, account.email);
+  return request(app)
+    .post('/auth/register')
+    .send({
+      verificationToken,
+      name: account.name ?? 'Test User',
+      username: account.username,
+      password: account.password ?? 'Str0ng!Pass',
+    });
+}

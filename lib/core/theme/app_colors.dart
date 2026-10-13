@@ -13,6 +13,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.onSecondary,
     required this.background,
     required this.surface,
+    required this.surfaceMuted,
     required this.error,
     required this.onError,
     required this.success,
@@ -30,6 +31,7 @@ class AppColors extends ThemeExtension<AppColors> {
     onSecondary: Color(0xFFFFFFFF),
     background: Color(0xFFF6F8FB),
     surface: Color(0xFFFFFFFF),
+    surfaceMuted: Color(0xFFEDF1F7),
     error: Color(0xFFB3261E),
     onError: Color(0xFFFFFFFF),
     success: Color(0xFF2E7D32),
@@ -47,6 +49,7 @@ class AppColors extends ThemeExtension<AppColors> {
     onSecondary: Color(0xFF00302B),
     background: Color(0xFF0B1220),
     surface: Color(0xFF141C2E),
+    surfaceMuted: Color(0xFF1B2640),
     error: Color(0xFFF2B8B5),
     onError: Color(0xFF601410),
     success: Color(0xFF81C784),
@@ -73,6 +76,9 @@ class AppColors extends ThemeExtension<AppColors> {
 
   /// Cards, sheets and inputs.
   final Color surface;
+
+  /// Quiet fill for disabled inputs, placeholders and grouped rows.
+  final Color surfaceMuted;
 
   /// Error state.
   final Color error;
@@ -105,6 +111,7 @@ class AppColors extends ThemeExtension<AppColors> {
           other.onSecondary == onSecondary &&
           other.background == background &&
           other.surface == surface &&
+          other.surfaceMuted == surfaceMuted &&
           other.error == error &&
           other.onError == onError &&
           other.success == success &&
@@ -121,6 +128,7 @@ class AppColors extends ThemeExtension<AppColors> {
     onSecondary,
     background,
     surface,
+    surfaceMuted,
     error,
     onError,
     success,
@@ -138,6 +146,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? onSecondary,
     Color? background,
     Color? surface,
+    Color? surfaceMuted,
     Color? error,
     Color? onError,
     Color? success,
@@ -153,6 +162,7 @@ class AppColors extends ThemeExtension<AppColors> {
       onSecondary: onSecondary ?? this.onSecondary,
       background: background ?? this.background,
       surface: surface ?? this.surface,
+      surfaceMuted: surfaceMuted ?? this.surfaceMuted,
       error: error ?? this.error,
       onError: onError ?? this.onError,
       success: success ?? this.success,
@@ -174,6 +184,7 @@ class AppColors extends ThemeExtension<AppColors> {
       onSecondary: mix(onSecondary, other.onSecondary),
       background: mix(background, other.background),
       surface: mix(surface, other.surface),
+      surfaceMuted: mix(surfaceMuted, other.surfaceMuted),
       error: mix(error, other.error),
       onError: mix(onError, other.onError),
       success: mix(success, other.success),

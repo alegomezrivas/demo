@@ -46,3 +46,15 @@ final class ValidationException extends AppException {
   /// Creates a validation exception.
   const ValidationException([super.code = 'validation_error']);
 }
+
+/// The user denied (or the platform blocks) camera or photo access.
+final class PermissionDeniedException extends AppException {
+  /// Creates a permission exception.
+  const PermissionDeniedException([super.code = 'permission_denied']);
+}
+
+/// The picked file is not a usable picture.
+final class InvalidImageException extends AppException {
+  /// Creates an invalid-image exception.
+  const InvalidImageException([super.code = 'invalid_image']);
+}

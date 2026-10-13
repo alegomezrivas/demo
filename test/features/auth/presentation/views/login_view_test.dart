@@ -62,6 +62,52 @@ void main() {
       verify(protection.enable()).called(1);
     });
 
+    testWidgets('offers "remember me", checked by default', (tester) async {
+      await pumpView(tester);
+
+      expect(find.text('Recordar sesión'), findsOneWidget);
+      expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+    });
+
+    testWidgets('unchecking "remember me" signs in without remembering', (
+      tester,
+    ) async {
+      when(login(any)).thenAnswer(
+        (_) async => right(
+          const User(
+            id: '1',
+            name: 'Ana',
+            email: 'ana@test.com',
+            username: 'ana',
+          ),
+        ),
+      );
+      await pumpView(tester);
+
+      await tester.tap(find.text('Recordar sesión'));
+      await tester.enterText(field('Correo electrónico'), 'ana@test.com');
+      await tester.enterText(field('Contraseña'), 'secret');
+      await tester.tap(find.text('Entrar'));
+      await tester.pumpAndSettle();
+
+      final params = verify(login(captureAny)).captured.single as LoginParams;
+      expect(params.rememberSession, isFalse);
+      expect(session.isPersistent, isFalse);
+    });
+
+    testWidgets('the link and the arrow lead to the welcome screen', (
+      tester,
+    ) async {
+      await pumpView(tester);
+
+      await tester.tap(find.textContaining('Crear cuenta'));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.arrow_back_ios_new));
+      await tester.pump();
+
+      verify(navigation.go(AppRoutes.welcome)).called(2);
+    });
+
     testWidgets('is available in English', (tester) async {
       await pumpView(tester, locale: const Locale('en'));
 
@@ -95,8 +141,14 @@ void main() {
 
     testWidgets('submits valid credentials and goes home', (tester) async {
       when(login(any)).thenAnswer(
-        (_) async =>
-            right(const User(id: '1', name: 'Ana', email: 'ana@test.com')),
+        (_) async => right(
+          const User(
+            id: '1',
+            name: 'Ana',
+            email: 'ana@test.com',
+            username: 'ana',
+          ),
+        ),
       );
       await pumpView(tester);
 
@@ -125,7 +177,7 @@ void main() {
       await tester.tap(find.text('Entrar'));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('auth_error')), findsOneWidget);
+      expect(find.byKey(const Key('step_error')), findsOneWidget);
       expect(find.text('Correo o contraseña incorrectos'), findsOneWidget);
     });
 
@@ -163,15 +215,6 @@ void main() {
       await tester.pump();
 
       expect(obscured(), isFalse);
-    });
-
-    testWidgets('opens the register screen', (tester) async {
-      await pumpView(tester);
-
-      await tester.tap(find.textContaining('Crear cuenta'));
-      await tester.pump();
-
-      verify(navigation.push<void>(AppRoutes.register)).called(1);
     });
   });
 }

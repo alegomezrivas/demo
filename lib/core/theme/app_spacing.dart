@@ -23,6 +23,16 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
     this.formMaxWidth = 420,
     this.illustrationSize = 48,
     this.progressHeight = 8,
+    this.minTouchTarget = 48,
+    this.borderThin = 1,
+    this.borderThick = 2,
+    this.otpBoxHeight = 56,
+    this.avatarMd = 120,
+    this.avatarLg = 144,
+    this.iconMd = 24,
+    this.sheetHandleWidth = 40,
+    this.sheetHandleHeight = 4,
+    this.heroSize = 220,
   });
 
   /// Smallest gap.
@@ -79,6 +89,36 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
   /// Thickness of linear progress bars.
   final double progressHeight;
 
+  /// Smallest comfortable tap target (accessibility guideline).
+  final double minTouchTarget;
+
+  /// Hairline outline width.
+  final double borderThin;
+
+  /// Emphasised outline width (focus, active code box).
+  final double borderThick;
+
+  /// Height of one code box in the confirmation code input.
+  final double otpBoxHeight;
+
+  /// Diameter of the avatar in forms.
+  final double avatarMd;
+
+  /// Diameter of the avatar on welcome screens.
+  final double avatarLg;
+
+  /// Default icon size.
+  final double iconMd;
+
+  /// Width of the drag handle of bottom sheets.
+  final double sheetHandleWidth;
+
+  /// Height of the drag handle of bottom sheets.
+  final double sheetHandleHeight;
+
+  /// Edge of the square that holds the welcome illustration.
+  final double heroSize;
+
   /// Small [BorderRadius].
   BorderRadius get borderRadiusSm => BorderRadius.circular(radiusSm);
 
@@ -111,6 +151,16 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
     double? formMaxWidth,
     double? illustrationSize,
     double? progressHeight,
+    double? minTouchTarget,
+    double? borderThin,
+    double? borderThick,
+    double? otpBoxHeight,
+    double? avatarMd,
+    double? avatarLg,
+    double? iconMd,
+    double? sheetHandleWidth,
+    double? sheetHandleHeight,
+    double? heroSize,
   }) {
     return AppSpacing(
       xxs: xxs ?? this.xxs,
@@ -131,6 +181,16 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
       formMaxWidth: formMaxWidth ?? this.formMaxWidth,
       illustrationSize: illustrationSize ?? this.illustrationSize,
       progressHeight: progressHeight ?? this.progressHeight,
+      minTouchTarget: minTouchTarget ?? this.minTouchTarget,
+      borderThin: borderThin ?? this.borderThin,
+      borderThick: borderThick ?? this.borderThick,
+      otpBoxHeight: otpBoxHeight ?? this.otpBoxHeight,
+      avatarMd: avatarMd ?? this.avatarMd,
+      avatarLg: avatarLg ?? this.avatarLg,
+      iconMd: iconMd ?? this.iconMd,
+      sheetHandleWidth: sheetHandleWidth ?? this.sheetHandleWidth,
+      sheetHandleHeight: sheetHandleHeight ?? this.sheetHandleHeight,
+      heroSize: heroSize ?? this.heroSize,
     );
   }
 

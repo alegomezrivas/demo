@@ -5,7 +5,6 @@ import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/security/auth_tokens.dart';
 import 'package:demo/features/auth/data/models/auth_response_dto.dart';
 import 'package:demo/features/auth/data/models/login_request_dto.dart';
-import 'package:demo/features/auth/data/models/register_request_dto.dart';
 import 'package:demo/features/auth/data/models/user_dto.dart';
 import 'package:demo/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:demo/features/auth/domain/entities/user.dart';
@@ -20,7 +19,12 @@ void main() {
   late MockAuthLocalDataSource local;
   late AuthRepositoryImpl repository;
 
-  const userDto = UserDto(id: '1', name: 'Ana', email: 'ana@test.com');
+  const userDto = UserDto(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
   const response = AuthResponseDto(
     user: userDto,
     accessToken: 'a',
@@ -44,7 +48,33 @@ void main() {
       );
 
       expect(result, right<Failure, User>(userDto.toEntity()));
-      verify(local.saveSession(tokens: tokens, user: userDto)).called(1);
+      verify(
+        local.saveSession(tokens: tokens, user: userDto),
+      ).called(1);
+    });
+
+    test('keeps the session in memory only when not remembered', () async {
+      when(remote.login(any)).thenAnswer((_) async => response);
+
+      await repository.login(
+        email: 'ana@test.com',
+        password: 'pw',
+        rememberSession: false,
+      );
+
+      verify(
+        local.saveSession(tokens: tokens, user: userDto, persist: false),
+      ).called(1);
+    });
+
+    test('remembers the session by default', () async {
+      when(remote.login(any)).thenAnswer((_) async => response);
+
+      await repository.login(email: 'ana@test.com', password: 'pw');
+
+      verify(
+        local.saveSession(tokens: tokens, user: userDto),
+      ).called(1);
     });
 
     test('sanitizes the e-mail but never touches the password', () async {
@@ -72,7 +102,11 @@ void main() {
         expect(result, left<Failure, User>(entry.value));
       }
       verifyNever(
-        local.saveSession(tokens: anyNamed('tokens'), user: anyNamed('user')),
+        local.saveSession(
+          tokens: anyNamed('tokens'),
+          user: anyNamed('user'),
+          persist: anyNamed('persist'),
+        ),
       );
     });
 
@@ -87,65 +121,16 @@ void main() {
     test('fails when the session cannot be persisted', () async {
       when(remote.login(any)).thenAnswer((_) async => response);
       when(
-        local.saveSession(tokens: anyNamed('tokens'), user: anyNamed('user')),
+        local.saveSession(
+          tokens: anyNamed('tokens'),
+          user: anyNamed('user'),
+          persist: anyNamed('persist'),
+        ),
       ).thenThrow(const CacheException());
 
       final result = await repository.login(email: 'a@b.co', password: 'pw');
 
       expect(result, left<Failure, User>(const CacheFailure()));
-    });
-  });
-
-  group('register', () {
-    test('sanitizes input, sends it and stores the session', () async {
-      when(remote.register(any)).thenAnswer((_) async => response);
-
-      final result = await repository.register(
-        name: '  <b>Ana</b> ',
-        email: ' Ana@Test.com ',
-        password: 'Abcdef1!',
-        phone: '+57 (300) 123-4567',
-      );
-
-      expect(result.isRight(), isTrue);
-      final request =
-          verify(remote.register(captureAny)).captured.single
-              as RegisterRequestDto;
-      expect(request.name, 'Ana');
-      expect(request.email, 'ana@test.com');
-      expect(request.phone, '+573001234567');
-      verify(local.saveSession(tokens: tokens, user: userDto)).called(1);
-    });
-
-    test('omits the phone when it is null or empty after cleaning', () async {
-      when(remote.register(any)).thenAnswer((_) async => response);
-
-      await repository.register(name: 'Ana', email: 'a@b.co', password: 'x');
-      await repository.register(
-        name: 'Ana',
-        email: 'a@b.co',
-        password: 'x',
-        phone: 'abc',
-      );
-
-      final requests = verify(
-        remote.register(captureAny),
-      ).captured.cast<RegisterRequestDto>();
-      expect(requests.map((r) => r.phone), [null, null]);
-    });
-
-    test('maps a duplicate e-mail to a ServerFailure with its code', () async {
-      when(
-        remote.register(any),
-      ).thenThrow(const ServerException(code: 'email_taken', statusCode: 409));
-
-      final result = await repository.register(
-        name: 'Ana',
-        email: 'a@b.co',
-        password: 'x',
-      );
-
-      expect(result, left<Failure, User>(const ServerFailure('email_taken')));
     });
   });
 

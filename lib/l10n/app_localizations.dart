@@ -140,12 +140,6 @@ abstract class AppLocalizations {
   /// **'Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo'**
   String get validationStrongPassword;
 
-  /// No description provided for @validationPhone.
-  ///
-  /// In es, this message translates to:
-  /// **'Ingresa un teléfono válido'**
-  String get validationPhone;
-
   /// No description provided for @validationMinLength.
   ///
   /// In es, this message translates to:
@@ -235,66 +229,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Entrar'**
   String get authLoginButton;
-
-  /// No description provided for @authNoAccount.
-  ///
-  /// In es, this message translates to:
-  /// **'¿No tienes cuenta?'**
-  String get authNoAccount;
-
-  /// No description provided for @authGoToRegister.
-  ///
-  /// In es, this message translates to:
-  /// **'Crear cuenta'**
-  String get authGoToRegister;
-
-  /// No description provided for @authRegisterTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Crear cuenta'**
-  String get authRegisterTitle;
-
-  /// No description provided for @authRegisterSubtitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Completa tus datos para registrarte'**
-  String get authRegisterSubtitle;
-
-  /// No description provided for @authNameLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'Nombre'**
-  String get authNameLabel;
-
-  /// No description provided for @authPhoneLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'Teléfono (opcional)'**
-  String get authPhoneLabel;
-
-  /// No description provided for @authConfirmPasswordLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'Confirmar contraseña'**
-  String get authConfirmPasswordLabel;
-
-  /// No description provided for @authRegisterButton.
-  ///
-  /// In es, this message translates to:
-  /// **'Registrarme'**
-  String get authRegisterButton;
-
-  /// No description provided for @authHaveAccount.
-  ///
-  /// In es, this message translates to:
-  /// **'¿Ya tienes cuenta?'**
-  String get authHaveAccount;
-
-  /// No description provided for @authGoToLogin.
-  ///
-  /// In es, this message translates to:
-  /// **'Iniciar sesión'**
-  String get authGoToLogin;
 
   /// No description provided for @authTogglePassword.
   ///
@@ -673,6 +607,426 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Confirma tu identidad para cambiar esta opción'**
   String get biometricReasonToggle;
+
+  /// No description provided for @commonClear.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar'**
+  String get commonClear;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get commonClose;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar'**
+  String get commonEdit;
+
+  /// No description provided for @fieldValidIndicator.
+  ///
+  /// In es, this message translates to:
+  /// **'Válido'**
+  String get fieldValidIndicator;
+
+  /// No description provided for @otpSemanticsLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Código de confirmación, {entered} de {total} dígitos'**
+  String otpSemanticsLabel(int entered, int total);
+
+  /// No description provided for @avatarSemanticsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin foto de perfil'**
+  String get avatarSemanticsEmpty;
+
+  /// No description provided for @avatarSemanticsFilled.
+  ///
+  /// In es, this message translates to:
+  /// **'Foto de perfil'**
+  String get avatarSemanticsFilled;
+
+  /// No description provided for @validationCode.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa el código de 6 dígitos'**
+  String get validationCode;
+
+  /// No description provided for @validationUsername.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa de 3 a 30 letras, números, puntos o guiones bajos, sin punto al inicio ni al final'**
+  String get validationUsername;
+
+  /// No description provided for @authCodeInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'El código no es correcto'**
+  String get authCodeInvalid;
+
+  /// No description provided for @authCodeExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'El código caducó. Pide uno nuevo.'**
+  String get authCodeExpired;
+
+  /// No description provided for @authCodeTooManyAttempts.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos. Pide un código nuevo.'**
+  String get authCodeTooManyAttempts;
+
+  /// No description provided for @authResendTooSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Espera un momento antes de pedir otro código'**
+  String get authResendTooSoon;
+
+  /// No description provided for @authUsernameTaken.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese nombre de usuario ya está en uso'**
+  String get authUsernameTaken;
+
+  /// No description provided for @authVerificationExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'La verificación del correo caducó. Empieza de nuevo.'**
+  String get authVerificationExpired;
+
+  /// No description provided for @authImageInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'No pudimos usar esa imagen. Prueba con otra.'**
+  String get authImageInvalid;
+
+  /// No description provided for @authImageTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'La imagen es demasiado grande'**
+  String get authImageTooLarge;
+
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Organiza tus tareas, sin ruido'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crea una cuenta en unos pasos y lleva todo en un solo lugar.'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @welcomeStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar'**
+  String get welcomeStart;
+
+  /// No description provided for @welcomeHaveAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya tengo cuenta'**
+  String get welcomeHaveAccount;
+
+  /// No description provided for @welcomeIllustrationLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Ilustración de tareas completadas'**
+  String get welcomeIllustrationLabel;
+
+  /// No description provided for @signUpNext.
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente'**
+  String get signUpNext;
+
+  /// No description provided for @signUpEmailTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cuál es tu correo electrónico?'**
+  String get signUpEmailTitle;
+
+  /// No description provided for @signUpEmailDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Te enviaremos un código para confirmar que es tuyo.'**
+  String get signUpEmailDescription;
+
+  /// No description provided for @signUpCodeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe el código de confirmación'**
+  String get signUpCodeTitle;
+
+  /// No description provided for @signUpCodeDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa el código de 6 dígitos que enviamos a {email}.'**
+  String signUpCodeDescription(String email);
+
+  /// No description provided for @signUpCodeNotReceived.
+  ///
+  /// In es, this message translates to:
+  /// **'No recibí el código'**
+  String get signUpCodeNotReceived;
+
+  /// No description provided for @signUpCodeResendIn.
+  ///
+  /// In es, this message translates to:
+  /// **'Podrás pedir otro código en {seconds} s'**
+  String signUpCodeResendIn(int seconds);
+
+  /// No description provided for @signUpPasswordTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crea una contraseña'**
+  String get signUpPasswordTitle;
+
+  /// No description provided for @signUpPasswordDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo.'**
+  String get signUpPasswordDescription;
+
+  /// No description provided for @authRememberSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordar sesión'**
+  String get authRememberSession;
+
+  /// No description provided for @authRememberSessionHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Si lo desactivas, tendrás que iniciar sesión cada vez que abras la app.'**
+  String get authRememberSessionHint;
+
+  /// No description provided for @signUpNameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cómo te llamas?'**
+  String get signUpNameTitle;
+
+  /// No description provided for @signUpNameDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Agrega tu nombre para que otras personas te reconozcan.'**
+  String get signUpNameDescription;
+
+  /// No description provided for @authFullNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre completo'**
+  String get authFullNameLabel;
+
+  /// No description provided for @signUpUsernameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige un nombre de usuario'**
+  String get signUpUsernameTitle;
+
+  /// No description provided for @signUpUsernameDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Será tu identificador público.'**
+  String get signUpUsernameDescription;
+
+  /// No description provided for @authUsernameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de usuario'**
+  String get authUsernameLabel;
+
+  /// No description provided for @usernameChecking.
+  ///
+  /// In es, this message translates to:
+  /// **'Comprobando disponibilidad…'**
+  String get usernameChecking;
+
+  /// No description provided for @usernameAvailable.
+  ///
+  /// In es, this message translates to:
+  /// **'{username} está disponible'**
+  String usernameAvailable(String username);
+
+  /// No description provided for @usernameUnknown.
+  ///
+  /// In es, this message translates to:
+  /// **'No pudimos comprobarlo ahora. Puedes continuar.'**
+  String get usernameUnknown;
+
+  /// No description provided for @signUpTermsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepta los términos y políticas'**
+  String get signUpTermsTitle;
+
+  /// No description provided for @signUpTermsDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Al crear tu cuenta aceptas los términos de uso y la política de privacidad de esta demostración.'**
+  String get signUpTermsDescription;
+
+  /// No description provided for @signUpTermsAccept.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepto'**
+  String get signUpTermsAccept;
+
+  /// No description provided for @signUpTermsRead.
+  ///
+  /// In es, this message translates to:
+  /// **'Leer los términos y políticas'**
+  String get signUpTermsRead;
+
+  /// No description provided for @termsScreenTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos y políticas'**
+  String get termsScreenTitle;
+
+  /// No description provided for @termsDemoNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto de ejemplo para esta demostración. No es un documento legal.'**
+  String get termsDemoNotice;
+
+  /// No description provided for @termsUseTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Uso de la app'**
+  String get termsUseTitle;
+
+  /// No description provided for @termsUseBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta app es una demostración técnica. Puedes crear tareas de prueba y borrarlas cuando quieras. No la uses para guardar información importante.'**
+  String get termsUseBody;
+
+  /// No description provided for @termsPrivacyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Privacidad'**
+  String get termsPrivacyTitle;
+
+  /// No description provided for @termsPrivacyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo guardamos los datos que escribes al crear tu cuenta: correo, nombre, nombre de usuario y, si quieres, una foto. Nunca guardamos tu contraseña en texto plano.'**
+  String get termsPrivacyBody;
+
+  /// No description provided for @termsDataTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus datos'**
+  String get termsDataTitle;
+
+  /// No description provided for @termsDataBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los datos de la demostración viven en memoria y se borran cuando el servidor se reinicia. No los compartimos con nadie.'**
+  String get termsDataBody;
+
+  /// No description provided for @signUpAvatarTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Agrega una foto de perfil'**
+  String get signUpAvatarTitle;
+
+  /// No description provided for @signUpAvatarDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Añade una foto para que te reconozcan. Puedes omitir este paso.'**
+  String get signUpAvatarDescription;
+
+  /// No description provided for @signUpAvatarAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar una foto'**
+  String get signUpAvatarAdd;
+
+  /// No description provided for @signUpAvatarSkip.
+  ///
+  /// In es, this message translates to:
+  /// **'Omitir'**
+  String get signUpAvatarSkip;
+
+  /// No description provided for @photoSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar foto de perfil'**
+  String get photoSheetTitle;
+
+  /// No description provided for @photoFromGallery.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir de la galería'**
+  String get photoFromGallery;
+
+  /// No description provided for @photoFromCamera.
+  ///
+  /// In es, this message translates to:
+  /// **'Tomar una foto'**
+  String get photoFromCamera;
+
+  /// No description provided for @photoGalleryDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesitamos permiso para acceder a tus fotos. Puedes activarlo en los ajustes del sistema.'**
+  String get photoGalleryDenied;
+
+  /// No description provided for @photoCameraDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesitamos permiso para usar la cámara. Puedes activarlo en los ajustes del sistema.'**
+  String get photoCameraDenied;
+
+  /// No description provided for @photoCropTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Recorta tu foto'**
+  String get photoCropTitle;
+
+  /// No description provided for @photoCropDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo'**
+  String get photoCropDone;
+
+  /// No description provided for @signUpDoneTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Te damos la bienvenida, @{username}'**
+  String signUpDoneTitle(String username);
+
+  /// No description provided for @signUpDoneDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta está lista. Empieza a organizar tus tareas.'**
+  String get signUpDoneDescription;
+
+  /// No description provided for @signUpDoneButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get signUpDoneButton;
+
+  /// No description provided for @settingsBiometricNeedsRememberedSession.
+  ///
+  /// In es, this message translates to:
+  /// **'La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado.'**
+  String get settingsBiometricNeedsRememberedSession;
+
+  /// No description provided for @authNoAccountCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes cuenta? Crear cuenta'**
+  String get authNoAccountCreate;
 }
 
 class _AppLocalizationsDelegate

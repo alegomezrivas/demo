@@ -14,6 +14,7 @@ import 'package:demo/core/services/session_service.dart';
 import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart';
 import 'package:demo/features/auth/data/datasources/mock_auth_backend.dart';
 import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart';
+import 'package:demo/features/auth/presentation/services/sign_up_progress.dart';
 import 'package:demo/features/settings/domain/entities/app_language.dart';
 import 'package:demo/features/settings/domain/entities/app_theme_mode.dart';
 import 'package:demo/features/settings/domain/usecases/get_settings_use_case.dart';
@@ -77,14 +78,16 @@ void main() {
     await resetLocator();
 
     final session = SessionService();
+    final progress = SignUpProgress();
     final router = AppRouter.create(
-      redirect: AuthGuard(session).redirect,
+      redirect: AuthGuard(session, signUpProgress: progress).redirect,
       refreshListenable: session,
     );
     await setupLocator(
       router: router,
       config: config,
       session: session,
+      signUpProgress: progress,
       mockRoutes: [...MockAuthBackend().routes, ...MockTasksBackend().routes],
     );
     locator
@@ -123,6 +126,8 @@ void main() {
   );
 
   Future<void> signIn(WidgetTester tester) async {
+    await tester.tap(find.text('Ya tengo cuenta'));
+    await tester.pumpAndSettle();
     await tester.enterText(
       field('Correo electrónico'),
       MockAuthBackend.demoEmail,
@@ -351,7 +356,7 @@ void main() {
 
       await boot(tester);
 
-      expect(find.text('Sign in'), findsWidgets);
+      expect(find.text('Get started'), findsOneWidget);
       expect(
         Theme.of(tester.element(find.byType(Scaffold).first)).brightness,
         Brightness.dark,

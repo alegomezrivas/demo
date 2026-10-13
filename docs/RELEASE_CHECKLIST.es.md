@@ -35,7 +35,7 @@ Marca cada punto antes de publicar. Los comandos usan FVM (versión fijada en `.
 - [ ] Iconos y *splash* definitivos (Android `mipmap-*`, iOS `AppIcon.appiconset`)
 - [ ] Id `com.softstark.demo` (o el definitivo) coincide en Android e iOS
 - [ ] `version` / build number incrementados en `pubspec.yaml`
-- [ ] Permisos mínimos: Android solo `INTERNET` y `USE_BIOMETRIC`; iOS `NSFaceIDUsageDescription` redactado
+- [ ] Permisos mínimos: Android solo `INTERNET` y `USE_BIOMETRIC` (el selector de fotos usa intents del sistema, así que no declara permiso de cámara: confírmalo en el manifiesto fusionado); iOS `NSFaceIDUsageDescription`, `NSPhotoLibraryUsageDescription` y `NSCameraUsageDescription` redactados
 
 ## 4. Firma
 
@@ -55,6 +55,8 @@ fvm flutter build ipa --release --obfuscate \
 - [ ] R8 y reducción de recursos activos (ya configurado en `android/app/build.gradle.kts`)
 - [ ] `debug-info/` archivado **fuera** del repo (sirve para simbolizar *crashes*)
 - [ ] Probar en dispositivos reales: login, tareas, ajustes, biometría, captura de pantalla bloqueada, modo avión
+- [ ] Probar el registro en dispositivos reales: sugerencias de correo sobre el teclado, autocompletado del código (iOS `oneTimeCode`), cuenta atrás del reenvío, comprobación del usuario sin conexión, cámara y galería (conceder **y** denegar), recorte, TalkBack/VoiceOver leyendo cada paso, fuente al 200 %, modo oscuro
+- [ ] «Recordar sesión» desmarcado: al matar la app la sesión desaparece y no queda nada en el Keychain/Keystore
 
 ## 6. Verificación de seguridad en el binario
 
@@ -64,6 +66,8 @@ fvm flutter build ipa --release --obfuscate \
 - [ ] En un dispositivo con root/jailbreak se aplica `ROOT_POLICY`
 - [ ] Revisa los logs de un build release: no deben aparecer tokens ni datos personales
 - [ ] La cuenta demo del mock (`demo@starkshowcase.dev`) **no** funciona contra la API real
+- [ ] El backend mock de la app (`MockAuthBackend`, código `123456`) no está en el binario release (`kReleaseMode` lo elimina; busca `mock-verification-` en los `strings` del build)
+- [ ] Ningún código de confirmación, token de verificación ni contraseña en los logs de release
 
 ## 7. Tiendas
 
@@ -72,6 +76,9 @@ fvm flutter build ipa --release --obfuscate \
 - [ ] Subida **solo** tras confirmación explícita; etiqueta `v<version>+<build>` tras publicar
 
 ## 8. Bloqueantes antes de producción con una API real
+
+- [ ] **Envío real de correos** para el código del registro (`ConfirmationCodeSender` en el backend) y **quitar `FIXED_CONFIRMATION_CODE`** del entorno de producción (`render.yaml` declara un valor de demostración): mientras exista, cualquiera puede registrarse con cualquier correo
+- [ ] Sustituir el texto de demostración de los términos (`termsUse*`, `termsPrivacy*`, `termsData*` en `lib/l10n/app_*.arb`) por el texto legal real
 
 - [ ] **Pinning SPKI en el *handshake***: fijar el hash de la clave pública (no del certificado completo) con ≥ 2 huellas (actual + respaldo) y validarlo durante el TLS, no al recibir las cabeceras
 - [ ] **Prueba de humo del build release** con R8 + `--obfuscate` en Android e iOS reales (los plugins `jailbreak_root_detection` y `screen_protector` pueden necesitar reglas en `proguard-rules.pro`)

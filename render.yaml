@@ -27,6 +27,11 @@ services:
       # Generated once by Render and kept across deploys. Never commit a real value.
       - key: JWT_ACCESS_SECRET
         generateValue: true
+      # Demo confirmation code accepted for every e-mail at sign-up (no e-mail is sent).
+      # Anyone who knows it can register on this public instance; data is in memory.
+      # Remove it to disable sign-up (codes then become random and undeliverable).
+      - key: FIXED_CONFIRMATION_CODE
+        value: "123456"
       # Comma-separated browser origins; leave empty for the native app only.
       - key: CORS_ALLOWED_ORIGINS
         value: ""

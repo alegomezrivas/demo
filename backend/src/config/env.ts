@@ -16,6 +16,10 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32, 'must have at least 32 characters'),
   ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).default(900),
   REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).default(2_592_000),
+  FIXED_CONFIRMATION_CODE: z
+    .string()
+    .regex(/^[0-9]{6}$/, 'must be exactly 6 digits')
+    .optional(),
   MOCK_SIMULATION_ENABLED: z.stringbool().optional(),
   RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().min(1).default(60),
   RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(300),
@@ -44,11 +48,20 @@ export interface AppConfig {
     readonly authMax: number;
     readonly refreshMax: number;
   };
+  /**
+   * Confirmation code accepted for every e-mail (the demo sends no e-mail). Outside
+   * production it defaults to [DEFAULT_CONFIRMATION_CODE]; in production it exists only
+   * if `FIXED_CONFIRMATION_CODE` is set on purpose. Without one, codes are random.
+   */
+  readonly fixedConfirmationCode: string | undefined;
   /** Enables the X-Mock-* headers; never true in production. */
   readonly mockSimulationEnabled: boolean;
   /** Enables `POST /__reset`; never true in production. */
   readonly resetEndpointEnabled: boolean;
 }
+
+/** Code used outside production when none is configured. */
+export const DEFAULT_CONFIRMATION_CODE = '123456';
 
 /** Thrown when the environment is invalid; messages never include values. */
 export class ConfigError extends Error {
@@ -94,7 +107,22 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       authMax: env.RATE_LIMIT_AUTH_MAX,
       refreshMax: env.RATE_LIMIT_REFRESH_MAX,
     },
+    fixedConfirmationCode: isProduction
+      ? env.FIXED_CONFIRMATION_CODE
+      : (env.FIXED_CONFIRMATION_CODE ?? DEFAULT_CONFIRMATION_CODE),
     mockSimulationEnabled: !isProduction && (env.MOCK_SIMULATION_ENABLED ?? true),
     resetEndpointEnabled: !isProduction,
   };
+}
+
+/** Conditions worth a warning at startup; messages never contain secret values. */
+export function startupWarnings(config: AppConfig): string[] {
+  const warnings: string[] = [];
+  if (config.isProduction && config.fixedConfirmationCode !== undefined) {
+    warnings.push(
+      'FIXED_CONFIRMATION_CODE is set: anyone who knows it can register with any e-mail. ' +
+        'Demo only; data is in memory and the instance is public.',
+    );
+  }
+  return warnings;
 }

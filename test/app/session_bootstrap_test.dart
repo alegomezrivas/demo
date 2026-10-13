@@ -24,7 +24,11 @@ void main() {
 
   group('restoreSession', () {
     test('signs in when a stored user exists', () async {
-      await run(right(const User(id: '1', name: 'Ana', email: 'a@b.co')));
+      await run(
+        right(
+          const User(id: '1', name: 'Ana', email: 'a@b.co', username: 'ana'),
+        ),
+      );
 
       expect(session.isAuthenticated, isTrue);
     });

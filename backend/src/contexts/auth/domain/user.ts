@@ -4,6 +4,7 @@ export interface User {
   readonly name: string;
   /** Normalized (trimmed, lower-case) and unique. */
   readonly email: string;
-  readonly phone: string | null;
+  /** Public identifier: lower-case, unique, 3-30 characters of `a-z 0-9 . _`. */
+  readonly username: string;
   readonly passwordHash: string;
 }

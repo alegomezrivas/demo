@@ -13,9 +13,10 @@ void main() {
         ValidationKeys.required,
         ValidationKeys.email,
         ValidationKeys.strongPassword,
-        ValidationKeys.phone,
         ValidationKeys.minLength,
         ValidationKeys.mustMatch,
+        ValidationKeys.code,
+        ValidationKeys.username,
       ]) {
         expect(messages, contains(key));
         expect(messages[key]?.call(<String, dynamic>{}), isNotEmpty);

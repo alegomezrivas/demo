@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { Argon2PasswordHasher } from '../../../../src/contexts/auth/infrastructure/argon2-password-hasher.js';
+import {
+  FixedConfirmationCodeGenerator,
+  NoopConfirmationCodeSender,
+  RandomConfirmationCodeGenerator,
+} from '../../../../src/contexts/auth/infrastructure/code-generators.js';
 import { CryptoRefreshTokenGenerator } from '../../../../src/contexts/auth/infrastructure/crypto-refresh-token-generator.js';
 import { InMemoryRefreshTokenRepository } from '../../../../src/contexts/auth/infrastructure/in-memory-refresh-token-repository.js';
+import { InMemorySignUpRepository } from '../../../../src/contexts/auth/infrastructure/in-memory-signup-repository.js';
 import { InMemoryUserRepository } from '../../../../src/contexts/auth/infrastructure/in-memory-user-repository.js';
 import { JoseAccessTokenService } from '../../../../src/contexts/auth/infrastructure/jose-access-token-service.js';
 import { passwordPolicySchema } from '../../../../src/contexts/auth/presentation/http/auth-schemas.js';
@@ -127,15 +133,32 @@ describe('InMemoryRefreshTokenRepository', () => {
 });
 
 describe('InMemoryUserRepository', () => {
-  const user = { id: 'u1', name: 'A', email: 'a@x.com', phone: null, passwordHash: 'h' };
+  const user = { id: 'u1', name: 'A', email: 'a@x.com', username: 'aa', passwordHash: 'h' };
 
   it('enforces unique e-mails', async () => {
     const repo = new InMemoryUserRepository();
-    expect(await repo.add(user)).toBe(true);
-    expect(await repo.add({ ...user, id: 'u2' })).toBe(false);
+    expect(await repo.add(user)).toBe('added');
+    expect(await repo.add({ ...user, id: 'u2', username: 'other' })).toBe('email_taken');
     expect(await repo.findByEmail('a@x.com')).toEqual(user);
     expect(await repo.findById('u2')).toBeUndefined();
     expect(await repo.findByEmail('b@x.com')).toBeUndefined();
+  });
+
+  it('enforces unique usernames and finds users by them', async () => {
+    const repo = new InMemoryUserRepository();
+    await repo.add(user);
+    expect(await repo.add({ ...user, id: 'u2', email: 'b@x.com' })).toBe('username_taken');
+    expect(await repo.findByUsername('aa')).toEqual(user);
+    expect(await repo.findByUsername('zz')).toBeUndefined();
+  });
+
+  it('forgets everything on clear', async () => {
+    const repo = new InMemoryUserRepository();
+    await repo.add(user);
+    repo.clear();
+    expect(await repo.findByEmail('a@x.com')).toBeUndefined();
+    expect(await repo.findByUsername('aa')).toBeUndefined();
+    expect(await repo.add(user)).toBe('added');
   });
 });
 
@@ -153,5 +176,53 @@ describe('passwordPolicySchema', () => {
     ['Aa1!' + 'x'.repeat(125), 'too long'],
   ])('rejects %j (%s)', (value) => {
     expect(passwordPolicySchema.safeParse(value).success).toBe(false);
+  });
+});
+
+describe('confirmation code adapters', () => {
+  it('the fixed generator always returns its code', () => {
+    const generator = new FixedConfirmationCodeGenerator('654321');
+    expect([generator.generate(), generator.generate()]).toEqual(['654321', '654321']);
+  });
+
+  it('the random generator returns six digits, keeping leading zeros', () => {
+    const generator = new RandomConfirmationCodeGenerator();
+    const codes = Array.from({ length: 200 }, () => generator.generate());
+    for (const code of codes) expect(code).toMatch(/^[0-9]{6}$/);
+    expect(new Set(codes).size).toBeGreaterThan(150);
+  });
+
+  it('the no-op sender delivers nothing and never fails', async () => {
+    await expect(new NoopConfirmationCodeSender().send()).resolves.toBeUndefined();
+  });
+});
+
+describe('InMemorySignUpRepository', () => {
+  const pending = {
+    email: 'a@x.com',
+    codeHash: 'h',
+    expiresAt: new Date(10),
+    sentAt: new Date(0),
+    failedAttempts: 0,
+  };
+
+  it('stores, counts failures on and deletes pending codes', async () => {
+    const repo = new InMemorySignUpRepository();
+    expect(await repo.registerFailedAttempt('a@x.com')).toBeUndefined();
+    await repo.savePending(pending);
+    expect((await repo.registerFailedAttempt('a@x.com'))?.failedAttempts).toBe(1);
+    expect((await repo.findPending('a@x.com'))?.failedAttempts).toBe(1);
+    await repo.deletePending('a@x.com');
+    expect(await repo.findPending('a@x.com')).toBeUndefined();
+  });
+
+  it('stores grants and forgets everything on clear', async () => {
+    const repo = new InMemorySignUpRepository();
+    await repo.savePending(pending);
+    await repo.saveGrant({ tokenHash: 't', email: 'a@x.com', expiresAt: new Date(10) });
+    expect((await repo.findGrant('t'))?.email).toBe('a@x.com');
+    repo.clear();
+    expect(await repo.findPending('a@x.com')).toBeUndefined();
+    expect(await repo.findGrant('t')).toBeUndefined();
   });
 });

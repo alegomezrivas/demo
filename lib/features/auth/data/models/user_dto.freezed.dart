@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserDto {
 
- String get id; String get name; String get email; String? get phone;
+ String get id; String get name; String get email; String get username; bool get hasAvatar;
 /// Create a copy of UserDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserDtoCopyWith<UserDto> get copyWith => _$UserDtoCopyWithImpl<UserDto>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.username, username) || other.username == username)&&(identical(other.hasAvatar, hasAvatar) || other.hasAvatar == hasAvatar));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,phone);
+int get hashCode => Object.hash(runtimeType,id,name,email,username,hasAvatar);
 
 @override
 String toString() {
-  return 'UserDto(id: $id, name: $name, email: $email, phone: $phone)';
+  return 'UserDto(id: $id, name: $name, email: $email, username: $username, hasAvatar: $hasAvatar)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserDtoCopyWith<$Res>  {
   factory $UserDtoCopyWith(UserDto value, $Res Function(UserDto) _then) = _$UserDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String email, String? phone
+ String id, String name, String email, String username, bool hasAvatar
 });
 
 
@@ -65,13 +65,14 @@ class _$UserDtoCopyWithImpl<$Res>
 
 /// Create a copy of UserDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? phone = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? username = null,Object? hasAvatar = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,hasAvatar: null == hasAvatar ? _self.hasAvatar : hasAvatar // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? phone)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String username,  bool hasAvatar)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserDto() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.phone);case _:
+return $default(_that.id,_that.name,_that.email,_that.username,_that.hasAvatar);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.id,_that.name,_that.email,_that.phone);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String? phone)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String email,  String username,  bool hasAvatar)  $default,) {final _that = this;
 switch (_that) {
 case _UserDto():
-return $default(_that.id,_that.name,_that.email,_that.phone);case _:
+return $default(_that.id,_that.name,_that.email,_that.username,_that.hasAvatar);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.id,_that.name,_that.email,_that.phone);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email,  String? phone)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String email,  String username,  bool hasAvatar)?  $default,) {final _that = this;
 switch (_that) {
 case _UserDto() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.phone);case _:
+return $default(_that.id,_that.name,_that.email,_that.username,_that.hasAvatar);case _:
   return null;
 
 }
@@ -212,13 +213,14 @@ return $default(_that.id,_that.name,_that.email,_that.phone);case _:
 @JsonSerializable()
 
 class _UserDto implements UserDto {
-  const _UserDto({required this.id, required this.name, required this.email, this.phone});
+  const _UserDto({required this.id, required this.name, required this.email, required this.username, this.hasAvatar = false});
   factory _UserDto.fromJson(Map<String, dynamic> json) => _$UserDtoFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override final  String email;
-@override final  String? phone;
+@override final  String username;
+@override@JsonKey() final  bool hasAvatar;
 
 /// Create a copy of UserDto
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +235,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.username, username) || other.username == username)&&(identical(other.hasAvatar, hasAvatar) || other.hasAvatar == hasAvatar));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,phone);
+int get hashCode => Object.hash(runtimeType,id,name,email,username,hasAvatar);
 
 @override
 String toString() {
-  return 'UserDto(id: $id, name: $name, email: $email, phone: $phone)';
+  return 'UserDto(id: $id, name: $name, email: $email, username: $username, hasAvatar: $hasAvatar)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$UserDtoCopyWith<$Res> implements $UserDtoCopyWith<$Res> {
   factory _$UserDtoCopyWith(_UserDto value, $Res Function(_UserDto) _then) = __$UserDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String email, String? phone
+ String id, String name, String email, String username, bool hasAvatar
 });
 
 
@@ -270,13 +272,14 @@ class __$UserDtoCopyWithImpl<$Res>
 
 /// Create a copy of UserDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? phone = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? username = null,Object? hasAvatar = null,}) {
   return _then(_UserDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,hasAvatar: null == hasAvatar ? _self.hasAvatar : hasAvatar // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

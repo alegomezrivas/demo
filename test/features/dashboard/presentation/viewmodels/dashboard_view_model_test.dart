@@ -20,7 +20,12 @@ void main() {
   late MockNavigationService navigation;
   late DataChangeNotifier changes;
   late DashboardViewModel viewModel;
-  const user = User(id: '1', name: 'Ana', email: 'ana@test.com');
+  const user = User(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
   const stats = TaskStats(
     total: 10,
     done: 4,

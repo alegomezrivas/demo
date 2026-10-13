@@ -26,6 +26,19 @@ describe('rate limiting', () => {
     expect(blocked.status).toBe(429);
   });
 
+  it.each([
+    ['/auth/signup/email', { email: 'a@example.com' }],
+    ['/auth/signup/code/resend', { email: 'a@example.com' }],
+    ['/auth/signup/verify', { email: 'a@example.com', code: '000000' }],
+  ])('throttles %s with the credentials budget', async (path, body) => {
+    const { app } = await buildTestContext({ RATE_LIMIT_AUTH_MAX: '2' });
+    await request(app).post(path).send(body);
+    await request(app).post(path).send(body);
+    const blocked = await request(app).post(path).send(body);
+    expect(blocked.status).toBe(429);
+    expect(errorBodySchema.parse(blocked.body)).toMatchObject({ code: 'rate_limited' });
+  });
+
   it('throttles refresh independently of login', async () => {
     const { app } = await buildTestContext({ RATE_LIMIT_REFRESH_MAX: '2' });
     for (let attempt = 0; attempt < 2; attempt += 1) {

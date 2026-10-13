@@ -10,7 +10,12 @@ import '../../helpers/auth_mocks.dart';
 void main() {
   late MockAuthRepository repository;
   late LoginUseCase useCase;
-  const user = User(id: '1', name: 'Ana', email: 'ana@test.com');
+  const user = User(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
 
   setUp(() {
     repository = MockAuthRepository();

@@ -38,7 +38,7 @@ void main() {
 
   group('GetCurrentUserUseCase', () {
     test('returns the restored user', () async {
-      const user = User(id: '1', name: 'Ana', email: 'a@b.co');
+      const user = User(id: '1', name: 'Ana', email: 'a@b.co', username: 'ana');
       when(repository.restoreSession()).thenAnswer((_) async => right(user));
 
       expect(

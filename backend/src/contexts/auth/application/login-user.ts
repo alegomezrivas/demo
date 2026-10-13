@@ -1,4 +1,5 @@
 import { AppError } from '../../../shared/errors/app-error.js';
+import type { AvatarStore } from '../../users/domain/avatar-store.js';
 import type { PasswordHasher } from '../domain/password-hasher.js';
 import type { UserRepository } from '../domain/user-repository.js';
 import type { AuthResult } from './register-user.js';
@@ -17,6 +18,7 @@ export class LoginUser {
     private readonly users: UserRepository,
     private readonly hasher: PasswordHasher,
     private readonly sessions: SessionIssuer,
+    private readonly avatars: AvatarStore,
   ) {}
 
   async execute(input: LoginInput): Promise<AuthResult> {
@@ -25,7 +27,11 @@ export class LoginUser {
     const matches = await this.hasher.verify(hash, input.password);
     // Same error for unknown e-mail and wrong password: no account enumeration.
     if (user === undefined || !matches) throw AppError.unauthorized('invalid_credentials');
-    return { user, ...(await this.sessions.issue(user.id)) };
+    return {
+      user,
+      hasAvatar: await this.avatars.has(user.id),
+      ...(await this.sessions.issue(user.id)),
+    };
   }
 
   private getDummyHash(): Promise<string> {

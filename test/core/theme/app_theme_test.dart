@@ -65,4 +65,54 @@ void main() {
       expect(captured.text.body.fontFamily, AppTypography.fontFamily);
     });
   });
+
+  group('AppTheme controls', () {
+    test('buttons are pills with a 48 dp minimum height', () {
+      final theme = AppTheme.light();
+      const minimum = Size(0, 48);
+
+      expect(
+        theme.filledButtonTheme.style?.shape?.resolve({}),
+        isA<StadiumBorder>(),
+      );
+      expect(
+        theme.outlinedButtonTheme.style?.shape?.resolve({}),
+        isA<StadiumBorder>(),
+      );
+      expect(theme.filledButtonTheme.style?.minimumSize?.resolve({}), minimum);
+      expect(
+        theme.outlinedButtonTheme.style?.minimumSize?.resolve({}),
+        minimum,
+      );
+    });
+
+    test(
+      'inputs get a thicker outline on focus and a muted fill when disabled',
+      () {
+        const colors = AppColors.light;
+        final theme = AppTheme.light();
+        final decoration = theme.inputDecorationTheme;
+
+        final focused = decoration.focusedBorder! as OutlineInputBorder;
+        final enabled = decoration.enabledBorder! as OutlineInputBorder;
+        expect(focused.borderSide.width, greaterThan(enabled.borderSide.width));
+        expect(focused.borderSide.color, colors.primary);
+        expect(
+          (decoration.errorBorder! as OutlineInputBorder).borderSide.color,
+          colors.error,
+        );
+
+        final fill = decoration.fillColor! as WidgetStateColor;
+        expect(fill.resolve({}), colors.surface);
+        expect(fill.resolve({WidgetState.disabled}), colors.surfaceMuted);
+      },
+    );
+
+    test('the dark theme uses the dark input colors', () {
+      final decoration = AppTheme.dark().inputDecorationTheme;
+
+      final focused = decoration.focusedBorder! as OutlineInputBorder;
+      expect(focused.borderSide.color, AppColors.dark.primary);
+    });
+  });
 }

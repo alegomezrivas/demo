@@ -19,16 +19,17 @@ repositorio, así que más adelante se pueden cambiar por una base de datos real
 1. [Inicio rápido](#inicio-rápido)
 2. [Cuentas de prueba](#cuentas-de-prueba)
 3. [Endpoints](#endpoints)
-4. [Conectar la app Flutter](#conectar-la-app-flutter)
-5. [Ejecutar en local y exponerlo con HTTPS](#ejecutar-en-local-y-exponerlo-con-https)
-6. [Desplegar gratis en Render](#desplegar-gratis-en-render)
-7. [Alternativas: Koyeb y Fly.io](#alternativas-koyeb-y-flyio)
-8. [Referencia de configuración](#referencia-de-configuración)
-9. [Probar la app con escenarios simulados](#probar-la-app-con-escenarios-simulados)
-10. [Notas de seguridad](#notas-de-seguridad)
-11. [Arquitectura](#arquitectura)
-12. [Scripts](#scripts)
-13. [Solución de problemas](#solución-de-problemas)
+4. [Alta de cuenta y código de confirmación](#alta-de-cuenta-y-código-de-confirmación)
+5. [Conectar la app Flutter](#conectar-la-app-flutter)
+6. [Ejecutar en local y exponerlo con HTTPS](#ejecutar-en-local-y-exponerlo-con-https)
+7. [Desplegar gratis en Render](#desplegar-gratis-en-render)
+8. [Alternativas: Koyeb y Fly.io](#alternativas-koyeb-y-flyio)
+9. [Referencia de configuración](#referencia-de-configuración)
+10. [Probar la app con escenarios simulados](#probar-la-app-con-escenarios-simulados)
+11. [Notas de seguridad](#notas-de-seguridad)
+12. [Arquitectura](#arquitectura)
+13. [Scripts](#scripts)
+14. [Solución de problemas](#solución-de-problemas)
 
 ## Inicio rápido
 
@@ -53,32 +54,38 @@ El servidor escucha en **http://localhost:5556** (cámbialo con `PORT`).
 
 ## Cuentas de prueba
 
-| Usuario   | Correo                   | Contraseña  | Datos semilla                    |
-| --------- | ------------------------ | ----------- | -------------------------------- |
-| Demo User | `demo@starkshowcase.dev` | `Demo1234!` | 23 tareas (`task-0` … `task-22`) |
-| Ana Gómez | `ana@starkshowcase.dev`  | `Ana12345!` | 5 tareas (`task-23` … `task-27`) |
+| Usuario   | Correo                   | Nombre de usuario | Contraseña  | Datos semilla                    |
+| --------- | ------------------------ | ----------------- | ----------- | -------------------------------- |
+| Demo User | `demo@starkshowcase.dev` | `demo`            | `Demo1234!` | 23 tareas (`task-0` … `task-22`) |
+| Ana Gómez | `ana@starkshowcase.dev`  | `ana`             | `Ana12345!` | 5 tareas (`task-23` … `task-27`) |
 
-Las cuentas nuevas creadas con `POST /auth/register` empiezan sin tareas. Cada usuario solo ve y
+Las cuentas nuevas empiezan sin tareas. Cada usuario solo ve y
 modifica las suyas (el id de una tarea ajena responde `404`, igual que uno inexistente).
 
 Son datos de prueba, no secretos. Se recrean en cada arranque y con `POST /__reset`.
 
 ## Endpoints
 
-| Método | Ruta             | Auth   | Para qué sirve                                                          |
-| ------ | ---------------- | ------ | ----------------------------------------------------------------------- |
-| GET    | `/health`        | no     | Comprobación de vida (`{"status":"ok"}`)                                |
-| POST   | `/auth/login`    | no     | Correo + contraseña → usuario y par de tokens                           |
-| POST   | `/auth/register` | no     | Crear cuenta → `201`, usuario y par de tokens                           |
-| POST   | `/auth/refresh`  | no     | Rotar el refresh token → nuevo par de tokens                            |
-| POST   | `/auth/logout`   | no     | Revocar la sesión (`204` idempotente). La app lo llama al cerrar sesión |
-| GET    | `/tasks`         | bearer | Lista con `page`, `pageSize`, `q`, `status`, `priority`                 |
-| POST   | `/tasks`         | bearer | Crear → `201`                                                           |
-| GET    | `/tasks/stats`   | bearer | `total`, `done`, `overdue`, `highPriorityPending`                       |
-| GET    | `/tasks/:id`     | bearer | Una tarea                                                               |
-| PUT    | `/tasks/:id`     | bearer | Reemplazar una tarea                                                    |
-| DELETE | `/tasks/:id`     | bearer | Borrar → `204`                                                          |
-| POST   | `/__reset`       | no     | Restaurar los datos semilla. **No existe en producción**                |
+| Método | Ruta                       | Auth   | Para qué sirve                                                          |
+| ------ | -------------------------- | ------ | ----------------------------------------------------------------------- |
+| GET    | `/health`                  | no     | Comprobación de vida (`{"status":"ok"}`)                                |
+| POST   | `/auth/login`              | no     | Correo + contraseña → usuario y par de tokens                           |
+| POST   | `/auth/signup/email`       | no     | Alta, paso 1: enviar el código de confirmación → `204`                  |
+| POST   | `/auth/signup/code/resend` | no     | Reenviar el código (30 s entre envíos) → `204`                          |
+| POST   | `/auth/signup/verify`      | no     | Paso 2: correo + código → `verificationToken`                           |
+| GET    | `/auth/username-available` | no     | `?username=` → `{ "available": true }`                                  |
+| POST   | `/auth/register`           | no     | Paso 3: `verificationToken`, nombre, usuario y contraseña → `201`       |
+| POST   | `/auth/refresh`            | no     | Rotar el refresh token → nuevo par de tokens                            |
+| POST   | `/auth/logout`             | no     | Revocar la sesión (`204` idempotente). La app lo llama al cerrar sesión |
+| PUT    | `/users/me/avatar`         | bearer | Sustituir tu foto de perfil (JPEG sin procesar, ≤ 200 KB) → `204`       |
+| GET    | `/users/me/avatar`         | bearer | Descargar tu propia foto (`image/jpeg`)                                 |
+| GET    | `/tasks`                   | bearer | Lista con `page`, `pageSize`, `q`, `status`, `priority`                 |
+| POST   | `/tasks`                   | bearer | Crear → `201`                                                           |
+| GET    | `/tasks/stats`             | bearer | `total`, `done`, `overdue`, `highPriorityPending`                       |
+| GET    | `/tasks/:id`               | bearer | Una tarea                                                               |
+| PUT    | `/tasks/:id`               | bearer | Reemplazar una tarea                                                    |
+| DELETE | `/tasks/:id`               | bearer | Borrar → `204`                                                          |
+| POST   | `/__reset`                 | no     | Restaurar los datos semilla. **No existe en producción**                |
 
 Todos los errores tienen el mismo cuerpo: `{ "code": "...", "message": "...", "details": [...]? }`.
 La app Flutter solo lee `code`. Códigos habituales: `invalid_credentials`, `email_taken`,
@@ -87,6 +94,27 @@ La app Flutter solo lee `code`. Códigos habituales: `invalid_credentials`, `ema
 
 Los access tokens duran 15 minutos y los refresh tokens 30 días y se usan una sola vez (rotación).
 Presentar un refresh token ya usado revoca toda la sesión, como medida contra robo.
+
+## Alta de cuenta y código de confirmación
+
+Crear una cuenta tiene tres pasos: `POST /auth/signup/email` envía un código de 6 dígitos,
+`POST /auth/signup/verify` cambia correo + código por un `verificationToken` de un solo uso y
+`POST /auth/register` crea la cuenta con ese token (el correo sale del token, nunca del cuerpo).
+Los códigos duran 10 minutos, se descartan tras 5 fallos y se pueden reenviar cada 30 segundos.
+
+Este backend **no envía correos**. Todas las direcciones aceptan el mismo código,
+`FIXED_CONFIRMATION_CODE`:
+
+- Fuera de producción vale `123456` por defecto.
+- En producción existe **solo si lo defines a propósito** (`render.yaml` lo declara con un valor de
+  demostración). Sin él los códigos son aleatorios y nadie puede registrarse. Si está definido en
+  producción, el servidor registra un aviso al arrancar (nunca el código).
+- Enviar correos reales es una mejora futura: basta implementar el puerto
+  `ConfirmationCodeSender`.
+
+> **Aviso de instancia pública.** Mientras haya un código fijo, cualquiera que lo conozca (está en
+> este README) puede registrarse en tu instancia pública. Los datos viven en memoria y se pierden al
+> reiniciar. `POST /__reset` nunca está disponible en producción.
 
 ## Conectar la app Flutter
 
@@ -237,26 +265,27 @@ Cualquier host de contenedores sirve igual: construye `backend/Dockerfile` e iny
 Todo se configura con variables de entorno, validadas con zod al arrancar (si algo falla, el
 servidor termina con un mensaje claro que nunca imprime valores).
 
-| Variable                    | Por defecto                | Descripción                                                            |
-| --------------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| `NODE_ENV`                  | `development`              | `development`, `test`, `staging` o `production`                        |
-| `PORT`                      | `5556`                     | Puerto de escucha (las plataformas lo inyectan)                        |
-| `LOG_LEVEL`                 | `info`                     | `fatal` … `trace`, o `silent`                                          |
-| `JWT_ACCESS_SECRET`         | **obligatoria**            | ≥ 32 caracteres                                                        |
-| `ACCESS_TOKEN_TTL_SECONDS`  | `900`                      | Vida del access token                                                  |
-| `REFRESH_TOKEN_TTL_SECONDS` | `2592000`                  | Vida del refresh token (30 días)                                       |
-| `CORS_ALLOWED_ORIGINS`      | vacío                      | Orígenes de navegador separados por comas; vacío = ninguno             |
-| `BODY_LIMIT`                | `10kb`                     | Tamaño máximo del JSON (`10kb`, `1mb`…)                                |
-| `TRUST_PROXY`               | `false`                    | `true` detrás de Render, Fly, Koyeb o un túnel                         |
-| `MOCK_SIMULATION_ENABLED`   | `true` fuera de producción | Activa los headers `X-Mock-*`                                          |
-| `RATE_LIMIT_WINDOW_SECONDS` | `60`                       | Ventana del limitador                                                  |
-| `RATE_LIMIT_MAX`            | `300`                      | Peticiones por IP y ventana (todas las rutas salvo `/health`, `/docs`) |
-| `RATE_LIMIT_AUTH_MAX`       | `10`                       | Intentos de login + registro por IP y ventana                          |
-| `RATE_LIMIT_REFRESH_MAX`    | `20`                       | Intentos de refresh por IP y ventana                                   |
+| Variable                    | Por defecto                  | Descripción                                                                         |
+| --------------------------- | ---------------------------- | ----------------------------------------------------------------------------------- |
+| `NODE_ENV`                  | `development`                | `development`, `test`, `staging` o `production`                                     |
+| `PORT`                      | `5556`                       | Puerto de escucha (las plataformas lo inyectan)                                     |
+| `LOG_LEVEL`                 | `info`                       | `fatal` … `trace`, o `silent`                                                       |
+| `JWT_ACCESS_SECRET`         | **obligatoria**              | ≥ 32 caracteres                                                                     |
+| `ACCESS_TOKEN_TTL_SECONDS`  | `900`                        | Vida del access token                                                               |
+| `REFRESH_TOKEN_TTL_SECONDS` | `2592000`                    | Vida del refresh token (30 días)                                                    |
+| `CORS_ALLOWED_ORIGINS`      | vacío                        | Orígenes de navegador separados por comas; vacío = ninguno                          |
+| `BODY_LIMIT`                | `10kb`                       | Tamaño máximo del JSON (`10kb`, `1mb`…)                                             |
+| `TRUST_PROXY`               | `false`                      | `true` detrás de Render, Fly, Koyeb o un túnel                                      |
+| `MOCK_SIMULATION_ENABLED`   | `true` fuera de producción   | Activa los headers `X-Mock-*`                                                       |
+| `FIXED_CONFIRMATION_CODE`   | `123456` fuera de producción | Código de 6 dígitos que acepta cualquier correo en el alta (ver abajo)              |
+| `RATE_LIMIT_WINDOW_SECONDS` | `60`                         | Ventana del limitador                                                               |
+| `RATE_LIMIT_MAX`            | `300`                        | Peticiones por IP y ventana (todas las rutas salvo `/health`, `/docs`)              |
+| `RATE_LIMIT_AUTH_MAX`       | `10`                         | Intentos de login, registro y alta (enviar / reenviar / verificar) por IP y ventana |
+| `RATE_LIMIT_REFRESH_MAX`    | `20`                         | Intentos de refresh por IP y ventana                                                |
 
 ## Probar la app con escenarios simulados
 
-Disponibles cuando `NODE_ENV` no es `production` (allí se ignoran). Se aplican a `/auth/*` y `/tasks/*`.
+Disponibles cuando `NODE_ENV` no es `production` (allí se ignoran). Se aplican a `/auth/*`, `/users/*` y `/tasks/*`.
 
 | Header                     | Efecto                                                                                                                                        |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -284,7 +313,10 @@ curl -X POST https://<host>/__reset                                             
   así que no se pueden enumerar cuentas.
 - El secreto JWT solo viene del entorno. Los refresh tokens son aleatorios, se guardan solo como hash
   SHA-256, rotan en cada uso, se revocan al cerrar sesión y tienen detección de reutilización.
-- Limitación de peticiones por IP, más estricta en login/registro y refresh.
+- Limitación de peticiones por IP, más estricta en login, registro, alta y refresh.
+- Los códigos del alta caducan a los 10 minutos, se descartan tras 5 fallos y solo se guardan como
+  hash; el token de verificación es de un solo uso. Las fotos se validan por sus bytes (solo JPEG,
+  ≤ 200 KB) y solo se sirven a su propietario con `nosniff`.
 - Los logs (pino) ocultan contraseñas, tokens y la cabecera `Authorization`; los logs de petición solo
   contienen método, ruta, estado y duración (nunca query strings ni bodies).
 - `Cache-Control: no-store` en `/auth/*`. `npm audit` forma parte del CI.

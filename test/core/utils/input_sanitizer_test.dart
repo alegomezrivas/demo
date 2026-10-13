@@ -24,14 +24,4 @@ void main() {
       expect(InputSanitizer.email('  Ana@Example.COM '), 'ana@example.com');
     });
   });
-
-  group('InputSanitizer.phone', () {
-    test('keeps digits and a leading plus only', () {
-      expect(InputSanitizer.phone('+57 (300) 123-4567'), '+573001234567');
-    });
-
-    test('drops plus signs that are not leading', () {
-      expect(InputSanitizer.phone('300+123'), '300123');
-    });
-  });
 }

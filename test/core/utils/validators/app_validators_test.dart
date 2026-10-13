@@ -98,32 +98,6 @@ void main() {
     });
   });
 
-  group('AppValidators.phone', () {
-    test('accepts numbers with separators and optional plus', () {
-      for (final value in ['+57 300 123 4567', '(300) 123-4567', '3001234']) {
-        expect(
-          control(value, AppValidators.phone).valid,
-          isTrue,
-          reason: value,
-        );
-      }
-    });
-
-    test('rejects letters, too short and too long numbers', () {
-      for (final value in ['abc1234567', '12345', '1234567890123456']) {
-        expect(
-          control(value, AppValidators.phone).errors,
-          contains(ValidationKeys.phone),
-          reason: value,
-        );
-      }
-    });
-
-    test('treats empty values as valid', () {
-      expect(control(' ', AppValidators.phone).valid, isTrue);
-    });
-  });
-
   group('AppValidators.mustMatch', () {
     test('flags the confirmation control when values differ', () {
       final form = FormGroup(
