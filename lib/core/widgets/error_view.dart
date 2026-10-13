@@ -1,5 +1,5 @@
 import 'package:demo/core/theme/app_theme.dart';
-import 'package:demo/core/widgets/app_button.dart';
+import 'package:demo/core/widgets/app_primary_button.dart';
 import 'package:flutter/material.dart';
 
 /// Centered error message with a retry button.
@@ -41,7 +41,7 @@ class ErrorView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: context.spacing.md),
-            AppButton(label: retryLabel, onPressed: onRetry),
+            AppPrimaryButton(label: retryLabel, onPressed: onRetry),
           ],
         ),
       ),

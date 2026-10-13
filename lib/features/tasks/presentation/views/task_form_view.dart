@@ -2,7 +2,7 @@ import 'package:demo/app/locator.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/core/utils/failure_message.dart';
 import 'package:demo/core/utils/validators/validation_messages.dart';
-import 'package:demo/core/widgets/app_button.dart';
+import 'package:demo/core/widgets/app_primary_button.dart';
 import 'package:demo/core/widgets/app_text_field.dart';
 import 'package:demo/core/widgets/error_view.dart';
 import 'package:demo/features/tasks/domain/entities/task_priority.dart';
@@ -148,7 +148,7 @@ class TaskFormView extends StatelessWidget {
               ),
             ],
             SizedBox(height: context.spacing.lg),
-            AppButton(
+            AppPrimaryButton(
               label: l10n.commonSave,
               isLoading: viewModel.isBusy,
               onPressed: viewModel.submit,

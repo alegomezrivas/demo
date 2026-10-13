@@ -2,9 +2,9 @@ import 'package:demo/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Primary call-to-action button that only consumes design tokens.
-class AppButton extends StatelessWidget {
+class AppPrimaryButton extends StatelessWidget {
   /// Creates a button; [onPressed] is ignored while [isLoading] is true.
-  const AppButton({
+  const AppPrimaryButton({
     required this.label,
     required this.onPressed,
     this.isLoading = false,

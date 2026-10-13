@@ -1,7 +1,7 @@
 import 'package:demo/app/locator.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/core/utils/validators/validation_messages.dart';
-import 'package:demo/core/widgets/app_button.dart';
+import 'package:demo/core/widgets/app_primary_button.dart';
 import 'package:demo/core/widgets/app_text_field.dart';
 import 'package:demo/features/auth/presentation/utils/auth_failure_message.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
@@ -82,7 +82,7 @@ class LoginView extends StatelessWidget {
                           ),
                         ],
                         SizedBox(height: context.spacing.lg),
-                        AppButton(
+                        AppPrimaryButton(
                           label: l10n.authLoginButton,
                           isLoading: viewModel.isBusy,
                           onPressed: viewModel.submit,
