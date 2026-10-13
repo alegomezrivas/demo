@@ -113,12 +113,13 @@ O pon esas mismas claves en tu `config/dev.json` y sigue usando
 
 Conviene saber:
 
-- **La app solo habla HTTPS.** Su `HttpsEnforcerInterceptor` rechaza `http://` y Android tiene el
-  tráfico en claro desactivado. Por eso `http://10.0.2.2:5556` (emulador Android) o
-  `http://192.168.x.x:5556` (dispositivo físico) **no funcionan tal cual**: usa el túnel HTTPS de
-  abajo. Si quieres `http` plano en el emulador, la app necesita una excepción solo para debug
-  (permitir `http` en el interceptor cuando `kDebugMode` y añadir una regla de tráfico en claro
-  para `10.0.2.2` en `android/app/src/debug`). No está aplicada y nunca debe llegar a release.
+- **HTTPS siempre, con una excepción solo para debug.** El `HttpsEnforcerInterceptor` de la app
+  rechaza `http://` y Android bloquea el tráfico en claro. Los **builds debug** hacen una excepción
+  para exactamente tres hosts: `10.0.2.2` (emulador Android → tu equipo), `localhost` y `127.0.0.1`.
+  Así, en el emulador `--dart-define=API_BASE_URL=http://10.0.2.2:5556` funciona con `npm run dev`.
+  Los builds profile y release, cualquier otro host (por ejemplo una IP de red local como
+  `http://192.168.1.20:5556`) e iOS siguen exigiendo HTTPS: usa el túnel de abajo. Para un móvil
+  Android físico por USB ejecuta `adb reverse tcp:5556 tcp:5556` y usa `http://localhost:5556`.
 - **Los builds release** no arrancan sin `ENV=staging` o `ENV=prod`, y `prod` además exige
   `PINNING_ENABLED=true` con la huella del certificado del servidor en `PINNING_SHA256`. Los
   certificados de Render rotan, así que para builds de demo contra Render usa `ENV=staging`.
@@ -136,14 +137,14 @@ npm run build
 NODE_ENV=staging JWT_ACCESS_SECRET=... npm start      # PowerShell: $env:NODE_ENV="staging"; ...
 ```
 
-Direcciones alcanzables (HTTP, válidas para navegador o `curl`, **no** para la app, como se explicó):
+Direcciones alcanzables por HTTP (la app solo acepta las marcadas con ✅, en builds debug):
 
-| Cliente                          | URL                                |
-| -------------------------------- | ---------------------------------- |
-| Mismo equipo                     | `http://localhost:5556`            |
-| Emulador Android                 | `http://10.0.2.2:5556`             |
-| Simulador iOS                    | `http://localhost:5556`            |
-| Dispositivo físico (misma Wi-Fi) | `http://<IP-de-tu-red-local>:5556` |
+| Cliente                                | URL                                                                                |
+| -------------------------------------- | ---------------------------------------------------------------------------------- |
+| Mismo equipo (ejecución de escritorio) | `http://localhost:5556` ✅                                                         |
+| Emulador Android                       | `http://10.0.2.2:5556` ✅                                                          |
+| Simulador iOS                          | `http://localhost:5556`                                                            |
+| Dispositivo físico (misma Wi-Fi)       | `http://<IP-de-tu-red-local>:5556` (solo navegador/curl; la app necesita el túnel) |
 
 ### Túnel HTTPS gratuito con cloudflared (recomendado para la app)
 

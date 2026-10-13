@@ -139,6 +139,95 @@ void main() {
       );
     });
 
+    group('plain HTTP to the development machine', () {
+      FakeHttpAdapter okAdapter() =>
+          FakeHttpAdapter((_) => FakeHttpAdapter.json({'ok': true}));
+
+      test('is allowed in debug builds for the emulator host', () async {
+        final adapter = okAdapter();
+        final dio = factory(
+          config(mock: false, baseUrl: 'http://10.0.2.2:5556'),
+          adapter: adapter,
+        ).create();
+
+        final response = await dio.get<dynamic>('/tasks');
+
+        expect(response.statusCode, 200);
+        expect(adapter.requests, hasLength(1));
+      });
+
+      test('is allowed for the token refresh client too', () async {
+        final adapter = FakeHttpAdapter((options) {
+          if (options.path == NetworkConstants.refreshPath) {
+            return FakeHttpAdapter.json({
+              'accessToken': 'new-access',
+              'refreshToken': 'new-refresh',
+            });
+          }
+          return options.headers['Authorization'] == 'Bearer old'
+              ? FakeHttpAdapter.json({'code': 'unauthorized'}, status: 401)
+              : FakeHttpAdapter.json({'ok': true});
+        });
+        final dio = factory(
+          config(mock: false, baseUrl: 'http://10.0.2.2:5556'),
+          storage: InMemoryTokenStorage(
+            const AuthTokens(accessToken: 'old', refreshToken: 'r'),
+          ),
+          adapter: adapter,
+        ).create();
+
+        final response = await dio.get<dynamic>('/tasks');
+
+        expect(response.statusCode, 200);
+        expect(adapter.requests.map((r) => r.path), [
+          '/tasks',
+          NetworkConstants.refreshPath,
+          '/tasks',
+        ]);
+      });
+
+      test('is rejected for any other host, even in debug builds', () async {
+        final adapter = okAdapter();
+        final dio = factory(
+          config(mock: false, baseUrl: 'http://192.168.1.20:5556'),
+          adapter: adapter,
+        ).create();
+
+        await expectLater(
+          dio.get<dynamic>('/tasks'),
+          throwsA(
+            isA<DioException>().having(
+              (e) => e.error,
+              'error',
+              isA<NetworkException>(),
+            ),
+          ),
+        );
+        expect(adapter.requests, isEmpty);
+      });
+
+      test('is rejected in release and profile builds', () async {
+        final adapter = okAdapter();
+        final dio = factory(
+          config(mock: false, baseUrl: 'http://10.0.2.2:5556'),
+          isRelease: true,
+          adapter: adapter,
+        ).create();
+
+        await expectLater(
+          dio.get<dynamic>('/tasks'),
+          throwsA(
+            isA<DioException>().having(
+              (e) => e.error,
+              'error',
+              isA<NetworkException>(),
+            ),
+          ),
+        );
+        expect(adapter.requests, isEmpty);
+      });
+    });
+
     test('sends the stored bearer token', () async {
       final storage = InMemoryTokenStorage(
         const AuthTokens(accessToken: 'abc', refreshToken: 'r'),

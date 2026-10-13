@@ -154,7 +154,8 @@ The app is a task manager with three tabs (bottom navigation bar):
 ## Security
 
 - **Storage**: tokens only in `flutter_secure_storage` (`SecureTokenStorage`).
-- **Transport**: HTTPS only (interceptor + `network_security_config` + ATS). Configurable certificate pinning
+- **Transport**: HTTPS only (interceptor + `network_security_config` + ATS); the single exception is plain HTTP to
+  `10.0.2.2`, `localhost` and `127.0.0.1` in **debug builds** (dev backend on the emulator). Configurable certificate pinning
   (`PINNING_ENABLED`, `PINNING_SHA256` with base64 SHA-256 fingerprints of the certificate); enabled without
   fingerprints it **rejects all traffic**. See *Known limitations* below.
 - **Device integrity**: `ROOT_POLICY=warn|block` (root/jailbreak and debugger) applied by `IntegrityGate`.

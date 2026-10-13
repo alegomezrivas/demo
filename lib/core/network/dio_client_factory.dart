@@ -20,6 +20,8 @@ import 'package:flutter/foundation.dart';
 ///
 /// Interceptor order: HTTPS enforcer -> auth -> logging -> mock. The mock is
 /// attached only when the config enables it and the build is not release.
+/// Debug builds may also reach the local dev machine over plain HTTP (see
+/// [NetworkConstants.debugCleartextHosts]); profile and release never can.
 class DioClientFactory {
   /// Creates the factory.
   DioClientFactory({
@@ -92,7 +94,14 @@ class DioClientFactory {
             ),
           )
           ..httpClientAdapter = adapterBuilder?.call() ?? buildPinnedAdapter()
-          ..interceptors.add(const HttpsEnforcerInterceptor());
+          ..interceptors.add(
+            HttpsEnforcerInterceptor(
+              // Plain HTTP to the dev machine is a debug-only convenience.
+              cleartextHosts: isRelease
+                  ? const {}
+                  : NetworkConstants.debugCleartextHosts,
+            ),
+          );
     return dio;
   }
 

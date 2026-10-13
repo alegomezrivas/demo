@@ -23,7 +23,8 @@ paths:
 ## Networking
 - One configured `Dio` instance created in `core/network/`; base URL and flags come from `AppConfig`
   (`--dart-define-from-file`). Switching from the mock to a real API changes only the base URL.
-- HTTPS only. Certificate pinning is configurable; with pinning enabled and an empty fingerprint
+- HTTPS only; the sole exception is plain HTTP to `NetworkConstants.debugCleartextHosts` in debug builds
+  (never profile/release). Certificate pinning is configurable; with pinning enabled and an empty fingerprint
   list the client must reject all connections (fail closed).
 - Interceptors, in order: HTTPS enforcer (rejects cleartext), auth (adds bearer token, refreshes on
   401 and retries ONCE, signs out if refresh fails), logging (method + path + status only; reduced in

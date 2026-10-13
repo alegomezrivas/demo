@@ -112,12 +112,13 @@ Or put the same keys in your `config/dev.json` and keep using
 
 Things worth knowing:
 
-- **The app only talks HTTPS.** Its `HttpsEnforcerInterceptor` rejects `http://` and Android is
-  configured with cleartext traffic disabled. That is why `http://10.0.2.2:5556` (Android emulator)
-  or `http://192.168.x.x:5556` (physical device) **do not work as they are**: use the HTTPS tunnel
-  below. If you want plain `http` on the emulator, the app needs a debug-only exception (allow
-  `http` in the interceptor when `kDebugMode` and add a cleartext rule for `10.0.2.2` in
-  `android/app/src/debug`). It is not applied; it must never reach release builds.
+- **HTTPS everywhere, with one debug-only exception.** The app's `HttpsEnforcerInterceptor` rejects
+  `http://`, and Android blocks cleartext traffic. **Debug builds** make an exception for exactly
+  three hosts: `10.0.2.2` (Android emulator → your machine), `localhost` and `127.0.0.1`. So on the
+  emulator `--dart-define=API_BASE_URL=http://10.0.2.2:5556` works with `npm run dev`. Profile and
+  release builds, any other host (for example a LAN IP such as `http://192.168.1.20:5556`) and iOS
+  still require HTTPS: use the tunnel below. For a physical Android phone over USB run
+  `adb reverse tcp:5556 tcp:5556` and use `http://localhost:5556`.
 - **Release builds** refuse to start without `ENV=staging` or `ENV=prod`, and `prod` additionally
   requires `PINNING_ENABLED=true` with the server certificate fingerprint in `PINNING_SHA256`.
   Render certificates rotate, so for demo builds against Render use `ENV=staging`.
@@ -135,8 +136,7 @@ npm run build
 NODE_ENV=staging JWT_ACCESS_SECRET=... npm start      # PowerShell: $env:NODE_ENV="staging"; ...
 ```
 
-Reachable addresses (HTTP, usable from a browser or `curl`, **not** from the app as explained
-above):
+Reachable addresses over HTTP (the app accepts only the ones marked ✅, in debug builds):
 
 | Client                       | URL                         |
 | ---------------------------- | --------------------------- |

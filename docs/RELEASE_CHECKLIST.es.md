@@ -58,7 +58,8 @@ fvm flutter build ipa --release --obfuscate \
 
 ## 6. Verificación de seguridad en el binario
 
-- [ ] No hay HTTP en claro: `network_security_config.xml` sin dominios con `cleartextTrafficPermitted="true"`
+- [ ] No hay HTTP en claro: `src/main/res/xml/network_security_config.xml` sin dominios con `cleartextTrafficPermitted="true"`
+      (solo `src/debug/res/xml/` puede tenerlos, para `10.0.2.2`/`localhost`/`127.0.0.1`), y la config fusionada del APK/AAB release lo confirma
 - [ ] Con `PINNING_ENABLED=true` y un certificado distinto al pinneado la app **no** conecta
 - [ ] En un dispositivo con root/jailbreak se aplica `ROOT_POLICY`
 - [ ] Revisa los logs de un build release: no deben aparecer tokens ni datos personales

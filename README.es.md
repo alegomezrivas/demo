@@ -153,7 +153,8 @@ La app es un gestor de tareas con tres pestañas (barra de navegación inferior)
 ## Seguridad
 
 - **Almacenamiento**: tokens solo en `flutter_secure_storage` (`SecureTokenStorage`).
-- **Transporte**: solo HTTPS (interceptor + `network_security_config` + ATS). Certificate pinning configurable
+- **Transporte**: solo HTTPS (interceptor + `network_security_config` + ATS); la única excepción es HTTP plano a
+  `10.0.2.2`, `localhost` y `127.0.0.1` en **builds debug** (backend de desarrollo en el emulador). Certificate pinning configurable
   (`PINNING_ENABLED`, `PINNING_SHA256` con huellas SHA-256 en base64 del certificado); activado sin huellas
   **rechaza todo el tráfico**. Ver *Limitaciones conocidas* más abajo.
 - **Integridad del dispositivo**: `ROOT_POLICY=warn|block` (root/jailbreak y depurador) aplicada por `IntegrityGate`.
