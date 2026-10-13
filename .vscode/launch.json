@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Development: mock backend enabled
+      "name": "App (dev)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/dev.json"
+      ]
+    },
+    {
+      // Staging: real backend, mock simulation allowed
+      "name": "App (staging)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/staging.json"
+      ]
+    },
+    {
+      // Production config in profile mode (performance checks)
+      "name": "App (prod - profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/prod.json"
+      ]
+    },
+    {
+      // Release mode for testing the final build
+      "name": "App (prod - release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/prod.json"
+      ]
+    }
+  ]
+}
