@@ -41,7 +41,9 @@ import 'package:demo/features/auth/domain/usecases/logout_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/send_confirmation_code_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/upload_avatar_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/verify_confirmation_code_use_case.dart';
+import 'package:demo/features/auth/presentation/services/sign_up_progress.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
+import 'package:demo/features/auth/presentation/viewmodels/sign_up_flow_view_model.dart';
 import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
 import 'package:demo/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:demo/features/settings/data/repositories/settings_repository_impl.dart';
@@ -83,6 +85,7 @@ Future<void> setupLocator({
   AppConfig? config,
   List<MockRoute> mockRoutes = const [],
   SessionService? session,
+  SignUpProgress? signUpProgress,
 }) async {
   final appConfig = config ?? AppConfig.fromEnvironment();
   locator
@@ -95,6 +98,7 @@ Future<void> setupLocator({
     ..registerSingleton<GoRouter>(router)
     ..registerSingleton<DataChangeNotifier>(DataChangeNotifier())
     ..registerSingleton<SessionService>(session ?? SessionService())
+    ..registerSingleton<SignUpProgress>(signUpProgress ?? SignUpProgress())
     ..registerLazySingleton<NavigationService>(
       () => GoRouterNavigationService(locator<GoRouter>()),
     )
@@ -253,6 +257,21 @@ Future<void> setupLocator({
         session: locator<SessionService>(),
         screenProtection: locator<ScreenProtection>(),
       ),
+    )
+    // One instance for the whole sign-up flow; `start()` resets it.
+    ..registerLazySingleton<SignUpFlowViewModel>(
+      () => SignUpFlowViewModel(
+        sendCode: locator<SendConfirmationCodeUseCase>(),
+        verifyCode: locator<VerifyConfirmationCodeUseCase>(),
+        checkUsername: locator<CheckUsernameAvailabilityUseCase>(),
+        completeSignUp: locator<CompleteSignUpUseCase>(),
+        uploadAvatar: locator<UploadAvatarUseCase>(),
+        navigation: locator<NavigationService>(),
+        session: locator<SessionService>(),
+        progress: locator<SignUpProgress>(),
+        screenProtection: locator<ScreenProtection>(),
+      ),
+      dispose: (viewModel) => viewModel.dispose(),
     )
     ..registerFactory<IntegrityGateViewModel>(
       () => IntegrityGateViewModel(locator<DeviceIntegrityService>()),

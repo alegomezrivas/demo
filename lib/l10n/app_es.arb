@@ -155,5 +155,15 @@
         "type": "int"
       }
     }
-  }
+  },
+  "validationCode": "Ingresa el código de 6 dígitos",
+  "validationUsername": "Usa de 3 a 30 letras, números, puntos o guiones bajos, sin punto al inicio ni al final",
+  "authCodeInvalid": "El código no es correcto",
+  "authCodeExpired": "El código caducó. Pide uno nuevo.",
+  "authCodeTooManyAttempts": "Demasiados intentos. Pide un código nuevo.",
+  "authResendTooSoon": "Espera un momento antes de pedir otro código",
+  "authUsernameTaken": "Ese nombre de usuario ya está en uso",
+  "authVerificationExpired": "La verificación del correo caducó. Empieza de nuevo.",
+  "authImageInvalid": "No pudimos usar esa imagen. Prueba con otra.",
+  "authImageTooLarge": "La imagen es demasiado grande"
 }

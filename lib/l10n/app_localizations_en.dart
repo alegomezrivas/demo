@@ -333,4 +333,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarSemanticsFilled => 'Profile picture';
+
+  @override
+  String get validationCode => 'Enter the 6-digit code';
+
+  @override
+  String get validationUsername =>
+      'Use 3 to 30 letters, numbers, dots or underscores, with no dot at the start or end';
+
+  @override
+  String get authCodeInvalid => 'That code is not correct';
+
+  @override
+  String get authCodeExpired => 'The code expired. Request a new one.';
+
+  @override
+  String get authCodeTooManyAttempts =>
+      'Too many attempts. Request a new code.';
+
+  @override
+  String get authResendTooSoon =>
+      'Wait a moment before requesting another code';
+
+  @override
+  String get authUsernameTaken => 'That username is already taken';
+
+  @override
+  String get authVerificationExpired =>
+      'E-mail verification expired. Start again.';
+
+  @override
+  String get authImageInvalid =>
+      'We couldn\'t use that picture. Try another one.';
+
+  @override
+  String get authImageTooLarge => 'The picture is too large';
 }

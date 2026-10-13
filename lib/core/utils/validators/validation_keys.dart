@@ -17,4 +17,10 @@ abstract final class ValidationKeys {
 
   /// Two controls differ (reactive_forms built-in).
   static const String mustMatch = 'mustMatch';
+
+  /// Value is not a 6-digit confirmation code.
+  static const String code = 'code';
+
+  /// Value is not an acceptable username.
+  static const String username = 'username';
 }

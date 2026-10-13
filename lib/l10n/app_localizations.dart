@@ -703,6 +703,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Foto de perfil'**
   String get avatarSemanticsFilled;
+
+  /// No description provided for @validationCode.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa el código de 6 dígitos'**
+  String get validationCode;
+
+  /// No description provided for @validationUsername.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa de 3 a 30 letras, números, puntos o guiones bajos, sin punto al inicio ni al final'**
+  String get validationUsername;
+
+  /// No description provided for @authCodeInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'El código no es correcto'**
+  String get authCodeInvalid;
+
+  /// No description provided for @authCodeExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'El código caducó. Pide uno nuevo.'**
+  String get authCodeExpired;
+
+  /// No description provided for @authCodeTooManyAttempts.
+  ///
+  /// In es, this message translates to:
+  /// **'Demasiados intentos. Pide un código nuevo.'**
+  String get authCodeTooManyAttempts;
+
+  /// No description provided for @authResendTooSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Espera un momento antes de pedir otro código'**
+  String get authResendTooSoon;
+
+  /// No description provided for @authUsernameTaken.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese nombre de usuario ya está en uso'**
+  String get authUsernameTaken;
+
+  /// No description provided for @authVerificationExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'La verificación del correo caducó. Empieza de nuevo.'**
+  String get authVerificationExpired;
+
+  /// No description provided for @authImageInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'No pudimos usar esa imagen. Prueba con otra.'**
+  String get authImageInvalid;
+
+  /// No description provided for @authImageTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'La imagen es demasiado grande'**
+  String get authImageTooLarge;
 }
 
 class _AppLocalizationsDelegate

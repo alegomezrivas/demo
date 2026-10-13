@@ -152,5 +152,15 @@
         "type": "int"
       }
     }
-  }
+  },
+  "validationCode": "Enter the 6-digit code",
+  "validationUsername": "Use 3 to 30 letters, numbers, dots or underscores, with no dot at the start or end",
+  "authCodeInvalid": "That code is not correct",
+  "authCodeExpired": "The code expired. Request a new one.",
+  "authCodeTooManyAttempts": "Too many attempts. Request a new code.",
+  "authResendTooSoon": "Wait a moment before requesting another code",
+  "authUsernameTaken": "That username is already taken",
+  "authVerificationExpired": "E-mail verification expired. Start again.",
+  "authImageInvalid": "We couldn't use that picture. Try another one.",
+  "authImageTooLarge": "The picture is too large"
 }

@@ -335,4 +335,38 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get avatarSemanticsFilled => 'Foto de perfil';
+
+  @override
+  String get validationCode => 'Ingresa el código de 6 dígitos';
+
+  @override
+  String get validationUsername =>
+      'Usa de 3 a 30 letras, números, puntos o guiones bajos, sin punto al inicio ni al final';
+
+  @override
+  String get authCodeInvalid => 'El código no es correcto';
+
+  @override
+  String get authCodeExpired => 'El código caducó. Pide uno nuevo.';
+
+  @override
+  String get authCodeTooManyAttempts =>
+      'Demasiados intentos. Pide un código nuevo.';
+
+  @override
+  String get authResendTooSoon =>
+      'Espera un momento antes de pedir otro código';
+
+  @override
+  String get authUsernameTaken => 'Ese nombre de usuario ya está en uso';
+
+  @override
+  String get authVerificationExpired =>
+      'La verificación del correo caducó. Empieza de nuevo.';
+
+  @override
+  String get authImageInvalid => 'No pudimos usar esa imagen. Prueba con otra.';
+
+  @override
+  String get authImageTooLarge => 'La imagen es demasiado grande';
 }

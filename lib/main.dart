@@ -10,6 +10,7 @@ import 'package:demo/core/services/session_service.dart';
 import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart';
 import 'package:demo/features/auth/data/datasources/mock_auth_backend.dart';
 import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart';
+import 'package:demo/features/auth/presentation/services/sign_up_progress.dart';
 import 'package:demo/features/settings/domain/usecases/get_settings_use_case.dart';
 import 'package:demo/features/settings/presentation/app_preferences.dart';
 import 'package:demo/features/tasks/data/datasources/mock_tasks_backend.dart';
@@ -22,13 +23,15 @@ Future<void> main() async {
 
   // The router needs the session state before the locator exists.
   final session = SessionService();
+  final signUpProgress = SignUpProgress();
   final router = AppRouter.create(
-    redirect: AuthGuard(session).redirect,
+    redirect: AuthGuard(session, signUpProgress: signUpProgress).redirect,
     refreshListenable: session,
   );
   await setupLocator(
     router: router,
     session: session,
+    signUpProgress: signUpProgress,
     mockRoutes: _mockRoutes(),
   );
 

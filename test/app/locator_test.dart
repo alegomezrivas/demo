@@ -27,7 +27,9 @@ import 'package:demo/features/auth/domain/usecases/logout_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/send_confirmation_code_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/upload_avatar_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/verify_confirmation_code_use_case.dart';
+import 'package:demo/features/auth/presentation/services/sign_up_progress.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
+import 'package:demo/features/auth/presentation/viewmodels/sign_up_flow_view_model.dart';
 import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
 import 'package:demo/features/settings/domain/repositories/settings_repository.dart';
 import 'package:demo/features/settings/presentation/app_preferences.dart';
@@ -130,6 +132,31 @@ void main() {
 
       // Disabled by default: confirmation is never required.
       expect(await guard.confirm(reason: 'x'), isTrue);
+    });
+
+    test('shares one sign-up progress and one sign-up flow ViewModel', () {
+      expect(locator<SignUpProgress>(), same(locator<SignUpProgress>()));
+      expect(
+        locator<SignUpFlowViewModel>(),
+        same(locator<SignUpFlowViewModel>()),
+      );
+    });
+
+    test('the sign-up flow shares the registered progress', () {
+      locator<SignUpFlowViewModel>().start();
+
+      expect(locator<SignUpProgress>().hasStarted, isTrue);
+    });
+
+    test('uses an injected sign-up progress', () async {
+      final progress = SignUpProgress();
+      await resetLocator();
+      await setupLocator(
+        router: AppRouter.create(),
+        signUpProgress: progress,
+      );
+
+      expect(locator<SignUpProgress>(), same(progress));
     });
 
     test('registers the auth ViewModels as factories', () {
