@@ -1,7 +1,11 @@
 import 'package:demo/core/theme/app_theme.dart';
+import 'package:demo/core/widgets/app_button_content.dart';
 import 'package:flutter/material.dart';
 
 /// Primary call-to-action button that only consumes design tokens.
+///
+/// It is announced by its label even while loading, so screen readers do not
+/// lose the context when the label is replaced by a progress indicator.
 class AppPrimaryButton extends StatelessWidget {
   /// Creates a button; [onPressed] is ignored while [isLoading] is true.
   const AppPrimaryButton({
@@ -22,19 +26,21 @@ class AppPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final spacing = context.spacing;
-    return FilledButton(
-      onPressed: isLoading ? null : onPressed,
-      child: isLoading
-          ? SizedBox.square(
-              dimension: spacing.md,
-              child: CircularProgressIndicator(
-                strokeWidth: spacing.xxs,
-                color: colors.onPrimary,
-              ),
-            )
-          : Text(label),
+    final isEnabled = onPressed != null && !isLoading;
+    return Semantics(
+      button: true,
+      enabled: isEnabled,
+      label: label,
+      onTap: isEnabled ? onPressed : null,
+      excludeSemantics: true,
+      child: FilledButton(
+        onPressed: isEnabled ? onPressed : null,
+        child: AppButtonContent(
+          label: label,
+          isLoading: isLoading,
+          progressColor: context.colors.onPrimary,
+        ),
+      ),
     );
   }
 }
