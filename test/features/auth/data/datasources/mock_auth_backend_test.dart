@@ -166,4 +166,50 @@ void main() {
       );
     });
   });
+
+  group('logout', () {
+    Future<String> signInAndGetRefreshToken() async {
+      final response = await post(AuthEndpoints.login, {
+        'email': MockAuthBackend.demoEmail,
+        'password': MockAuthBackend.demoPassword,
+      });
+      return response.data?['refreshToken'] as String;
+    }
+
+    test('answers 204 and revokes the refresh token', () async {
+      final refreshToken = await signInAndGetRefreshToken();
+
+      final response = await post(AuthEndpoints.logout, {
+        'refreshToken': refreshToken,
+      });
+
+      expect(response.statusCode, 204);
+      await expectLater(
+        post(NetworkConstants.refreshPath, {'refreshToken': refreshToken}),
+        throwsA(status(401, 'invalid_refresh_token')),
+      );
+    });
+
+    test('is idempotent for used and unknown tokens', () async {
+      final refreshToken = await signInAndGetRefreshToken();
+      await post(AuthEndpoints.logout, {'refreshToken': refreshToken});
+
+      final again = await post(AuthEndpoints.logout, {
+        'refreshToken': refreshToken,
+      });
+      final unknown = await post(AuthEndpoints.logout, {
+        'refreshToken': 'never-issued',
+      });
+
+      expect(again.statusCode, 204);
+      expect(unknown.statusCode, 204);
+    });
+
+    test('rejects a missing token with 422', () async {
+      await expectLater(
+        post(AuthEndpoints.logout, {}),
+        throwsA(status(422, 'validation_error')),
+      );
+    });
+  });
 }

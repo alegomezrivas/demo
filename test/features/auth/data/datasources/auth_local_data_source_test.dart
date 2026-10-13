@@ -64,4 +64,23 @@ void main() {
       expect(storage.values, isEmpty);
     });
   });
+
+  group('readRefreshToken', () {
+    test('returns the stored refresh token', () async {
+      await source.saveSession(tokens: pair, user: user);
+
+      expect(await source.readRefreshToken(), 'r');
+    });
+
+    test('returns null when there is no session', () async {
+      expect(await source.readRefreshToken(), isNull);
+    });
+
+    test('returns null after the session was cleared', () async {
+      await source.saveSession(tokens: pair, user: user);
+      await source.clear();
+
+      expect(await source.readRefreshToken(), isNull);
+    });
+  });
 }

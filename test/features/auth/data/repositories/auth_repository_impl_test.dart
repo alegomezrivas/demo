@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:demo/core/error/exceptions.dart';
 import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/security/auth_tokens.dart';
@@ -148,12 +150,66 @@ void main() {
   });
 
   group('logout', () {
-    test('clears local session data', () async {
+    test('revokes the session on the server, then clears local data', () async {
+      when(local.readRefreshToken()).thenAnswer((_) async => 'r');
+
       expect(await repository.logout(), right<Failure, Unit>(unit));
+
+      verifyInOrder([remote.logout('r'), local.clear()]);
+    });
+
+    test('only clears local data when there is no refresh token', () async {
+      when(local.readRefreshToken()).thenAnswer((_) async => null);
+
+      expect(await repository.logout(), right<Failure, Unit>(unit));
+
+      verifyNever(remote.logout(any));
       verify(local.clear()).called(1);
     });
 
-    test('reports storage failures', () async {
+    test('still signs out when the server call fails', () async {
+      when(local.readRefreshToken()).thenAnswer((_) async => 'r');
+      final errors = <Exception>[
+        const NetworkException(),
+        const ServerException(code: 'boom', statusCode: 500),
+        const UnauthorizedException(),
+        const FormatException('unexpected'),
+      ];
+      for (final error in errors) {
+        clearInteractions(local);
+        when(remote.logout(any)).thenThrow(error);
+
+        final result = await repository.logout();
+
+        expect(result, right<Failure, Unit>(unit), reason: '$error');
+        verify(local.clear()).called(1);
+      }
+    });
+
+    test('does not wait forever for a slow server', () async {
+      repository = AuthRepositoryImpl(
+        remote: remote,
+        local: local,
+        serverLogoutTimeout: const Duration(milliseconds: 1),
+      );
+      when(local.readRefreshToken()).thenAnswer((_) async => 'r');
+      when(remote.logout(any)).thenAnswer((_) => Completer<void>().future);
+
+      expect(await repository.logout(), right<Failure, Unit>(unit));
+
+      verify(local.clear()).called(1);
+    });
+
+    test('still signs out when the refresh token cannot be read', () async {
+      when(local.readRefreshToken()).thenThrow(const CacheException());
+
+      expect(await repository.logout(), right<Failure, Unit>(unit));
+
+      verifyNever(remote.logout(any));
+      verify(local.clear()).called(1);
+    });
+
+    test('reports storage failures when clearing', () async {
       when(local.clear()).thenThrow(const CacheException());
 
       expect(

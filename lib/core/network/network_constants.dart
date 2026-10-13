@@ -11,6 +11,17 @@ abstract final class NetworkConstants {
 
   /// Path of the token refresh endpoint.
   static const String refreshPath = '/auth/refresh';
+
+  /// Hosts that may be reached over plain HTTP in debug builds only.
+  ///
+  /// `10.0.2.2` is how the Android emulator sees the development machine; the
+  /// others serve `adb reverse` and desktop runs. Anything else, and every
+  /// profile or release build, is HTTPS only.
+  static const Set<String> debugCleartextHosts = {
+    '10.0.2.2',
+    'localhost',
+    '127.0.0.1',
+  };
 }
 
 /// Keys used in `RequestOptions.extra`.
