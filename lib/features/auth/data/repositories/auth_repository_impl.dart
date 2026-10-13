@@ -18,11 +18,17 @@ import 'package:fpdart/fpdart.dart';
 /// Passwords are never modified.
 class AuthRepositoryImpl implements AuthRepository {
   /// Creates the repository.
+  ///
+  /// [serverLogoutTimeout] bounds how long signing out waits for the server.
   const AuthRepositoryImpl({
     required AuthRemoteDataSource remote,
     required AuthLocalDataSource local,
+    this.serverLogoutTimeout = const Duration(seconds: 5),
   }) : _remote = remote,
        _local = local;
+
+  /// Longest wait for the server to acknowledge a logout.
+  final Duration serverLogoutTimeout;
 
   final AuthRemoteDataSource _remote;
   final AuthLocalDataSource _local;
@@ -64,6 +70,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, Unit>> logout() {
     return _guard(() async {
+      await _revokeOnServer();
       await _local.clear();
       return unit;
     });
@@ -72,6 +79,23 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User?>> restoreSession() {
     return _guard(() async => (await _local.readUser())?.toEntity());
+  }
+
+  /// Tells the server to revoke the session, on a best-effort basis.
+  ///
+  /// Signing out must always work, even offline, so a failure or a slow server
+  /// (bounded by [serverLogoutTimeout], a `TimeoutException`) never blocks it:
+  /// the local session is wiped right after. The refresh token then simply
+  /// expires on the server.
+  Future<void> _revokeOnServer() async {
+    try {
+      final refreshToken = await _local.readRefreshToken();
+      if (refreshToken == null) return;
+      await _remote.logout(refreshToken).timeout(serverLogoutTimeout);
+    } on Exception {
+      // Any failure (offline, 5xx, timeout, unreadable storage) is ignored:
+      // the caller still wipes the local session. See above.
+    }
   }
 
   Future<User> _persist(AuthResponseDto response) async {

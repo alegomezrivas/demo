@@ -66,20 +66,20 @@ Son datos de prueba, no secretos. Se recrean en cada arranque y con `POST /__res
 
 ## Endpoints
 
-| Método | Ruta             | Auth   | Para qué sirve                                                |
-| ------ | ---------------- | ------ | ------------------------------------------------------------- |
-| GET    | `/health`        | no     | Comprobación de vida (`{"status":"ok"}`)                      |
-| POST   | `/auth/login`    | no     | Correo + contraseña → usuario y par de tokens                 |
-| POST   | `/auth/register` | no     | Crear cuenta → `201`, usuario y par de tokens                 |
-| POST   | `/auth/refresh`  | no     | Rotar el refresh token → nuevo par de tokens                  |
-| POST   | `/auth/logout`   | no     | Revocar la sesión (`204` idempotente). Solo backend por ahora |
-| GET    | `/tasks`         | bearer | Lista con `page`, `pageSize`, `q`, `status`, `priority`       |
-| POST   | `/tasks`         | bearer | Crear → `201`                                                 |
-| GET    | `/tasks/stats`   | bearer | `total`, `done`, `overdue`, `highPriorityPending`             |
-| GET    | `/tasks/:id`     | bearer | Una tarea                                                     |
-| PUT    | `/tasks/:id`     | bearer | Reemplazar una tarea                                          |
-| DELETE | `/tasks/:id`     | bearer | Borrar → `204`                                                |
-| POST   | `/__reset`       | no     | Restaurar los datos semilla. **No existe en producción**      |
+| Método | Ruta             | Auth   | Para qué sirve                                                          |
+| ------ | ---------------- | ------ | ----------------------------------------------------------------------- |
+| GET    | `/health`        | no     | Comprobación de vida (`{"status":"ok"}`)                                |
+| POST   | `/auth/login`    | no     | Correo + contraseña → usuario y par de tokens                           |
+| POST   | `/auth/register` | no     | Crear cuenta → `201`, usuario y par de tokens                           |
+| POST   | `/auth/refresh`  | no     | Rotar el refresh token → nuevo par de tokens                            |
+| POST   | `/auth/logout`   | no     | Revocar la sesión (`204` idempotente). La app lo llama al cerrar sesión |
+| GET    | `/tasks`         | bearer | Lista con `page`, `pageSize`, `q`, `status`, `priority`                 |
+| POST   | `/tasks`         | bearer | Crear → `201`                                                           |
+| GET    | `/tasks/stats`   | bearer | `total`, `done`, `overdue`, `highPriorityPending`                       |
+| GET    | `/tasks/:id`     | bearer | Una tarea                                                               |
+| PUT    | `/tasks/:id`     | bearer | Reemplazar una tarea                                                    |
+| DELETE | `/tasks/:id`     | bearer | Borrar → `204`                                                          |
+| POST   | `/__reset`       | no     | Restaurar los datos semilla. **No existe en producción**                |
 
 Todos los errores tienen el mismo cuerpo: `{ "code": "...", "message": "...", "details": [...]? }`.
 La app Flutter solo lee `code`. Códigos habituales: `invalid_credentials`, `email_taken`,

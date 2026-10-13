@@ -14,6 +14,9 @@ abstract interface class AuthLocalDataSource {
   /// Returns the stored user when a token pair exists, otherwise null.
   Future<UserDto?> readUser();
 
+  /// Returns the stored refresh token, or null when there is no session.
+  Future<String?> readRefreshToken();
+
   /// Removes every piece of session data.
   Future<void> clear();
 }
@@ -51,6 +54,10 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       throw const CacheException('invalid_user_cache');
     }
   }
+
+  @override
+  Future<String?> readRefreshToken() async =>
+      (await _tokens.read())?.refreshToken;
 
   @override
   Future<void> clear() async {

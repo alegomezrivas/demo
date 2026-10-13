@@ -210,6 +210,15 @@ class MockAuthRemoteDataSource extends _i1.Mock
             ),
           )
           as _i4.Future<_i2.AuthResponseDto>);
+
+  @override
+  _i4.Future<void> logout(String? refreshToken) =>
+      (super.noSuchMethod(
+            Invocation.method(#logout, [refreshToken]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }
 
 /// A class which mocks [AuthLocalDataSource].
@@ -237,6 +246,15 @@ class MockAuthLocalDataSource extends _i1.Mock
             returnValueForMissingStub: _i4.Future<_i14.UserDto?>.value(),
           )
           as _i4.Future<_i14.UserDto?>);
+
+  @override
+  _i4.Future<String?> readRefreshToken() =>
+      (super.noSuchMethod(
+            Invocation.method(#readRefreshToken, []),
+            returnValue: _i4.Future<String?>.value(),
+            returnValueForMissingStub: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
 
   @override
   _i4.Future<void> clear() =>

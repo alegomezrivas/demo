@@ -145,7 +145,7 @@ export function buildOpenApiDocument(config: AppConfig): Json {
     '/auth/logout': {
       post: {
         tags: ['Auth'],
-        summary: 'Revoke a session (backend only: the app does not call it yet)',
+        summary: 'Revoke a session (called by the app on sign-out)',
         description: 'Idempotent: always 204 for a well-formed body, even for unknown tokens.',
         parameters: simulation,
         requestBody: { required: true, content: json('LogoutRequest') },

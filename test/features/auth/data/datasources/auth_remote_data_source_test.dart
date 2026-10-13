@@ -144,4 +144,44 @@ void main() {
       },
     );
   });
+
+  group('logout', () {
+    test('posts the refresh token without auth', () async {
+      final source = build((_) => ResponseBody.fromString('', 204));
+
+      await source.logout('refresh-1');
+
+      final request = adapter.requests.single;
+      expect(request.path, AuthEndpoints.logout);
+      expect(request.method, 'POST');
+      expect(request.data, {'refreshToken': 'refresh-1'});
+      expect(request.extra[RequestExtras.skipAuth], isTrue);
+    });
+
+    test('maps server errors keeping only the code', () async {
+      final source = build(
+        (_) => FakeHttpAdapter.json({'code': 'rate_limited'}, status: 429),
+      );
+
+      await expectLater(
+        source.logout('r'),
+        throwsA(
+          isA<ServerException>()
+              .having((e) => e.code, 'code', 'rate_limited')
+              .having((e) => e.statusCode, 'statusCode', 429),
+        ),
+      );
+    });
+
+    test('maps connection errors to NetworkException', () async {
+      final source = build(
+        (options) => throw DioException.connectionError(
+          requestOptions: options,
+          reason: 'down',
+        ),
+      );
+
+      await expectLater(source.logout('r'), throwsA(isA<NetworkException>()));
+    });
+  });
 }

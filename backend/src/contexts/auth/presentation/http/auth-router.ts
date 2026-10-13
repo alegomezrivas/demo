@@ -8,7 +8,7 @@ export function authRouter(useCases: AuthUseCases): Router {
   router.post('/login', controller.login);
   router.post('/register', controller.register);
   router.post('/refresh', controller.refresh);
-  // Backend-only for now: the Flutter app does not call it yet.
+  // The Flutter app calls it on sign-out (best effort, with the refresh token).
   router.post('/logout', controller.logout);
   return router;
 }

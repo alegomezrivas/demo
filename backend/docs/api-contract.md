@@ -217,7 +217,7 @@ Si llegan ambos headers, `X-Mock-Error` tiene prioridad. Un valor desconocido se
 
 ## 4.1 Endpoints solo de backend
 
-- `POST /auth/logout` — **solo backend, la app aún no lo llama.** Body `{ "refreshToken": "string" }`. Responde siempre **204**, aunque el token ya esté revocado, no exista o sea inválido (idempotente). Revoca la familia de refresh tokens. Para usarlo, la app solo tendría que llamarlo al cerrar sesión.
+- `POST /auth/logout` — **la app lo llama al cerrar sesión** (sin bearer, con el refresh token guardado; si falla o tarda más de 5 s, la sesión local se borra igualmente). Body `{ "refreshToken": "string" }`. Responde siempre **204**, aunque el token ya esté revocado, no exista o sea inválido (idempotente). Revoca la familia de refresh tokens.
 - `POST /__reset` — restaura los datos semilla. Solo fuera de producción (en producción no existe: 404).
 - `GET /health` — `200 {"status":"ok"}`, sin información sensible.
 
@@ -281,7 +281,7 @@ Por IP y ventana (`RATE_LIMIT_WINDOW_SECONDS`, 60 s por defecto): 300 en general
 1. **HTTPS en local:** túnel `cloudflared`. Para probar rápido en emulador se puede permitir `http` solo en el build debug de la app (config de red en el source set `debug`), nunca en release. Sin certificado propio.
 2. **Headers:** `X-Mock-Latency`, `X-Mock-Error` y mapeo de `x-mock-scenario` (sección 4).
 3. **`401-once`** por access token (sección 4).
-4. **`POST /auth/logout`** idempotente, marcado como solo backend (sección 4.1).
+4. **`POST /auth/logout`** idempotente (sección 4.1); la app ya lo llama al cerrar sesión.
 5. **Tareas por usuario**, con 404 para recursos ajenos (sección 4.2).
 6. **Política de contraseña** en `register` (sección 4.2).
 7. **Query inválida:** 422 para tipos/enums y límites silenciosos para rangos (sección 4.2).

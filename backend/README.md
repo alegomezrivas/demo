@@ -65,20 +65,20 @@ These are fixtures, not secrets. They are re-created on every start and by `POST
 
 ## Endpoints
 
-| Method | Path             | Auth   | Purpose                                                     |
-| ------ | ---------------- | ------ | ----------------------------------------------------------- |
-| GET    | `/health`        | no     | Liveness probe (`{"status":"ok"}`)                          |
-| POST   | `/auth/login`    | no     | E-mail + password → user and token pair                     |
-| POST   | `/auth/register` | no     | Create an account → `201`, user and token pair              |
-| POST   | `/auth/refresh`  | no     | Rotate the refresh token → new token pair                   |
-| POST   | `/auth/logout`   | no     | Revoke the session (idempotent `204`). Backend only for now |
-| GET    | `/tasks`         | bearer | List with `page`, `pageSize`, `q`, `status`, `priority`     |
-| POST   | `/tasks`         | bearer | Create → `201`                                              |
-| GET    | `/tasks/stats`   | bearer | `total`, `done`, `overdue`, `highPriorityPending`           |
-| GET    | `/tasks/:id`     | bearer | One task                                                    |
-| PUT    | `/tasks/:id`     | bearer | Replace a task                                              |
-| DELETE | `/tasks/:id`     | bearer | Delete → `204`                                              |
-| POST   | `/__reset`       | no     | Restore seed data. **Not available in production**          |
+| Method | Path             | Auth   | Purpose                                                              |
+| ------ | ---------------- | ------ | -------------------------------------------------------------------- |
+| GET    | `/health`        | no     | Liveness probe (`{"status":"ok"}`)                                   |
+| POST   | `/auth/login`    | no     | E-mail + password → user and token pair                              |
+| POST   | `/auth/register` | no     | Create an account → `201`, user and token pair                       |
+| POST   | `/auth/refresh`  | no     | Rotate the refresh token → new token pair                            |
+| POST   | `/auth/logout`   | no     | Revoke the session (idempotent `204`). Called by the app on sign-out |
+| GET    | `/tasks`         | bearer | List with `page`, `pageSize`, `q`, `status`, `priority`              |
+| POST   | `/tasks`         | bearer | Create → `201`                                                       |
+| GET    | `/tasks/stats`   | bearer | `total`, `done`, `overdue`, `highPriorityPending`                    |
+| GET    | `/tasks/:id`     | bearer | One task                                                             |
+| PUT    | `/tasks/:id`     | bearer | Replace a task                                                       |
+| DELETE | `/tasks/:id`     | bearer | Delete → `204`                                                       |
+| POST   | `/__reset`       | no     | Restore seed data. **Not available in production**                   |
 
 Every error has the same body: `{ "code": "...", "message": "...", "details": [...]? }`. The Flutter
 app only reads `code`. Common codes: `invalid_credentials`, `email_taken`, `validation_error`,

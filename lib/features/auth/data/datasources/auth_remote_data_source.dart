@@ -14,6 +14,11 @@ abstract interface class AuthRemoteDataSource {
 
   /// Creates an account.
   Future<AuthResponseDto> register(RegisterRequestDto request);
+
+  /// Revokes the server-side session behind [refreshToken].
+  ///
+  /// The server answers 204 even when the token is unknown or already revoked.
+  Future<void> logout(String refreshToken);
 }
 
 /// [AuthRemoteDataSource] backed by Dio.
@@ -30,6 +35,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseDto> register(RegisterRequestDto request) =>
       _post(AuthEndpoints.register, request.toJson());
+
+  @override
+  Future<void> logout(String refreshToken) async {
+    try {
+      await _dio.post<void>(
+        AuthEndpoints.logout,
+        data: {'refreshToken': refreshToken},
+        // The refresh token is the credential here: no bearer, and a 401 must
+        // never start a token refresh while the user is signing out.
+        options: Options(extra: {RequestExtras.skipAuth: true}),
+      );
+    } on DioException catch (error) {
+      throw DioExceptionMapper.map(error);
+    }
+  }
 
   Future<AuthResponseDto> _post(String path, Map<String, dynamic> body) async {
     final Response<Map<String, dynamic>> response;

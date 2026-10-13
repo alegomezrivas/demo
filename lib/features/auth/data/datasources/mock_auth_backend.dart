@@ -41,6 +41,11 @@ class MockAuthBackend {
       pattern: NetworkConstants.refreshPath,
       handler: _refresh,
     ),
+    MockRoute(
+      method: 'POST',
+      pattern: AuthEndpoints.logout,
+      handler: _logout,
+    ),
   ];
 
   MockResponse _login(MockRequest request) {
@@ -97,6 +102,20 @@ class MockAuthBackend {
         'refreshToken': session['refreshToken'],
       },
     );
+  }
+
+  /// Revokes a refresh token. Like the real API it is idempotent: unknown or
+  /// already revoked tokens still answer 204.
+  MockResponse _logout(MockRequest request) {
+    final token = _text(_body(request), 'refreshToken');
+    if (token.isEmpty) {
+      return const MockResponse(
+        statusCode: 422,
+        data: {'code': 'validation_error'},
+      );
+    }
+    _refreshOwners.remove(token);
+    return const MockResponse(statusCode: 204);
   }
 
   /// Issues a new token pair (rotating refresh tokens) for [account].
