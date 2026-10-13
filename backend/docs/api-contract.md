@@ -230,6 +230,15 @@ Si llegan ambos headers, `X-Mock-Error` tiene prioridad. Un valor desconocido se
 - **Contraseñas:** argon2id. En `login` se verifica siempre un hash (aunque el usuario no exista) para igualar tiempos.
 - **Códigos de error de `register`:** `details` por campo con `issue` entre `too_small`, `too_big`, `invalid_format`, `invalid_type`, `unrecognized_keys`, `missing_uppercase`, `missing_lowercase`, `missing_digit`, `missing_symbol`.
 
+## 4.4 Detalles de tareas implementados
+
+- **Aislamiento:** todas las operaciones de `/tasks` se filtran por el usuario del token; el propietario nunca se acepta del cliente ni se devuelve.
+- **Semilla:** `user-0` (demo) tiene 23 tareas (`task-0`…`task-22`, igual que el mock de la app) y `user-1` (Ana) tiene 5 (`task-23`…`task-27`). Las cuentas nuevas empiezan vacías.
+- **Consulta de `GET /tasks`:** `status=all` también se acepta (equivale a omitirlo); parámetros desconocidos se ignoran; `q` admite hasta 100 caracteres (más → 422); `page`/`pageSize` solo admiten enteros de hasta 9 dígitos (si no → 422) y se recortan a `page ≥ 1`, `1 ≤ pageSize ≤ 100`.
+- **Orden:** `createdAt` descendente y, si empatan, `id` descendente, para que la paginación sea estable.
+- **Cuerpo de crear/actualizar:** estricto; `id`, `createdAt` y propietario no se pueden enviar. `dueDate` acepta cualquier instante ISO 8601 (la app envía UTC con hasta microsegundos) y se devuelve normalizado a milisegundos (`...123Z`). `title` se recorta; `description` no.
+- **`POST /__reset`:** responde 204 sin cuerpo y restaura usuarios y tareas semilla e invalida todas las sesiones. No requiere autenticación y no existe en producción (404).
+
 ## 4.2 Reglas decididas
 
 - **Tareas por usuario.** Cada usuario solo ve y modifica las suyas. Acceder a una tarea ajena responde **404 `not_found`** (nunca 403), para no revelar que existe. El usuario demo arranca con 23 tareas semilla; las cuentas nuevas, vacías.

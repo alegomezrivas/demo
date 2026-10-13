@@ -12,11 +12,23 @@ import { InMemoryRefreshTokenRepository } from './contexts/auth/infrastructure/i
 import { InMemoryUserRepository } from './contexts/auth/infrastructure/in-memory-user-repository.js';
 import { JoseAccessTokenService } from './contexts/auth/infrastructure/jose-access-token-service.js';
 import type { AuthUseCases } from './contexts/auth/presentation/http/auth-controller.js';
-import { SystemClock, type Clock } from './shared/clock.js';
+import {
+  CreateTask,
+  DeleteTask,
+  GetTask,
+  GetTaskStats,
+  ListTasks,
+  UpdateTask,
+} from './contexts/tasks/application/task-use-cases.js';
+import { InMemoryTaskRepository } from './contexts/tasks/infrastructure/in-memory-task-repository.js';
+import type { TaskUseCases } from './contexts/tasks/presentation/http/task-controller.js';
+import { buildSeedTasks } from './seed/tasks.js';
 import { buildSeedUsers } from './seed/users.js';
+import { SystemClock, type Clock } from './shared/clock.js';
 
 export interface Container {
   readonly auth: AuthUseCases;
+  readonly tasks: TaskUseCases;
   readonly authenticate: AuthenticateAccessToken;
   /** Restores the seed data (used by `POST /__reset`). */
   reset(): Promise<void>;
@@ -51,12 +63,23 @@ export async function createContainer(
     config.jwt.refreshTtlSeconds,
   );
 
+  const tasks = new InMemoryTaskRepository();
+
   const seed = async (): Promise<void> => {
     for (const user of await buildSeedUsers(hasher)) await users.add(user);
+    tasks.load(buildSeedTasks(clock.now()));
   };
   await seed();
 
   return {
+    tasks: {
+      list: new ListTasks(tasks),
+      get: new GetTask(tasks),
+      create: new CreateTask(tasks, clock),
+      update: new UpdateTask(tasks),
+      remove: new DeleteTask(tasks),
+      stats: new GetTaskStats(tasks, clock),
+    },
     auth: {
       register: new RegisterUser(users, hasher, sessions),
       login: new LoginUser(users, hasher, sessions),
@@ -68,6 +91,7 @@ export async function createContainer(
       users.clear();
       refreshTokens.clear();
       await seed();
+      // Tasks are replaced wholesale by seed(), so nothing else to clear.
     },
   };
 }
