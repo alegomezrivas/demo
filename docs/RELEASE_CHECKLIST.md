@@ -35,7 +35,7 @@ Tick every item before publishing. Commands use FVM (version pinned in `.fvmrc`)
 - [ ] Final icons and splash screen (Android `mipmap-*`, iOS `AppIcon.appiconset`)
 - [ ] Id `com.softstark.demo` (or the final one) matches on Android and iOS
 - [ ] `version` / build number bumped in `pubspec.yaml`
-- [ ] Minimal permissions: Android only `INTERNET` and `USE_BIOMETRIC`; iOS `NSFaceIDUsageDescription` written
+- [ ] Minimal permissions: Android only `INTERNET` and `USE_BIOMETRIC` (the picture picker uses system intents, so it declares no camera permission: confirm in the merged manifest); iOS `NSFaceIDUsageDescription`, `NSPhotoLibraryUsageDescription` and `NSCameraUsageDescription` written
 
 ## 4. Signing
 
@@ -55,6 +55,8 @@ fvm flutter build ipa --release --obfuscate \
 - [ ] R8 and resource shrinking are on (already configured in `android/app/build.gradle.kts`)
 - [ ] `debug-info/` archived **outside** the repo (it is used to symbolicate crashes)
 - [ ] Test on real devices: sign-in, tasks, settings, biometrics, screenshot blocking, airplane mode
+- [ ] Test the sign-up on real devices: e-mail suggestions above the keyboard, code autofill (iOS `oneTimeCode`), resend countdown, username check offline, camera and gallery (grant **and** deny), cropping, TalkBack/VoiceOver reading each step, 2× font size, dark mode
+- [ ] "Remember me" off: after killing the app the session is gone and nothing remains in the Keychain/Keystore
 
 ## 6. Security verification on the binary
 
@@ -64,6 +66,8 @@ fvm flutter build ipa --release --obfuscate \
 - [ ] On a rooted/jailbroken device, `ROOT_POLICY` is applied
 - [ ] Check the logs of a release build: no tokens or personal data may appear
 - [ ] The mock's demo account (`demo@starkshowcase.dev`) does **not** work against the real API
+- [ ] The in-app mock backend (`MockAuthBackend`, code `123456`) is not in the release binary (`kReleaseMode` drops it; check `strings` of the build for `mock-verification-`)
+- [ ] No confirmation code, verification token or password in release logs
 
 ## 7. Stores
 
@@ -72,6 +76,9 @@ fvm flutter build ipa --release --obfuscate \
 - [ ] Upload **only** after explicit confirmation; tag `v<version>+<build>` after publishing
 
 ## 8. Blockers before production with a real API
+
+- [ ] **Real e-mail delivery** for the sign-up code (`ConfirmationCodeSender` in the backend) and **remove `FIXED_CONFIRMATION_CODE`** from the production environment (`render.yaml` declares a demo value): while it is set, anyone can register with any address
+- [ ] Replace the demo terms text (`termsUse*`, `termsPrivacy*`, `termsData*` in `lib/l10n/app_*.arb`) with the real legal text
 
 - [ ] **SPKI pinning in the handshake**: pin the public-key hash (not the whole certificate) with ≥ 2 fingerprints (current + backup) and validate it during TLS, not when the response headers arrive
 - [ ] **Release build smoke test** with R8 + `--obfuscate` on real Android and iOS devices (the `jailbreak_root_detection` and `screen_protector` plugins may need rules in `proguard-rules.pro`)

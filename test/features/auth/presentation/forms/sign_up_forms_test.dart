@@ -92,6 +92,20 @@ void main() {
     });
   });
 
+  group('rememberOf', () {
+    test('is true while the box is checked', () {
+      expect(SignUpForms.rememberOf(forms.password), isTrue);
+    });
+
+    test('is false when unchecked or unset', () {
+      set(forms.password, SignUpForms.rememberField, false);
+      expect(SignUpForms.rememberOf(forms.password), isFalse);
+
+      set(forms.password, SignUpForms.rememberField, null);
+      expect(SignUpForms.rememberOf(forms.password), isFalse);
+    });
+  });
+
   group('textOf', () {
     test('returns the typed text or an empty string', () {
       expect(SignUpForms.textOf(forms.email, SignUpForms.emailField), '');

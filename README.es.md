@@ -98,16 +98,43 @@ Claves (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINN
 
 ## Autenticación (feature `auth`)
 
-Login y registro completos con `reactive_forms`, casos de uso (`Login`, `Register`, `Logout`,
-`GetCurrentUser`), repositorio con datasources remoto (Dio) y local (almacenamiento seguro) y DTOs `freezed`.
+Login y un registro en varios pasos con `reactive_forms`, casos de uso (`Login`, `SendConfirmationCode`,
+`VerifyConfirmationCode`, `CheckUsernameAvailability`, `CompleteSignUp`, `UploadAvatar`, `Logout`,
+`GetCurrentUser`), repositorios con datasources remoto (Dio) y local (almacenamiento seguro) y DTOs `freezed`.
+Las pantallas siguen los patrones de layout de un onboarding moderno (una pregunta por pantalla, botones en píldora,
+código de seis casillas) usando solo los tokens de diseño, los textos y la ilustración propios de esta app.
 
-- **Cuenta demo del mock**: `demo@starkshowcase.dev` / `Demo1234!` (solo existe en memoria con `USE_MOCK_API=true`).
-- **Guard del router**: sin sesión solo se accede a `/login` y `/register`; con sesión, `/login` redirige al inicio.
-  `SessionService` notifica al router y se desloguea solo cuando falla el refresh del token.
-- **Sesión persistente**: al abrir la app se restaura el usuario guardado (tokens en Keystore/Keychain).
-- **Pantallas sensibles**: login y registro activan `ScreenProtection` (con conteo de referencias).
-- **Errores**: mensajes genéricos y localizados (credenciales incorrectas, correo ya registrado, sin conexión...).
-- **Entrada**: validadores en los formularios y `InputSanitizer` en el repositorio (la contraseña nunca se modifica).
+**Flujo de registro** (`/welcome` → `/signup/…`): correo (con sugerencias de dominio) → código de 6 dígitos →
+contraseña y «Recordar sesión» → nombre completo → nombre de usuario (comprobado mientras se escribe) → términos →
+foto de perfil opcional → bienvenida. La cuenta se crea al aceptar los términos; el paso de la foto ya tiene sesión.
+
+- **Un ViewModel para el flujo**: `SignUpFlowViewModel` guarda un `SignUpState` inmutable, un `FormGroup` por paso
+  (`SignUpForms`) y solo llama a casos de uso. `SignUpProgress` + `AuthGuard` rechazan los enlaces que se saltan un
+  paso y, una vez creada la cuenta, los pasos anteriores quedan cerrados.
+- **Código por correo**: el backend no envía correos. El código es `FIXED_CONFIRMATION_CODE` (`123456` por defecto
+  fuera de producción; el mock de la app usa el mismo). Los códigos caducan a los 10 minutos, se descartan tras 5
+  fallos y se pueden volver a pedir cada 30 segundos (la pantalla cuenta atrás). Ver `backend/README.es.md`.
+- **Recordar sesión**: marcado = tokens y usuario en `flutter_secure_storage`. Desmarcado = **solo en memoria**: no se
+  escribe nada en disco, la sesión no se restaura al reabrir la app, los tokens renovados siguen en memoria y Ajustes
+  no ofrece la confirmación biométrica (no hay sesión guardada que proteger). Cerrar sesión siempre limpia ambos.
+- **Foto de perfil**: galería o cámara (los permisos se piden solo al usarlas, con un mensaje claro si se
+  deniegan), recorte circular y recodificación fuera del hilo de la UI a un JPEG de ≤ 512 px y menos de 200 KB. Al
+  recodificar se pierden los datos EXIF; se rechazan los orígenes de más de 15 MB o 16 megapíxeles antes de decodificar; el servidor vuelve a validar los bytes. Las fotos viven en la memoria del backend.
+- **Qué se olvida y cuándo**: salir del flujo (atrás desde el primer paso, «Ya tengo cuenta») vacía los formularios,
+  el token de verificación y la contraseña; también se descartan al crearse la cuenta. Cuando caduca una sesión se
+  borra el perfil guardado junto con los tokens. Las respuestas que llegan después de volver atrás se ignoran.
+- **Cuenta demo del mock**: `demo@starkshowcase.dev` / `Demo1234!`, usuario `demo` (solo existe en memoria con `USE_MOCK_API=true`).
+- **Guard del router**: sin sesión solo se accede a las pantallas de autenticación (los visitantes aterrizan en
+  `/welcome`); con sesión redirigen al inicio. `SessionService` notifica al router y se desloguea solo cuando falla
+  el refresh del token.
+- **Pantallas sensibles**: login y el paso de la contraseña activan `ScreenProtection` (con conteo de referencias).
+- **Errores**: mensajes genéricos y localizados (credenciales incorrectas, código erróneo o caducado, correo o
+  usuario ya usados, sin conexión...). Nunca se registran códigos, tokens ni contraseñas.
+- **Entrada**: validadores en los formularios (`AuthRules` es la única fuente Dart pura de las reglas),
+  `InputSanitizer` en los repositorios (la contraseña y el código nunca se modifican).
+- **Accesibilidad y movimiento**: áreas de 48 dp, controles etiquetados, regiones *live* para los errores, tokens con
+  contraste AA, claro/oscuro, 320×568 con texto 2× y teclado abierto (con tests). Las transiciones y animaciones de
+  mensajes salen de `AppMotion` y desaparecen si el sistema pide reducir el movimiento.
 
 ## Funcionalidades
 
@@ -117,7 +144,7 @@ La app es un gestor de tareas con tres pestañas (barra de navegación inferior)
 |---|---|
 | **Inicio** (`dashboard`) | Saludo, % completado y estadísticas (total, completadas, vencidas, prioridad alta pendientes). Se recarga sola cuando cambian las tareas en otra pestaña. |
 | **Tareas** (`tasks`) | Lista paginada (scroll infinito), búsqueda con *debounce*, filtros por estado y prioridad, completar con el checkbox (optimista, con rollback), borrar con confirmación, crear y editar en un formulario `reactive_forms`. |
-| **Ajustes** (`settings`) | Perfil, tema (sistema/claro/oscuro), idioma (sistema/español/inglés), confirmación biométrica y cierre de sesión. |
+| **Ajustes** (`settings`) | Perfil, tema (sistema/claro/oscuro), idioma (sistema/español/inglés), confirmación biométrica (solo con la sesión recordada) y cierre de sesión. |
 
 - **Preferencias**: se guardan en `shared_preferences` (no son secretos) y se aplican al instante vía `AppPreferences`.
 - **Confirmación biométrica** (opcional): al activarla se pide huella/rostro/PIN antes de **eliminar tareas** y **cerrar sesión**
@@ -209,3 +236,8 @@ Para reproducir el *gate* de cobertura en local: `fvm flutter test --coverage &&
 - **No se pudo compilar en Android/iOS** en el entorno de desarrollo (sin Android SDK ni Xcode): falta una prueba de
   humo de un build release con R8 y ofuscación (ver `docs/RELEASE_CHECKLIST.es.md`).
 - Las pruebas de plugins nativos usan *mocks*: valídalas en dispositivos reales.
+- **Registro con un backend público**: el código de confirmación es fijo y está documentado, así que cualquiera puede
+  registrarse en una instancia pública; los datos viven en memoria (`backend/README.es.md`). Un proveedor real de
+  correo es una mejora futura tras `ConfirmationCodeSender`.
+- **Las pantallas de foto y registro** solo tienen tests de widgets y un backend mock: la cámara, el selector de la
+  galería, los diálogos de permisos y el comportamiento del teclado hay que comprobarlos en dispositivos reales.

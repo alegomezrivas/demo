@@ -165,4 +165,51 @@ void main() {
       expect(persistent.tokens, pair);
     });
   });
+
+  group('a session that ended', () {
+    test('leaves no profile behind once the tokens are gone', () async {
+      await source.saveSession(tokens: pair, user: user);
+      // What the auth interceptor does when the refresh token is rejected.
+      await tokens.clear();
+
+      expect(await source.readUser(), isNull);
+      expect(storage.values, isEmpty);
+    });
+
+    test('also forgets an in-memory profile', () async {
+      await source.saveSession(tokens: pair, user: user, persist: false);
+      await tokens.clear();
+
+      expect(await source.readUser(), isNull);
+
+      // A later token pair must not resurrect the old profile.
+      await tokens.save(pair);
+      expect(await source.readUser(), isNull);
+    });
+
+    test(
+      'clear still removes the profile when clearing the tokens fails',
+      () async {
+        await source.saveSession(tokens: pair, user: user);
+        final failing = AuthLocalDataSourceImpl(
+          _FailingTokens(persistent),
+          storage,
+        );
+        await failing.saveSession(tokens: pair, user: user);
+
+        await expectLater(failing.clear(), throwsA(isA<StateError>()));
+
+        expect(storage.values, isEmpty);
+      },
+    );
+  });
+}
+
+/// Token storage whose `clear` fails, to prove nothing is left half-wiped.
+class _FailingTokens extends ScopedTokenStorage {
+  // ignore: matching_super_parameters, the parent's field is private
+  _FailingTokens(super.persistent);
+
+  @override
+  Future<void> clear() async => throw StateError('storage error');
 }

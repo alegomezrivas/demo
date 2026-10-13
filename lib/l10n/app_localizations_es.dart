@@ -83,12 +83,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authLoginButton => 'Entrar';
 
   @override
-  String get authNoAccount => '¿No tienes cuenta?';
-
-  @override
-  String get authGoToRegister => 'Crear cuenta';
-
-  @override
   String get authTogglePassword => 'Mostrar u ocultar contraseña';
 
   @override
@@ -528,4 +522,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settingsBiometricNeedsRememberedSession =>
       'La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado.';
+
+  @override
+  String get authNoAccountCreate => '¿No tienes cuenta? Crear cuenta';
 }

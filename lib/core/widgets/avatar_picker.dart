@@ -93,6 +93,7 @@ class _Avatar extends StatelessWidget {
       child: imageBytes == null
           ? placeholder
           : Image.memory(
+              // non-null: this branch runs only when a picture exists
               imageBytes!,
               width: size,
               height: size,

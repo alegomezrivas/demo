@@ -32,8 +32,6 @@
   "authEmailLabel": "Correo electrónico",
   "authPasswordLabel": "Contraseña",
   "authLoginButton": "Entrar",
-  "authNoAccount": "¿No tienes cuenta?",
-  "authGoToRegister": "Crear cuenta",
   "authTogglePassword": "Mostrar u ocultar contraseña",
   "authInvalidCredentials": "Correo o contraseña incorrectos",
   "authEmailTaken": "Ya existe una cuenta con ese correo",
@@ -238,5 +236,6 @@
   },
   "signUpDoneDescription": "Tu cuenta está lista. Empieza a organizar tus tareas.",
   "signUpDoneButton": "Continuar",
-  "settingsBiometricNeedsRememberedSession": "La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado."
+  "settingsBiometricNeedsRememberedSession": "La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado.",
+  "authNoAccountCreate": "¿No tienes cuenta? Crear cuenta"
 }

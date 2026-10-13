@@ -29,10 +29,10 @@ class LoginView extends StatelessWidget {
           child: AppStepScaffold(
             title: l10n.authLoginTitle,
             description: l10n.authLoginSubtitle,
-            onBack: viewModel.goToSignUp,
+            onBack: viewModel.goToWelcome,
             bottomLink: TextButton(
-              onPressed: viewModel.goToSignUp,
-              child: Text('${l10n.authNoAccount} ${l10n.authGoToRegister}'),
+              onPressed: viewModel.goToWelcome,
+              child: Text(l10n.authNoAccountCreate),
             ),
             actions: [
               AppPrimaryButton(

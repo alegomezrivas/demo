@@ -6,6 +6,7 @@ import 'package:demo/core/error/exceptions.dart';
 import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/services/image_processor.dart';
 import 'package:demo/core/services/image_source_service.dart';
+import 'package:demo/features/auth/presentation/viewmodels/avatar_step_view_model.dart';
 import 'package:demo/features/auth/presentation/views/sign_up_avatar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,7 +36,14 @@ void main() {
     processor = MockImageProcessor();
     locator
       ..registerSingleton<ImageSourceService>(source)
-      ..registerSingleton<ImageProcessor>(processor);
+      ..registerSingleton<ImageProcessor>(processor)
+      ..registerFactory<AvatarStepViewModel>(
+        () => AvatarStepViewModel(
+          source: source,
+          processor: processor,
+          flow: harness.flow,
+        ),
+      );
     when(source.pick(any)).thenAnswer((_) async => png);
     when(processor.toAvatarJpeg(any)).thenAnswer((_) async => jpeg);
   });

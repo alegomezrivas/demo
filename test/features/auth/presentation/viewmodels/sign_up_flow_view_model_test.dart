@@ -257,6 +257,8 @@ void main() {
       viewModel.start();
       typeEmail();
       await viewModel.submitEmail();
+      // The person goes back to the first step and taps "Next" again.
+      viewModel.back();
       clearInteractions(sendCode);
       clearInteractions(navigation);
 
@@ -275,6 +277,10 @@ void main() {
       expect(viewModel.state.isEmailVerified, isTrue);
       expect(progress.canEnter(SignUpStep.password), isTrue);
 
+      // Back to the first step to change the address.
+      viewModel
+        ..back()
+        ..back();
       typeEmail('otra@test.com');
       await viewModel.submitEmail();
 
@@ -957,6 +963,273 @@ void main() {
 
       await expectLater(viewModel.protectScreen(enabled: true), completes);
     });
+  });
+
+  group('leaving the flow', () {
+    test('backing out of the first step forgets everything typed', () async {
+      viewModel.start();
+      typeEmail();
+      typePassword();
+
+      viewModel.back();
+
+      verify(navigation.pop<Object?>()).called(1);
+      expect(progress.hasStarted, isFalse);
+      expect(
+        SignUpForms.textOf(viewModel.forms.password, SignUpForms.passwordField),
+        isEmpty,
+      );
+      expect(
+        SignUpForms.textOf(viewModel.forms.email, SignUpForms.emailField),
+        isEmpty,
+      );
+    });
+
+    test('backing out of a later step keeps what was typed', () async {
+      viewModel.start();
+      typeEmail();
+      await viewModel.submitEmail();
+
+      viewModel.back();
+
+      expect(viewModel.state.email, 'lucia@test.com');
+      expect(progress.hasStarted, isTrue);
+    });
+
+    test('going back twice from the code step leaves the flow', () async {
+      viewModel.start();
+      typeEmail();
+      await viewModel.submitEmail();
+
+      viewModel
+        ..back()
+        ..back();
+
+      expect(progress.hasStarted, isFalse);
+      expect(viewModel.state.email, isEmpty);
+    });
+
+    test('opening the sign-in forgets the password and the proof', () async {
+      await reachTerms();
+
+      viewModel.goToLogin();
+
+      verify(navigation.go(AppRoutes.login)).called(1);
+      expect(viewModel.state.isEmailVerified, isFalse);
+      expect(
+        SignUpForms.textOf(viewModel.forms.password, SignUpForms.passwordField),
+        isEmpty,
+      );
+      expect(progress.hasStarted, isFalse);
+    });
+
+    test(
+      'reset empties the retired forms that screens may still show',
+      () async {
+        viewModel.start();
+        typePassword();
+        final oldForms = viewModel.forms;
+
+        viewModel.reset();
+
+        expect(
+          oldForms.password.control(SignUpForms.passwordField).value,
+          isNull,
+        );
+        // Still usable: a screen animating out must not crash on it.
+        expect(
+          () =>
+              oldForms.password.control(SignUpForms.passwordField).value = 'x',
+          returnsNormally,
+        );
+      },
+    );
+  });
+
+  group('answers that arrive late', () {
+    test(
+      'going back while the code is being sent ignores the answer',
+      () async {
+        final pending = Completer<Either<Failure, Unit>>();
+        when(sendCode(any)).thenAnswer((_) => pending.future);
+        viewModel.start();
+        typeEmail();
+        clearInteractions(navigation);
+
+        final submit = viewModel.submitEmail();
+        viewModel.back();
+        pending.complete(right(unit));
+        await submit;
+
+        verifyNever(navigation.push<void>(AppRoutes.signUpCode));
+        expect(viewModel.state.email, isEmpty);
+        expect(viewModel.isBusy, isFalse);
+        expect(viewModel.resendSecondsLeft, 0);
+      },
+    );
+
+    test('restarting while the code is checked ignores the answer', () async {
+      viewModel.start();
+      typeEmail();
+      await viewModel.submitEmail();
+      final pending = Completer<Either<Failure, String>>();
+      when(verifyCode(any)).thenAnswer((_) => pending.future);
+      typeCode();
+
+      final submit = viewModel.submitCode();
+      viewModel.start();
+      pending.complete(right('tok'));
+      await submit;
+
+      expect(viewModel.state.isEmailVerified, isFalse);
+      verifyNever(navigation.push<void>(AppRoutes.signUpPassword));
+    });
+
+    test('a failure that arrives after leaving is not shown', () async {
+      final pending = Completer<Either<Failure, Unit>>();
+      when(sendCode(any)).thenAnswer((_) => pending.future);
+      viewModel.start();
+      typeEmail();
+
+      final submit = viewModel.submitEmail();
+      viewModel.reset();
+      pending.complete(left(const ServerFailure('email_taken')));
+      await submit;
+
+      expect(viewModel.failure, isNull);
+    });
+
+    test(
+      'an account created after leaving does not move the new flow',
+      () async {
+        await reachTerms();
+        final pending = Completer<Either<Failure, User>>();
+        when(completeSignUp(any)).thenAnswer((_) => pending.future);
+        clearInteractions(navigation);
+
+        final accept = viewModel.acceptTerms();
+        viewModel.reset();
+        pending.complete(right(user));
+        await accept;
+
+        verifyNever(navigation.go(AppRoutes.signUpAvatar));
+        expect(viewModel.state.hasAccount, isFalse);
+      },
+    );
+
+    test(
+      'a picture uploaded after leaving does not open the final step',
+      () async {
+        await reachTerms();
+        await viewModel.acceptTerms();
+        final pending = Completer<Either<Failure, User>>();
+        when(uploadAvatar(any)).thenAnswer((_) => pending.future);
+        clearInteractions(navigation);
+
+        final upload = viewModel.submitAvatar(jpeg);
+        viewModel.reset();
+        pending.complete(right(user));
+        await upload;
+
+        verifyNever(navigation.go(AppRoutes.signUpDone));
+        expect(viewModel.state.avatar, isNull);
+      },
+    );
+  });
+
+  group('double taps', () {
+    test('two quick taps on the username step push the terms once', () async {
+      viewModel.start();
+      typeUsername();
+
+      final first = viewModel.submitUsername();
+      final second = viewModel.submitUsername();
+      await Future.wait([first, second]);
+
+      verify(navigation.push<void>(AppRoutes.signUpTerms)).called(1);
+      expect(viewModel.isBusy, isFalse);
+    });
+
+    test('a username already known free is also pushed only once', () {
+      fakeAsync((async) {
+        viewModel.start();
+        typeUsername();
+        async.elapse(const Duration(seconds: 1));
+        async.flushMicrotasks();
+        clearInteractions(navigation);
+
+        viewModel.submitUsername();
+        viewModel.submitUsername();
+        async.flushMicrotasks();
+
+        verify(navigation.push<void>(AppRoutes.signUpTerms)).called(1);
+      });
+    });
+
+    test('leaving during the check does not open the terms', () async {
+      final pending = Completer<Either<Failure, bool>>();
+      when(checkUsername(any)).thenAnswer((_) => pending.future);
+      viewModel.start();
+      typeUsername();
+      clearInteractions(navigation);
+
+      final submit = viewModel.submitUsername();
+      viewModel.reset();
+      pending.complete(right(true));
+      await submit;
+
+      verifyNever(navigation.push<void>(AppRoutes.signUpTerms));
+    });
+  });
+
+  group('small details', () {
+    test(
+      'the same address in another case does not send a second code',
+      () async {
+        viewModel.start();
+        typeEmail();
+        await viewModel.submitEmail();
+        clearInteractions(sendCode);
+
+        typeEmail('LUCIA@Test.com');
+        await viewModel.submitEmail();
+
+        verifyZeroInteractions(sendCode);
+      },
+    );
+
+    test('skipping after a failed upload clears the failure', () async {
+      await reachTerms();
+      await viewModel.acceptTerms();
+      when(uploadAvatar(any)).thenAnswer(
+        (_) async => left(const ServerFailure('invalid_image')),
+      );
+      await viewModel.submitAvatar(jpeg);
+      expect(viewModel.failure, isNotNull);
+
+      viewModel.skipAvatar();
+
+      expect(viewModel.failure, isNull);
+    });
+
+    test(
+      'an unexpected "remember me" value counts as not remembering',
+      () async {
+        viewModel.start();
+        typePassword();
+        viewModel.forms.password.control(SignUpForms.rememberField).value =
+            null;
+        viewModel.submitPassword();
+        typeName();
+        viewModel.submitName();
+        typeUsername();
+        await viewModel.submitUsername();
+        typeEmail();
+        await viewModel.submitEmail();
+
+        expect(SignUpForms.rememberOf(viewModel.forms.password), isFalse);
+      },
+    );
   });
 
   test('dispose cancels pending work without errors', () {

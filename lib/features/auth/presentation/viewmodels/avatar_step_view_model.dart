@@ -47,6 +47,7 @@ class AvatarStepViewModel extends BaseViewModel {
   Uint8List? _preview;
   AvatarIssue _issue = AvatarIssue.none;
   bool _isUploading = false;
+  bool _isPicking = false;
 
   /// The picture as chosen, before cropping (what the cropper starts from).
   Uint8List? get original => _original;
@@ -61,12 +62,14 @@ class AvatarStepViewModel extends BaseViewModel {
   bool get hasPicture => _preview != null;
 
   /// Whether the picture is being prepared or sent.
-  bool get isWorking => isBusy || _isUploading || _flow.isBusy;
+  bool get isWorking => isBusy || _isUploading || _isPicking || _flow.isBusy;
 
   /// Asks the system for a picture; cancelling leaves things as they were.
   Future<void> pick(PhotoSource source) async {
     if (isWorking) return;
     _issue = AvatarIssue.none;
+    _isPicking = true;
+    notifyListeners();
     try {
       final bytes = await _source.pick(source);
       if (bytes == null) {
@@ -81,6 +84,11 @@ class AvatarStepViewModel extends BaseViewModel {
           : AvatarIssue.galleryDenied;
     } on InvalidImageException catch (error) {
       _issue = _issueFor(error);
+    } on Exception {
+      // Anything unexpected from the platform is "that did not work".
+      _issue = AvatarIssue.invalidImage;
+    } finally {
+      _isPicking = false;
     }
     notifyListeners();
   }
@@ -102,8 +110,17 @@ class AvatarStepViewModel extends BaseViewModel {
     try {
       final jpeg = await _processor.toAvatarJpeg(picture);
       await _flow.submitAvatar(jpeg);
+      // The pictures are no longer needed once uploaded (or when it failed
+      // for good, the person picks again): do not keep the original, which
+      // may still carry metadata, in memory.
+      if (_flow.state.avatar != null) {
+        _original = null;
+        _preview = null;
+      }
     } on InvalidImageException catch (error) {
       _issue = _issueFor(error);
+    } on Exception {
+      _issue = AvatarIssue.invalidImage;
     } finally {
       _isUploading = false;
       notifyListeners();
@@ -116,5 +133,9 @@ class AvatarStepViewModel extends BaseViewModel {
       : AvatarIssue.invalidImage;
 
   /// Continues without a picture.
-  void skip() => _flow.skipAvatar();
+  void skip() {
+    _original = null;
+    _preview = null;
+    _flow.skipAvatar();
+  }
 }

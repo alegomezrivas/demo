@@ -135,6 +135,7 @@ class _OtpInputState extends State<OtpInput> {
             if (widget.errorText != null) ...[
               SizedBox(height: spacing.sm),
               Text(
+                // non-null: guarded by the `if` above
                 widget.errorText!,
                 style: context.text.bodySmall.copyWith(
                   color: context.colors.error,

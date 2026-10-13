@@ -29,8 +29,6 @@
   "authEmailLabel": "Email",
   "authPasswordLabel": "Password",
   "authLoginButton": "Sign in",
-  "authNoAccount": "Don't have an account?",
-  "authGoToRegister": "Create account",
   "authTogglePassword": "Show or hide password",
   "authInvalidCredentials": "Incorrect email or password",
   "authEmailTaken": "An account with that email already exists",
@@ -235,5 +233,6 @@
   },
   "signUpDoneDescription": "Your account is ready. Start organizing your tasks.",
   "signUpDoneButton": "Continue",
-  "settingsBiometricNeedsRememberedSession": "Biometric confirmation is only available when the session is remembered. Sign out and sign in again with “Remember me” on."
+  "settingsBiometricNeedsRememberedSession": "Biometric confirmation is only available when the session is remembered. Sign out and sign in again with “Remember me” on.",
+  "authNoAccountCreate": "Don't have an account? Create account"
 }

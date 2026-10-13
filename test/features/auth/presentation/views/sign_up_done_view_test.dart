@@ -130,5 +130,19 @@ void main() {
       expect(find.text('Continue'), findsOneWidget);
       harness.flow.reset();
     });
+
+    testWidgets('keeps the greeting while the flow resets behind it', (
+      tester,
+    ) async {
+      await pumpView(tester);
+
+      await tester.tap(find.text('Continuar'));
+      await tester.pump();
+
+      // Entering the app reset the flow; this page is still animating out.
+      expect(harness.flow.state.user, isNull);
+      expect(find.text('Te damos la bienvenida, @lucia'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

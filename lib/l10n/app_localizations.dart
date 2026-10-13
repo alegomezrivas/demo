@@ -230,18 +230,6 @@ abstract class AppLocalizations {
   /// **'Entrar'**
   String get authLoginButton;
 
-  /// No description provided for @authNoAccount.
-  ///
-  /// In es, this message translates to:
-  /// **'¿No tienes cuenta?'**
-  String get authNoAccount;
-
-  /// No description provided for @authGoToRegister.
-  ///
-  /// In es, this message translates to:
-  /// **'Crear cuenta'**
-  String get authGoToRegister;
-
   /// No description provided for @authTogglePassword.
   ///
   /// In es, this message translates to:
@@ -1033,6 +1021,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'La confirmación biométrica solo está disponible cuando la sesión se recuerda. Cierra sesión e inicia de nuevo con “Recordar sesión” activado.'**
   String get settingsBiometricNeedsRememberedSession;
+
+  /// No description provided for @authNoAccountCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes cuenta? Crear cuenta'**
+  String get authNoAccountCreate;
 }
 
 class _AppLocalizationsDelegate

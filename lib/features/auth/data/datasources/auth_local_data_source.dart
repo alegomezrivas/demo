@@ -62,7 +62,13 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<UserDto?> readUser() async {
-    if (await _tokens.read() == null) return null;
+    if (await _tokens.read() == null) {
+      // No session: a profile left behind (for example by an expired
+      // session) must not outlive it.
+      _memoryUser = null;
+      await _storage.delete(_userKey);
+      return null;
+    }
     if (!_persist) return _memoryUser;
     final raw = await _storage.read(_userKey);
     if (raw == null) return null;
@@ -82,10 +88,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clear() async {
+    // Every step is attempted even if an earlier one fails, so a storage
+    // error cannot leave the user's profile behind.
     _memoryUser = null;
     _persist = true;
-    await _tokens.clear();
-    await _storage.delete(_userKey);
+    try {
+      await _tokens.clear();
+    } finally {
+      await _storage.delete(_userKey);
+    }
   }
 
   Future<void> _writeUser(UserDto user) async {

@@ -38,6 +38,8 @@ class ScopedTokenStorage implements SessionTokenStorage {
   @override
   Future<void> clear() async {
     _memory = null;
+    // Back to the default so a later plain `save` is persisted again.
+    _persist = true;
     await _persistent.clear();
   }
 }

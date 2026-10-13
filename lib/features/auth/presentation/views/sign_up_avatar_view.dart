@@ -1,5 +1,4 @@
 import 'package:demo/app/locator.dart';
-import 'package:demo/core/services/image_processor.dart';
 import 'package:demo/core/services/image_source_service.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/core/widgets/app_bottom_sheet.dart';
@@ -59,11 +58,7 @@ class SignUpAvatarView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final flow = locator<SignUpFlowViewModel>();
     return ViewModelBuilder<AvatarStepViewModel>.reactive(
-      viewModelBuilder: () => AvatarStepViewModel(
-        source: locator<ImageSourceService>(),
-        processor: locator<ImageProcessor>(),
-        flow: flow,
-      ),
+      viewModelBuilder: () => locator<AvatarStepViewModel>(),
       builder: (context, viewModel, _) {
         // The flow ViewModel owns the upload failure; rebuild with it too.
         return ListenableBuilder(

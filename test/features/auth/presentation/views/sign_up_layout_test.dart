@@ -2,6 +2,7 @@ import 'package:demo/app/locator.dart';
 import 'package:demo/core/services/image_processor.dart';
 import 'package:demo/core/services/image_source_service.dart';
 import 'package:demo/features/auth/presentation/forms/sign_up_forms.dart';
+import 'package:demo/features/auth/presentation/viewmodels/avatar_step_view_model.dart';
 import 'package:demo/features/auth/presentation/views/sign_up_avatar_view.dart';
 import 'package:demo/features/auth/presentation/views/sign_up_code_view.dart';
 import 'package:demo/features/auth/presentation/views/sign_up_done_view.dart';
@@ -27,9 +28,18 @@ void main() {
   setUp(() async {
     harness = SignUpHarness();
     await harness.register();
+    final source = MockImageSourceService();
+    final processor = MockImageProcessor();
     locator
-      ..registerSingleton<ImageSourceService>(MockImageSourceService())
-      ..registerSingleton<ImageProcessor>(MockImageProcessor());
+      ..registerSingleton<ImageSourceService>(source)
+      ..registerSingleton<ImageProcessor>(processor)
+      ..registerFactory<AvatarStepViewModel>(
+        () => AvatarStepViewModel(
+          source: source,
+          processor: processor,
+          flow: harness.flow,
+        ),
+      );
   });
 
   tearDown(() async {

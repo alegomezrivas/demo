@@ -36,8 +36,18 @@ class JpegAvatarProcessor implements ImageProcessor {
   /// First JPEG quality tried (lowered when the result is too big).
   final int startQuality;
 
+  /// Largest source file accepted, in bytes.
+  static const int maxSourceBytes = 15 * 1024 * 1024;
+
+  /// Largest source accepted, in pixels (a tiny file can declare huge sizes).
+  static const int maxSourcePixels = 16 * 1000 * 1000;
+
   @override
   Future<Uint8List> toAvatarJpeg(Uint8List source) async {
+    // Refuse huge inputs before spending memory on them.
+    if (source.length > maxSourceBytes) {
+      throw const InvalidImageException('too_large');
+    }
     final job = _Job(
       source: source,
       maxSide: maxSide,
@@ -73,6 +83,23 @@ const double _shrinkFactor = 0.8;
 
 /// Runs inside the isolate; returns bytes or an error code.
 (Uint8List?, String?) _process(_Job job) {
+  try {
+    return _convert(job);
+  } on Exception {
+    // A decoder failure on a damaged or hostile file is just "not a picture".
+    return (null, 'unsupported_image');
+  }
+}
+
+(Uint8List?, String?) _convert(_Job job) {
+  // Read only the header first: dimensions are known before any pixel buffer
+  // is allocated.
+  final info = img.findDecoderForData(job.source)?.startDecode(job.source);
+  if (info == null) return (null, 'unsupported_image');
+  if (info.width * info.height > JpegAvatarProcessor.maxSourcePixels) {
+    return (null, 'too_large');
+  }
+
   final decoded = img.decodeImage(job.source);
   if (decoded == null) return (null, 'unsupported_image');
 

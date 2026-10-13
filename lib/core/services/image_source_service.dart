@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:demo/core/error/exceptions.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -45,7 +47,7 @@ class ImagePickerSourceService implements ImageSourceService {
         // Skips the extra photo-library permission only needed for metadata.
         requestFullMetadata: false,
       );
-      return file?.readAsBytes();
+      return await file?.readAsBytes();
     } on PlatformException catch (error) {
       throw switch (error.code) {
         'photo_access_denied' => const PermissionDeniedException(
@@ -56,6 +58,8 @@ class ImagePickerSourceService implements ImageSourceService {
         ),
         _ => const InvalidImageException('pick_failed'),
       };
+    } on FileSystemException {
+      throw const InvalidImageException('pick_failed');
     }
   }
 }

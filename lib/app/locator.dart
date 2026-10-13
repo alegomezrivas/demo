@@ -44,6 +44,7 @@ import 'package:demo/features/auth/domain/usecases/send_confirmation_code_use_ca
 import 'package:demo/features/auth/domain/usecases/upload_avatar_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/verify_confirmation_code_use_case.dart';
 import 'package:demo/features/auth/presentation/services/sign_up_progress.dart';
+import 'package:demo/features/auth/presentation/viewmodels/avatar_step_view_model.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
 import 'package:demo/features/auth/presentation/viewmodels/sign_up_flow_view_model.dart';
 import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
@@ -277,6 +278,13 @@ Future<void> setupLocator({
         screenProtection: locator<ScreenProtection>(),
       ),
       dispose: (viewModel) => viewModel.dispose(),
+    )
+    ..registerFactory<AvatarStepViewModel>(
+      () => AvatarStepViewModel(
+        source: locator<ImageSourceService>(),
+        processor: locator<ImageProcessor>(),
+        flow: locator<SignUpFlowViewModel>(),
+      ),
     )
     ..registerFactory<IntegrityGateViewModel>(
       () => IntegrityGateViewModel(locator<DeviceIntegrityService>()),

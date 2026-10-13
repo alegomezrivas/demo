@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:demo/app/locator.dart';
 import 'package:demo/core/theme/app_theme.dart';
 import 'package:demo/core/widgets/app_primary_button.dart';
@@ -8,9 +10,21 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 /// Sign-up final step: a greeting with the new username.
-class SignUpDoneView extends StatelessWidget {
+///
+/// It keeps its own copy of the username and picture: entering the app resets
+/// the flow while this page is still animating out, and it must not flash
+/// empty.
+class SignUpDoneView extends StatefulWidget {
   /// Creates the view.
   const SignUpDoneView({super.key});
+
+  @override
+  State<SignUpDoneView> createState() => _SignUpDoneViewState();
+}
+
+class _SignUpDoneViewState extends State<SignUpDoneView> {
+  String? _username;
+  Uint8List? _avatar;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +34,10 @@ class SignUpDoneView extends StatelessWidget {
       viewModelBuilder: () => locator<SignUpFlowViewModel>(),
       disposeViewModel: false,
       builder: (context, viewModel, _) {
-        final username = viewModel.state.user?.username ?? '';
+        // Captured on the first build, while the flow still holds them.
+        _username ??= viewModel.state.user?.username ?? '';
+        _avatar ??= viewModel.state.avatar;
+        final username = _username ?? '';
         return Scaffold(
           body: SafeArea(
             child: Center(
@@ -34,7 +51,7 @@ class SignUpDoneView extends StatelessWidget {
                     children: [
                       Center(
                         child: AvatarPicker(
-                          imageBytes: viewModel.state.avatar,
+                          imageBytes: _avatar,
                           diameter: spacing.avatarLg,
                         ),
                       ),

@@ -149,8 +149,8 @@ void main() {
   });
 
   group('navigation', () {
-    test('goToSignUp opens the welcome screen', () {
-      viewModel.goToSignUp();
+    test('goToWelcome opens the welcome screen', () {
+      viewModel.goToWelcome();
 
       verify(navigation.go(AppRoutes.welcome)).called(1);
     });

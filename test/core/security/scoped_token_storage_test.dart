@@ -108,4 +108,16 @@ void main() {
       expect(await storage.read(), isNull);
     });
   });
+
+  group('after clear', () {
+    test('goes back to persisting', () async {
+      await storage.usePersistence(persist: false);
+      await storage.save(first);
+
+      await storage.clear();
+      await storage.save(second);
+
+      expect(persistent.tokens, second);
+    });
+  });
 }

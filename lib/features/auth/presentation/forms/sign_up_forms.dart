@@ -71,6 +71,13 @@ class SignUpForms {
     return value is String ? value : '';
   }
 
+  /// Whether the "remember me" box is checked; anything unexpected counts as
+  /// not remembering, the choice that stores less.
+  static bool rememberOf(FormGroup password) {
+    final value = password.control(rememberField).value;
+    return value is bool && value;
+  }
+
   /// Releases the controls.
   void dispose() {
     email.dispose();

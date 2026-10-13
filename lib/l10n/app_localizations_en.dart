@@ -82,12 +82,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authLoginButton => 'Sign in';
 
   @override
-  String get authNoAccount => 'Don\'t have an account?';
-
-  @override
-  String get authGoToRegister => 'Create account';
-
-  @override
   String get authTogglePassword => 'Show or hide password';
 
   @override
@@ -527,4 +521,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsBiometricNeedsRememberedSession =>
       'Biometric confirmation is only available when the session is remembered. Sign out and sign in again with “Remember me” on.';
+
+  @override
+  String get authNoAccountCreate => 'Don\'t have an account? Create account';
 }

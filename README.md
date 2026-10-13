@@ -98,17 +98,44 @@ Keys (`--dart-define-from-file`): `ENV`, `API_BASE_URL`, `USE_MOCK_API`, `PINNIN
 
 ## Authentication (`auth` feature)
 
-Complete sign-in and sign-up with `reactive_forms`, use cases (`Login`, `Register`, `Logout`,
-`GetCurrentUser`), a repository with remote (Dio) and local (secure storage) datasources, and `freezed` DTOs.
+Sign-in and a multi-step sign-up with `reactive_forms`, use cases (`Login`, `SendConfirmationCode`,
+`VerifyConfirmationCode`, `CheckUsernameAvailability`, `CompleteSignUp`, `UploadAvatar`, `Logout`,
+`GetCurrentUser`), repositories with remote (Dio) and local (secure storage) data sources, and `freezed` DTOs.
+The screens follow the layout patterns of a modern onboarding (one question per screen, pill buttons, a
+six-box code input) using only this app's own design tokens, strings and illustration.
 
-- **Mock demo account**: `demo@starkshowcase.dev` / `Demo1234!` (exists only in memory with `USE_MOCK_API=true`).
-- **Router guard**: without a session only `/login` and `/register` are reachable; with a session, `/login`
-  redirects to the home screen. `SessionService` notifies the router and signs the user out when the token
-  refresh is rejected.
-- **Persistent session**: on launch the stored user is restored (tokens live in the Keystore/Keychain).
-- **Sensitive screens**: sign-in and sign-up enable `ScreenProtection` (reference counted).
-- **Errors**: generic, localized messages (wrong credentials, e-mail already registered, no connection...).
-- **Input**: validators in the forms and `InputSanitizer` in the repository (passwords are never modified).
+**Sign-up flow** (`/welcome` → `/signup/…`): e-mail (with domain suggestions) → 6-digit code → password and
+"Remember me" → full name → username (checked while typing) → terms → optional profile picture → welcome.
+The account is created when the terms are accepted; the picture step already has a session.
+
+- **One ViewModel for the flow**: `SignUpFlowViewModel` keeps an immutable `SignUpState`, one `FormGroup` per step
+  (`SignUpForms`) and calls use cases only. `SignUpProgress` + `AuthGuard` refuse deep links that skip a step, and
+  once the account exists the earlier steps are closed.
+- **E-mail code**: the backend sends no e-mail. The code is `FIXED_CONFIRMATION_CODE` (`123456` by default outside
+  production; the in-app mock uses the same). Codes expire after 10 minutes, are discarded after 5 wrong guesses
+  and can be requested again every 30 seconds (the screen counts down). See `backend/README.md`.
+- **Remember me**: checked = tokens and user in `flutter_secure_storage`. Unchecked = **memory only**: nothing is
+  written to disk, the session is not restored on the next launch, refreshed tokens stay in memory, and Settings
+  does not offer biometric confirmation (there is no stored session to protect). Sign-out always clears both.
+- **Profile picture**: gallery or camera (permissions requested only when used, with a clear message if denied),
+  a circular crop, then re-encoding off the UI thread to a ≤ 512 px JPEG under 200 KB. Re-encoding drops the EXIF
+  data; sources over 15 MB or 16 megapixels are refused before decoding; the server validates the bytes again. Pictures live in the backend's memory.
+- **What is forgotten, and when**: leaving the flow (back from the first step, "I already have an account") empties
+  the forms, the verification token and the password; they are also dropped once the account exists. When a session
+  expires the stored profile is wiped together with the tokens. Answers that arrive after the person went back are
+  ignored.
+- **Mock demo account**: `demo@starkshowcase.dev` / `Demo1234!`, username `demo` (only in memory with `USE_MOCK_API=true`).
+- **Router guard**: without a session only the auth screens are reachable (visitors land on `/welcome`); with a
+  session they redirect to the home screen. `SessionService` notifies the router and signs the user out when the
+  token refresh is rejected.
+- **Sensitive screens**: sign-in and the password step enable `ScreenProtection` (reference counted).
+- **Errors**: generic, localized messages (wrong credentials, wrong or expired code, taken e-mail or username, no
+  connection...). Codes, tokens and passwords are never logged.
+- **Input**: validators in the forms (`AuthRules` is the single pure-Dart source of the rules), `InputSanitizer` in
+  the repositories (passwords and codes are never modified).
+- **Accessibility and motion**: 48 dp targets, labelled controls, live regions for errors, AA-contrast tokens,
+  light/dark, 320×568 with 2× text and an open keyboard (tested). Transitions and message animations come from
+  `AppMotion` and disappear when the system asks to reduce motion.
 
 ## Features
 
@@ -118,7 +145,7 @@ The app is a task manager with three tabs (bottom navigation bar):
 |---|---|
 | **Home** (`dashboard`) | Greeting, completion percentage and statistics (total, completed, overdue, open high-priority). It reloads by itself when tasks change in another tab. |
 | **Tasks** (`tasks`) | Paginated list (infinite scroll), debounced search, status and priority filters, completing with the checkbox (optimistic, with rollback), deleting with confirmation, and a `reactive_forms` form to create and edit. |
-| **Settings** (`settings`) | Profile, theme (system/light/dark), language (system/Spanish/English), biometric confirmation and sign-out. |
+| **Settings** (`settings`) | Profile, theme (system/light/dark), language (system/Spanish/English), biometric confirmation (only when the session is remembered) and sign-out. |
 
 - **Preferences**: stored in `shared_preferences` (they are not secrets) and applied instantly through `AppPreferences`.
 - **Biometric confirmation** (optional): when on, fingerprint/face/PIN is requested before **deleting tasks** and
@@ -212,3 +239,8 @@ To reproduce the coverage gate locally: `fvm flutter test --coverage && tool/che
 - **Android/iOS builds could not be compiled** in the development environment (no Android SDK or Xcode): a smoke
   test of a release build with R8 and obfuscation is still missing (see `docs/RELEASE_CHECKLIST.md`).
 - Native plugin tests use *mocks*: validate them on real devices.
+- **Sign-up on a public backend**: the confirmation code is fixed and documented, so anyone can register on a public
+  instance; data is in memory (`backend/README.md`). A real e-mail provider is a future improvement behind
+  `ConfirmationCodeSender`.
+- **Picture and sign-up screens** are covered by widget tests and a mock backend only: the camera, gallery picker,
+  permission dialogs and keyboard behaviour must be checked on real devices.

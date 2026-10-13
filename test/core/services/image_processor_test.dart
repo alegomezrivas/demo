@@ -189,4 +189,98 @@ void main() {
       );
     });
   });
+
+  group('JpegAvatarProcessor hostile input', () {
+    test('rejects a source file over the byte limit before decoding', () async {
+      final huge = Uint8List(JpegAvatarProcessor.maxSourceBytes + 1);
+
+      await expectLater(
+        processor.toAvatarJpeg(huge),
+        throwsA(
+          isA<InvalidImageException>().having(
+            (e) => e.code,
+            'code',
+            'too_large',
+          ),
+        ),
+      );
+    });
+
+    test('rejects a tiny file that declares enormous dimensions', () async {
+      final png = Uint8List.fromList(img.encodePng(solid(2, 2)));
+      final bomb = _withPngSize(png, 15000, 15000);
+
+      await expectLater(
+        processor.toAvatarJpeg(bomb),
+        throwsA(
+          isA<InvalidImageException>().having(
+            (e) => e.code,
+            'code',
+            'too_large',
+          ),
+        ),
+      );
+    });
+
+    test(
+      'turns the decoder own refusal of absurd sizes into an invalid picture',
+      () async {
+        final png = Uint8List.fromList(img.encodePng(solid(2, 2)));
+
+        await expectLater(
+          processor.toAvatarJpeg(_withPngSize(png, 20000, 20000)),
+          throwsA(isA<InvalidImageException>()),
+        );
+      },
+    );
+
+    test('accepts dimensions at the pixel budget', () async {
+      final png = Uint8List.fromList(img.encodePng(solid(2, 2)));
+      // Declared size is within the budget, so the (real, tiny) data decodes
+      // or fails as an invalid picture, never as "too large".
+      final within = _withPngSize(png, 2, 2);
+
+      final out = await processor.toAvatarJpeg(within);
+
+      expect(out.sublist(0, 3), [0xFF, 0xD8, 0xFF]);
+    });
+
+    test(
+      'turns a decoder crash on damaged data into an invalid picture',
+      () async {
+        final damaged = Uint8List.fromList([
+          0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, //
+          ...List<int>.filled(40, 0x07),
+        ]);
+
+        await expectLater(
+          processor.toAvatarJpeg(damaged),
+          throwsA(isA<InvalidImageException>()),
+        );
+      },
+    );
+  });
+}
+
+/// Copy of [png] whose IHDR declares [width] x [height], with a valid CRC.
+Uint8List _withPngSize(Uint8List png, int width, int height) {
+  final bytes = Uint8List.fromList(png);
+  // Signature (8) + length (4) + "IHDR" (4) = 16: width, height follow.
+  ByteData.sublistView(bytes)
+    ..setUint32(16, width)
+    ..setUint32(20, height);
+  // The CRC covers the chunk type and data, so it is computed afterwards.
+  ByteData.sublistView(bytes).setUint32(29, _crc32(bytes.sublist(12, 29)));
+  return bytes;
+}
+
+int _crc32(List<int> data) {
+  var crc = 0xFFFFFFFF;
+  for (final byte in data) {
+    crc ^= byte;
+    for (var i = 0; i < 8; i++) {
+      crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320 : crc >> 1;
+    }
+  }
+  return crc ^ 0xFFFFFFFF;
 }

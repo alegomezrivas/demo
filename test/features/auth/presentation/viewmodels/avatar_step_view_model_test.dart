@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:demo/core/error/exceptions.dart';
@@ -117,7 +118,8 @@ void main() {
 
       await viewModel.pick(PhotoSource.gallery);
 
-      expect(notified, 1);
+      // Once when the picker opens, once with the result.
+      expect(notified, 2);
     });
   });
 
@@ -228,6 +230,92 @@ void main() {
 
       verifyZeroInteractions(harness.uploadAvatar);
       verify(harness.navigation.go('/signup/done')).called(1);
+    });
+  });
+
+  group('robustness', () {
+    test(
+      'an unexpected error while picking is a normal "try another"',
+      () async {
+        when(source.pick(any)).thenThrow(Exception('platform failure'));
+
+        await viewModel.pick(PhotoSource.gallery);
+
+        expect(viewModel.issue, AvatarIssue.invalidImage);
+        expect(viewModel.isWorking, isFalse);
+      },
+    );
+
+    test('an unexpected error while compressing is reported', () async {
+      when(processor.toAvatarJpeg(any)).thenThrow(Exception('isolate failure'));
+      await viewModel.pick(PhotoSource.gallery);
+
+      await viewModel.submit();
+
+      expect(viewModel.issue, AvatarIssue.invalidImage);
+      expect(viewModel.isWorking, isFalse);
+      verifyZeroInteractions(harness.uploadAvatar);
+    });
+
+    test(
+      'a second tap while the picker is open does not open another',
+      () async {
+        final pending = Completer<Uint8List?>();
+        when(source.pick(any)).thenAnswer((_) => pending.future);
+
+        final first = viewModel.pick(PhotoSource.gallery);
+        final second = viewModel.pick(PhotoSource.camera);
+        pending.complete(picked);
+        await Future.wait([first, second]);
+
+        verify(source.pick(any)).called(1);
+        expect(viewModel.isWorking, isFalse);
+      },
+    );
+
+    test('is working while the picker is open', () async {
+      final pending = Completer<Uint8List?>();
+      when(source.pick(any)).thenAnswer((_) => pending.future);
+
+      final pick = viewModel.pick(PhotoSource.gallery);
+      expect(viewModel.isWorking, isTrue);
+      pending.complete(null);
+      await pick;
+
+      expect(viewModel.isWorking, isFalse);
+    });
+
+    test('forgets the pictures once uploaded', () async {
+      await viewModel.pick(PhotoSource.gallery);
+
+      await viewModel.submit();
+
+      expect(viewModel.original, isNull);
+      expect(viewModel.preview, isNull);
+    });
+
+    test(
+      'keeps the pictures when the upload fails so it can be retried',
+      () async {
+        when(harness.uploadAvatar(any)).thenAnswer(
+          (_) async => left(const ServerFailure('invalid_image')),
+        );
+        await viewModel.pick(PhotoSource.gallery);
+
+        await viewModel.submit();
+
+        expect(viewModel.original, picked);
+        expect(viewModel.preview, picked);
+      },
+    );
+
+    test('forgets the pictures when skipping', () async {
+      await viewModel.pick(PhotoSource.gallery);
+
+      viewModel.skip();
+
+      expect(viewModel.original, isNull);
+      expect(viewModel.preview, isNull);
     });
   });
 }

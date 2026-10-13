@@ -70,6 +70,7 @@ class AppStepScaffold extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // `onBack!`: non-null, checked by the condition on this line.
                 if (onBack != null) _BackButton(onPressed: onBack!),
                 Expanded(
                   child: CustomScrollView(
@@ -94,12 +95,14 @@ class AppStepScaffold extends StatelessWidget {
                               if (description != null) ...[
                                 SizedBox(height: spacing.sm),
                                 Text(
+                                  // non-null: guarded by the `if` above
                                   description!,
                                   style: context.text.bodySmall,
                                 ),
                               ],
                               if (child != null) ...[
                                 SizedBox(height: spacing.lg),
+                                // non-null: guarded by the `if` above
                                 child!,
                               ],
                               if (actionsPlacement ==
@@ -125,6 +128,7 @@ class AppStepScaffold extends StatelessWidget {
                   ),
                 ),
                 if (keyboardAccessory != null && isKeyboardOpen)
+                  // non-null: guarded by the condition above
                   keyboardAccessory!,
               ],
             ),

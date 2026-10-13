@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:demo/core/error/exceptions.dart';
 import 'package:demo/core/services/image_source_service.dart';
 import 'package:flutter/services.dart';
@@ -119,4 +121,30 @@ void main() {
       );
     });
   });
+
+  group('ImagePickerSourceService unreadable files', () {
+    test('a file that cannot be read becomes an invalid picture', () async {
+      stubPick(() async => _UnreadableFile());
+
+      await expectLater(
+        service.pick(PhotoSource.gallery),
+        throwsA(
+          isA<InvalidImageException>().having(
+            (e) => e.code,
+            'code',
+            'pick_failed',
+          ),
+        ),
+      );
+    });
+  });
+}
+
+/// A picked file whose bytes cannot be read.
+class _UnreadableFile extends XFile {
+  _UnreadableFile() : super('/missing/picture.jpg');
+
+  @override
+  Future<Uint8List> readAsBytes() async =>
+      throw const FileSystemException('cannot read');
 }

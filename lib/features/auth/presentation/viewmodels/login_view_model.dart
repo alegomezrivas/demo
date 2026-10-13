@@ -87,7 +87,7 @@ class LoginViewModel extends BaseViewModel {
     _failure = null;
     setBusy(true);
     final remember = form.control(rememberField).value;
-    final rememberSession = remember is! bool || remember;
+    final rememberSession = remember is bool && remember;
     final result = await _login(
       LoginParams(
         email: _email.value ?? '',
@@ -104,7 +104,7 @@ class LoginViewModel extends BaseViewModel {
   }
 
   /// Opens the welcome screen, where an account can be created.
-  void goToSignUp() => _navigation.go(AppRoutes.welcome);
+  void goToWelcome() => _navigation.go(AppRoutes.welcome);
 
   void _onSignedIn({required bool persistent}) {
     _session.markSignedIn(persistent: persistent);

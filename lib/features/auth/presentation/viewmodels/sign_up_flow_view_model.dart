@@ -6,6 +6,7 @@ import 'package:demo/core/error/failures.dart';
 import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/core/services/navigation_service.dart';
 import 'package:demo/core/services/session_service.dart';
+import 'package:demo/features/auth/domain/entities/user.dart';
 import 'package:demo/features/auth/domain/rules/auth_rules.dart';
 import 'package:demo/features/auth/domain/usecases/check_username_availability_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/complete_sign_up_use_case.dart';
@@ -82,10 +83,14 @@ class SignUpFlowViewModel extends BaseViewModel {
 
   late final ResendCountdown _countdown;
   late SignUpForms _forms;
+  SignUpForms? _retiredForms;
   SignUpState _state = const SignUpState();
   Timer? _usernameTimer;
   StreamSubscription<Object?>? _usernameSubscription;
   int _usernameRequest = 0;
+  int _epoch = 0;
+  bool _stale = false;
+  SignUpStep _current = SignUpStep.email;
   String _lastUsername = '';
   bool _rememberSession = true;
 
@@ -109,18 +114,30 @@ class SignUpFlowViewModel extends BaseViewModel {
   /// Starts a fresh sign-up and opens the first step.
   void start() {
     reset();
+    _current = SignUpStep.email;
     _progress.unlock(SignUpStep.email);
     unawaited(_navigation.push<void>(SignUpStep.email.route));
   }
 
   /// Forgets everything typed or confirmed so far.
   void reset() {
+    // Answers still on their way belong to the flow that is being dropped.
+    _epoch++;
     _usernameTimer?.cancel();
     _usernameRequest++;
     _lastUsername = '';
     _countdown.cancel();
     unawaited(_usernameSubscription?.cancel());
-    _forms.dispose();
+    // Screens that are still animating out keep listening to these controls,
+    // so they are emptied now (nothing typed may linger) and released one
+    // generation later instead of being disposed under them.
+    _forms.password.reset();
+    _forms.email.reset();
+    _forms.code.reset();
+    _forms.name.reset();
+    _forms.username.reset();
+    _retiredForms?.dispose();
+    _retiredForms = _forms;
     _forms = _createForms();
     _state = const SignUpState();
     _rememberSession = true;
@@ -128,16 +145,27 @@ class SignUpFlowViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  /// Goes back one step.
+  /// Goes back one step; backing out of the first one leaves the flow and
+  /// forgets everything typed (the password must not linger in memory).
   void back() {
+    // A request still in flight belongs to the step that is being left.
+    _epoch++;
+    _navigation.pop();
+    if (_current == SignUpStep.email) {
+      reset();
+      return;
+    }
+    _current = SignUpStep.values[_current.index - 1];
     // An error belongs to the step that raised it, not to the one before.
     _state = _state.copyWith(clearFailure: true);
-    _navigation.pop();
     notifyListeners();
   }
 
-  /// Opens the sign-in screen.
-  void goToLogin() => _navigation.go(AppRoutes.login);
+  /// Opens the sign-in screen, leaving the sign-up (and its data) behind.
+  void goToLogin() {
+    _navigation.go(AppRoutes.login);
+    reset();
+  }
 
   /// Opens the terms and policies text.
   void openTerms() => unawaited(_navigation.push<void>(AppRoutes.terms));
@@ -164,7 +192,8 @@ class SignUpFlowViewModel extends BaseViewModel {
     ).trim();
 
     // Coming back to a confirmed step with the same address needs no new code.
-    if (email == _state.email && _progress.canEnter(SignUpStep.code)) {
+    if (email.toLowerCase() == _state.email.toLowerCase() &&
+        _progress.canEnter(SignUpStep.code)) {
       _advance(SignUpStep.code);
       return;
     }
@@ -173,7 +202,7 @@ class SignUpFlowViewModel extends BaseViewModel {
       final result = await _sendCode(SendCodeParams(email: email));
       return result.fold((failure) => failure, (_) => null);
     });
-    if (failed != null) return;
+    if (_stale || failed != null) return;
 
     _state = _state.copyWith(
       email: email,
@@ -201,6 +230,7 @@ class SignUpFlowViewModel extends BaseViewModel {
         return null;
       });
     });
+    if (_stale) return;
     if (failed != null) {
       // A wrong code is not worth keeping; the person types it again.
       _forms.code.reset();
@@ -220,6 +250,7 @@ class SignUpFlowViewModel extends BaseViewModel {
       );
       return result.fold((failure) => failure, (_) => null);
     });
+    if (_stale) return;
     if (failed != null) {
       // The server may still be counting (e.g. after a restart): wait again.
       if (failed.code == 'resend_too_soon') _countdown.start();
@@ -233,8 +264,7 @@ class SignUpFlowViewModel extends BaseViewModel {
   /// Step 3: keeps the password (in memory only) and asks for the name.
   void submitPassword() {
     if (isBusy || !_validate(_forms.password)) return;
-    final remember = _forms.password.control(SignUpForms.rememberField).value;
-    _rememberSession = remember is! bool || remember;
+    _rememberSession = SignUpForms.rememberOf(_forms.password);
     _advance(SignUpStep.name);
   }
 
@@ -248,10 +278,18 @@ class SignUpFlowViewModel extends BaseViewModel {
   Future<void> submitUsername() async {
     if (isBusy || !_validate(_forms.username)) return;
     _usernameTimer?.cancel();
-    if (_state.usernameStatus != UsernameStatus.available &&
-        _state.usernameStatus != UsernameStatus.unknown) {
-      await _checkNow();
+    final epoch = _epoch;
+    // Busy for the whole check: a second tap must not push the step twice.
+    setBusy(true);
+    try {
+      if (_state.usernameStatus != UsernameStatus.available &&
+          _state.usernameStatus != UsernameStatus.unknown) {
+        await _checkNow();
+      }
+    } finally {
+      setBusy(false);
     }
+    if (epoch != _epoch) return;
     final status = _state.usernameStatus;
     // `unknown` (the check failed) is allowed through: registration enforces
     // uniqueness anyway and reports `username_taken`.
@@ -270,6 +308,7 @@ class SignUpFlowViewModel extends BaseViewModel {
       return;
     }
 
+    User? created;
     final failed = await _run(() async {
       final result = await _completeSignUp(
         CompleteSignUpParams(
@@ -287,18 +326,21 @@ class SignUpFlowViewModel extends BaseViewModel {
         ),
       );
       return result.fold((failure) => failure, (user) {
-        _state = _state.copyWith(user: user);
+        created = user;
         return null;
       });
     });
+    if (_stale) return;
     if (failed != null) {
       _onAccountFailure(failed);
       return;
     }
+    _state = _state.copyWith(user: created);
 
     // The password and the proof are no longer needed: drop them right away.
     _forms.password.control(SignUpForms.passwordField).value = null;
     _state = _state.copyWith(clearVerificationToken: true, clearFailure: true);
+    _current = SignUpStep.avatar;
     _progress
       ..lockBeforeAvatar()
       ..unlock(SignUpStep.avatar);
@@ -310,14 +352,16 @@ class SignUpFlowViewModel extends BaseViewModel {
   /// Step 7: uploads the (already cropped and compressed) picture.
   Future<void> submitAvatar(Uint8List jpeg) async {
     if (isBusy) return;
+    User? updated;
     final failed = await _run(() async {
       final result = await _uploadAvatar(jpeg);
       return result.fold((failure) => failure, (user) {
-        _state = _state.copyWith(user: user, avatar: jpeg);
+        updated = user;
         return null;
       });
     });
-    if (failed != null) return;
+    if (_stale || failed != null) return;
+    _state = _state.copyWith(user: updated, avatar: jpeg);
     _goToDone();
   }
 
@@ -408,14 +452,22 @@ class SignUpFlowViewModel extends BaseViewModel {
   /// storing it in the state.
   Future<Failure?> _run(Future<Failure?> Function() action) async {
     _state = _state.copyWith(clearFailure: true);
+    final epoch = _epoch;
     setBusy(true);
     final failure = await action();
-    if (failure != null) _state = _state.copyWith(failure: failure);
+    // The flow was left or restarted while waiting: drop the answer.
+    _stale = epoch != _epoch;
+    if (!_stale && failure != null) {
+      _state = _state.copyWith(failure: failure);
+    }
     setBusy(false);
-    return failure;
+    return _stale ? null : failure;
   }
 
   void _advance(SignUpStep step) {
+    // A double tap must not push the same step twice.
+    if (step.index <= _current.index) return;
+    _current = step;
     _state = _state.copyWith(clearFailure: true);
     _progress.unlock(step);
     unawaited(_navigation.push<void>(step.route));
@@ -423,6 +475,8 @@ class SignUpFlowViewModel extends BaseViewModel {
   }
 
   void _goToDone() {
+    _current = SignUpStep.done;
+    _state = _state.copyWith(clearFailure: true);
     _progress.unlock(SignUpStep.done);
     _navigation.go(SignUpStep.done.route);
     notifyListeners();
@@ -433,6 +487,7 @@ class SignUpFlowViewModel extends BaseViewModel {
       case 'username_taken':
         _state = _state.copyWith(usernameStatus: UsernameStatus.taken);
         // The terms step sits on top of the username step.
+        _current = SignUpStep.username;
         _navigation.pop();
         notifyListeners();
       case 'invalid_verification_token' || 'email_taken':
@@ -446,6 +501,7 @@ class SignUpFlowViewModel extends BaseViewModel {
   /// person has to confirm an e-mail again.
   void _restartFromEmail(Failure failure) {
     _state = _state.copyWith(clearVerificationToken: true, failure: failure);
+    _current = SignUpStep.email;
     _progress.rewindTo(SignUpStep.email);
     _navigation.go(SignUpStep.email.route);
     notifyListeners();
@@ -457,6 +513,7 @@ class SignUpFlowViewModel extends BaseViewModel {
     _countdown.cancel();
     unawaited(_usernameSubscription?.cancel());
     _forms.dispose();
+    _retiredForms?.dispose();
     super.dispose();
   }
 }
