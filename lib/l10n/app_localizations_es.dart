@@ -318,4 +318,27 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get biometricReasonToggle =>
       'Confirma tu identidad para cambiar esta opción';
+
+  @override
+  String get commonClear => 'Borrar';
+
+  @override
+  String get commonClose => 'Cerrar';
+
+  @override
+  String get commonEdit => 'Editar';
+
+  @override
+  String get fieldValidIndicator => 'Válido';
+
+  @override
+  String otpSemanticsLabel(int entered, int total) {
+    return 'Código de confirmación, $entered de $total dígitos';
+  }
+
+  @override
+  String get avatarSemanticsEmpty => 'Sin foto de perfil';
+
+  @override
+  String get avatarSemanticsFilled => 'Foto de perfil';
 }

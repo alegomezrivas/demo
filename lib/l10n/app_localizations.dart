@@ -673,6 +673,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Confirma tu identidad para cambiar esta opción'**
   String get biometricReasonToggle;
+
+  /// No description provided for @commonClear.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar'**
+  String get commonClear;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get commonClose;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar'**
+  String get commonEdit;
+
+  /// No description provided for @fieldValidIndicator.
+  ///
+  /// In es, this message translates to:
+  /// **'Válido'**
+  String get fieldValidIndicator;
+
+  /// No description provided for @otpSemanticsLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Código de confirmación, {entered} de {total} dígitos'**
+  String otpSemanticsLabel(int entered, int total);
+
+  /// No description provided for @avatarSemanticsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin foto de perfil'**
+  String get avatarSemanticsEmpty;
+
+  /// No description provided for @avatarSemanticsFilled.
+  ///
+  /// In es, this message translates to:
+  /// **'Foto de perfil'**
+  String get avatarSemanticsFilled;
 }
 
 class _AppLocalizationsDelegate

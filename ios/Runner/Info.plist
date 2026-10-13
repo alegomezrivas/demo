@@ -13,6 +13,10 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Usamos la cámara solo cuando eliges tomar tu foto de perfil. / We use the camera only when you choose to take your profile picture.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Usamos tus fotos solo cuando eliges una imagen de perfil. / We use your photos only when you choose a profile picture.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Stark Showcase</string>
 	<key>CFBundleExecutable</key>

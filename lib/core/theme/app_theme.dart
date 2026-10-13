@@ -1,4 +1,5 @@
 import 'package:demo/core/theme/app_colors.dart';
+import 'package:demo/core/theme/app_motion.dart';
 import 'package:demo/core/theme/app_spacing.dart';
 import 'package:demo/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -57,24 +58,62 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           textStyle: text.label,
+          minimumSize: Size(0, spacing.minTouchTarget),
           padding: EdgeInsets.symmetric(
             horizontal: spacing.lg,
             vertical: spacing.md,
           ),
-          shape: RoundedRectangleBorder(borderRadius: spacing.borderRadiusMd),
+          shape: const StadiumBorder(),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          textStyle: text.label,
+          foregroundColor: colors.textPrimary,
+          minimumSize: Size(0, spacing.minTouchTarget),
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.lg,
+            vertical: spacing.md,
+          ),
+          side: BorderSide(color: colors.border),
+          shape: const StadiumBorder(),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colors.surface,
-        border: OutlineInputBorder(
-          borderRadius: spacing.borderRadiusMd,
-          borderSide: BorderSide(color: colors.border),
+        fillColor: WidgetStateColor.resolveWith(
+          (states) => states.contains(WidgetState.disabled)
+              ? colors.surfaceMuted
+              : colors.surface,
         ),
+        border: _outline(spacing, colors.border, spacing.borderThin),
+        enabledBorder: _outline(spacing, colors.border, spacing.borderThin),
+        disabledBorder: _outline(spacing, colors.border, spacing.borderThin),
+        focusedBorder: _outline(spacing, colors.primary, spacing.borderThick),
+        errorBorder: _outline(spacing, colors.error, spacing.borderThin),
+        focusedErrorBorder: _outline(
+          spacing,
+          colors.error,
+          spacing.borderThick,
+        ),
+        helperStyle: text.bodySmall,
+        errorStyle: text.bodySmall.copyWith(color: colors.error),
       ),
-      extensions: <ThemeExtension<dynamic>>[colors, text, spacing],
+      extensions: <ThemeExtension<dynamic>>[
+        colors,
+        text,
+        spacing,
+        const AppMotion(),
+      ],
     );
   }
+}
+
+OutlineInputBorder _outline(AppSpacing spacing, Color color, double width) {
+  return OutlineInputBorder(
+    borderRadius: spacing.borderRadiusMd,
+    borderSide: BorderSide(color: color, width: width),
+  );
 }
 
 /// Short accessors for the design tokens: `context.colors`, etc.
@@ -94,4 +133,12 @@ extension AppThemeContext on BuildContext {
   /// Spacing, radius and elevation tokens of the active theme.
   AppSpacing get spacing =>
       Theme.of(this).extension<AppSpacing>() ?? const AppSpacing();
+
+  /// Motion tokens of the active theme.
+  AppMotion get motion =>
+      Theme.of(this).extension<AppMotion>() ?? const AppMotion();
+
+  /// [duration], or [Duration.zero] when the platform asks to reduce motion.
+  Duration motionDuration(Duration duration) =>
+      MediaQuery.disableAnimationsOf(this) ? Duration.zero : duration;
 }

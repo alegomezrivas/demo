@@ -316,4 +316,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get biometricReasonToggle =>
       'Confirm your identity to change this option';
+
+  @override
+  String get commonClear => 'Clear';
+
+  @override
+  String get commonClose => 'Close';
+
+  @override
+  String get commonEdit => 'Edit';
+
+  @override
+  String get fieldValidIndicator => 'Valid';
+
+  @override
+  String otpSemanticsLabel(int entered, int total) {
+    return 'Confirmation code, $entered of $total digits';
+  }
+
+  @override
+  String get avatarSemanticsEmpty => 'No profile picture';
+
+  @override
+  String get avatarSemanticsFilled => 'Profile picture';
 }

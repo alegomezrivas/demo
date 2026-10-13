@@ -137,5 +137,22 @@
       }
     }
   },
-  "biometricReasonToggle": "Confirm your identity to change this option"
+  "biometricReasonToggle": "Confirm your identity to change this option",
+  "commonClear": "Clear",
+  "commonClose": "Close",
+  "commonEdit": "Edit",
+  "fieldValidIndicator": "Valid",
+  "otpSemanticsLabel": "Confirmation code, {entered} of {total} digits",
+  "avatarSemanticsEmpty": "No profile picture",
+  "avatarSemanticsFilled": "Profile picture",
+  "@otpSemanticsLabel": {
+    "placeholders": {
+      "entered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }
