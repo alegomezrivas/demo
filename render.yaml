@@ -1,0 +1,33 @@
+# Render Blueprint for the Stark Showcase backend (free plan).
+# Dashboard: New + > Blueprint > pick this repository > Apply.
+# Full instructions: backend/README.md ("Deploy for free on Render").
+services:
+  - type: web
+    name: stark-showcase-backend
+    runtime: node
+    plan: free
+    # The repository also holds the Flutter app; build and run from the backend folder.
+    rootDir: backend
+    # NODE_ENV=production would make npm skip devDependencies, which `tsc` needs.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # production: no /__reset and no X-Mock-* headers. Use "staging" for demos that need
+      # them (see the README: staging endpoints are open to anyone who knows the URL).
+      - key: NODE_ENV
+        value: production
+      # Render sits behind a proxy; without this every client would share one IP and the
+      # rate limiter would throttle everybody together.
+      - key: TRUST_PROXY
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+      # Generated once by Render and kept across deploys. Never commit a real value.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      # Comma-separated browser origins; leave empty for the native app only.
+      - key: CORS_ALLOWED_ORIGINS
+        value: ""
+      # PORT is injected by Render and read from the environment by the server.
