@@ -10,7 +10,6 @@ abstract final class ValidationMessages {
       ValidationKeys.required: (_) => l10n.validationRequired,
       ValidationKeys.email: (_) => l10n.validationEmail,
       ValidationKeys.strongPassword: (_) => l10n.validationStrongPassword,
-      ValidationKeys.phone: (_) => l10n.validationPhone,
       ValidationKeys.minLength: (error) =>
           l10n.validationMinLength(_requiredLength(error)),
       ValidationKeys.maxLength: (error) =>

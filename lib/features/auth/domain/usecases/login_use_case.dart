@@ -7,13 +7,20 @@ import 'package:fpdart/fpdart.dart';
 /// Input of [LoginUseCase].
 class LoginParams {
   /// Creates the parameters.
-  const LoginParams({required this.email, required this.password});
+  const LoginParams({
+    required this.email,
+    required this.password,
+    this.rememberSession = true,
+  });
 
   /// E-mail address.
   final String email;
 
   /// Plain password (never logged or stored).
   final String password;
+
+  /// Keep the session across app restarts (otherwise memory only).
+  final bool rememberSession;
 }
 
 /// Signs a user in.
@@ -31,6 +38,7 @@ class LoginUseCase implements UseCase<User, LoginParams> {
     return _repository.login(
       email: params.email,
       password: params.password,
+      rememberSession: params.rememberSession,
     );
   }
 }

@@ -4,9 +4,11 @@ import 'package:demo/core/config/app_config.dart';
 import 'package:demo/core/network/session_expired_notifier.dart';
 import 'package:demo/core/security/biometric_authenticator.dart';
 import 'package:demo/core/security/device_integrity_service.dart';
+import 'package:demo/core/security/scoped_token_storage.dart';
 import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/core/security/security_policy.dart';
 import 'package:demo/core/security/sensitive_action_guard.dart';
+import 'package:demo/core/security/session_token_storage.dart';
 import 'package:demo/core/security/token_storage.dart';
 import 'package:demo/core/services/go_router_navigation_service.dart';
 import 'package:demo/core/services/navigation_service.dart';
@@ -15,12 +17,17 @@ import 'package:demo/core/utils/logging/app_logger.dart';
 import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart';
 import 'package:demo/features/about/presentation/viewmodels/about_view_model.dart';
 import 'package:demo/features/auth/domain/repositories/auth_repository.dart';
+import 'package:demo/features/auth/domain/repositories/avatar_repository.dart';
+import 'package:demo/features/auth/domain/repositories/sign_up_repository.dart';
+import 'package:demo/features/auth/domain/usecases/check_username_availability_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/complete_sign_up_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/login_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/logout_use_case.dart';
-import 'package:demo/features/auth/domain/usecases/register_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/send_confirmation_code_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/upload_avatar_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/verify_confirmation_code_use_case.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
-import 'package:demo/features/auth/presentation/viewmodels/register_view_model.dart';
 import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
 import 'package:demo/features/settings/domain/repositories/settings_repository.dart';
 import 'package:demo/features/settings/presentation/app_preferences.dart';
@@ -49,6 +56,9 @@ void main() {
 
     test('registers the security services', () {
       expect(locator<TokenStorage>(), isA<TokenStorage>());
+      // Session persistence is switchable, and every name shares one instance.
+      expect(locator<SessionTokenStorage>(), same(locator<TokenStorage>()));
+      expect(locator<ScopedTokenStorage>(), same(locator<TokenStorage>()));
       expect(locator<DeviceIntegrityService>(), isA<DeviceIntegrityService>());
       expect(locator<BiometricAuthenticator>(), isA<BiometricAuthenticator>());
       expect(locator<ScreenProtection>(), isA<ScreenProtection>());
@@ -70,7 +80,22 @@ void main() {
     test('wires the auth feature from repository to use cases', () {
       expect(locator<AuthRepository>(), same(locator<AuthRepository>()));
       expect(locator<LoginUseCase>(), isA<LoginUseCase>());
-      expect(locator<RegisterUseCase>(), isA<RegisterUseCase>());
+      expect(
+        locator<SendConfirmationCodeUseCase>(),
+        isA<SendConfirmationCodeUseCase>(),
+      );
+      expect(
+        locator<VerifyConfirmationCodeUseCase>(),
+        isA<VerifyConfirmationCodeUseCase>(),
+      );
+      expect(
+        locator<CheckUsernameAvailabilityUseCase>(),
+        isA<CheckUsernameAvailabilityUseCase>(),
+      );
+      expect(locator<CompleteSignUpUseCase>(), isA<CompleteSignUpUseCase>());
+      expect(locator<UploadAvatarUseCase>(), isA<UploadAvatarUseCase>());
+      expect(locator<SignUpRepository>(), same(locator<SignUpRepository>()));
+      expect(locator<AvatarRepository>(), same(locator<AvatarRepository>()));
       expect(locator<LogoutUseCase>(), isA<LogoutUseCase>());
       expect(locator<GetCurrentUserUseCase>(), isA<GetCurrentUserUseCase>());
     });
@@ -109,7 +134,6 @@ void main() {
 
     test('registers the auth ViewModels as factories', () {
       expect(locator<LoginViewModel>(), isNot(same(locator<LoginViewModel>())));
-      expect(locator<RegisterViewModel>(), isA<RegisterViewModel>());
     });
 
     test('registers ViewModels as factories (new instance per call)', () {

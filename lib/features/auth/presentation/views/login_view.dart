@@ -87,13 +87,6 @@ class LoginView extends StatelessWidget {
                           isLoading: viewModel.isBusy,
                           onPressed: viewModel.submit,
                         ),
-                        SizedBox(height: context.spacing.sm),
-                        TextButton(
-                          onPressed: viewModel.goToRegister,
-                          child: Text(
-                            '${l10n.authNoAccount} ${l10n.authGoToRegister}',
-                          ),
-                        ),
                       ],
                     ),
                   ),

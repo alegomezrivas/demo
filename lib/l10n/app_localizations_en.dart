@@ -32,9 +32,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Use at least 8 characters with upper case, lower case, a number and a symbol';
 
   @override
-  String get validationPhone => 'Enter a valid phone number';
-
-  @override
   String validationMinLength(int length) {
     return 'Must be at least $length characters';
   }
@@ -98,9 +95,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authNameLabel => 'Name';
-
-  @override
-  String get authPhoneLabel => 'Phone (optional)';
 
   @override
   String get authConfirmPasswordLabel => 'Confirm password';

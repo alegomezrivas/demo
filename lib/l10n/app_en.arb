@@ -7,7 +7,6 @@
   "validationRequired": "This field is required",
   "validationEmail": "Enter a valid email address",
   "validationStrongPassword": "Use at least 8 characters with upper case, lower case, a number and a symbol",
-  "validationPhone": "Enter a valid phone number",
   "validationMinLength": "Must be at least {length} characters",
   "@validationMinLength": {
     "placeholders": {
@@ -35,7 +34,6 @@
   "authRegisterTitle": "Create account",
   "authRegisterSubtitle": "Fill in your details to sign up",
   "authNameLabel": "Name",
-  "authPhoneLabel": "Phone (optional)",
   "authConfirmPasswordLabel": "Confirm password",
   "authRegisterButton": "Sign up",
   "authHaveAccount": "Already have an account?",

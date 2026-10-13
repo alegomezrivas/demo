@@ -143,41 +143,6 @@ void main() {
       expect(find.text('Inicio'), findsNothing);
     });
 
-    testWidgets('registers a new account and lands on home', (tester) async {
-      await boot(tester);
-
-      await tester.tap(find.textContaining('Crear cuenta'));
-      await tester.pumpAndSettle();
-      await tester.enterText(field('Nombre'), 'Lucía Gómez');
-      await tester.enterText(field('Correo electrónico'), 'lucia@test.com');
-      await tester.enterText(field('Contraseña'), 'Abcdef1!');
-      await tester.enterText(field('Confirmar contraseña'), 'Abcdef1!');
-      await tester.tap(find.text('Registrarme'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Hola, Lucía Gómez'), findsOneWidget);
-    });
-
-    testWidgets('registering the demo e-mail reports it is taken', (
-      tester,
-    ) async {
-      await boot(tester);
-
-      await tester.tap(find.textContaining('Crear cuenta'));
-      await tester.pumpAndSettle();
-      await tester.enterText(field('Nombre'), 'Alguien');
-      await tester.enterText(
-        field('Correo electrónico'),
-        MockAuthBackend.demoEmail,
-      );
-      await tester.enterText(field('Contraseña'), 'Abcdef1!');
-      await tester.enterText(field('Confirmar contraseña'), 'Abcdef1!');
-      await tester.tap(find.text('Registrarme'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Ya existe una cuenta con ese correo'), findsOneWidget);
-    });
-
     testWidgets('a stored session is restored on the next launch', (
       tester,
     ) async {

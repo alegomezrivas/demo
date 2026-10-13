@@ -39,8 +39,14 @@ void main() {
     session = SessionService(isAuthenticated: true);
     preferences = AppPreferences();
     when(getCurrentUser(any)).thenAnswer(
-      (_) async =>
-          right(const User(id: '1', name: 'Ana Pérez', email: 'ana@test.com')),
+      (_) async => right(
+        const User(
+          id: '1',
+          name: 'Ana Pérez',
+          email: 'ana@test.com',
+          username: 'ana',
+        ),
+      ),
     );
     when(saveSettings(any)).thenAnswer((_) async => right(unit));
     when(logout(any)).thenAnswer((_) async => right(unit));

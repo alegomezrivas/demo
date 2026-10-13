@@ -9,9 +9,6 @@ abstract final class ValidationKeys {
   /// Password does not satisfy the strength policy.
   static const String strongPassword = 'strongPassword';
 
-  /// Value is not a valid phone number.
-  static const String phone = 'phone';
-
   /// Value is shorter than required (reactive_forms built-in).
   static const String minLength = 'minLength';
 

@@ -10,7 +10,6 @@
   "validationRequired": "Este campo es obligatorio",
   "validationEmail": "Ingresa un correo electrónico válido",
   "validationStrongPassword": "Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo",
-  "validationPhone": "Ingresa un teléfono válido",
   "validationMinLength": "Debe tener al menos {length} caracteres",
   "@validationMinLength": {
     "placeholders": {
@@ -38,7 +37,6 @@
   "authRegisterTitle": "Crear cuenta",
   "authRegisterSubtitle": "Completa tus datos para registrarte",
   "authNameLabel": "Nombre",
-  "authPhoneLabel": "Teléfono (opcional)",
   "authConfirmPasswordLabel": "Confirmar contraseña",
   "authRegisterButton": "Registrarme",
   "authHaveAccount": "¿Ya tienes cuenta?",

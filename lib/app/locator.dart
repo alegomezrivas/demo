@@ -8,11 +8,13 @@ import 'package:demo/core/security/device_integrity_service.dart';
 import 'package:demo/core/security/flutter_secure_storage_service.dart';
 import 'package:demo/core/security/jailbreak_root_integrity_checker.dart';
 import 'package:demo/core/security/local_auth_biometric_authenticator.dart';
+import 'package:demo/core/security/scoped_token_storage.dart';
 import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/core/security/screen_protector_service.dart';
 import 'package:demo/core/security/secure_storage.dart';
 import 'package:demo/core/security/secure_token_storage.dart';
 import 'package:demo/core/security/sensitive_action_guard.dart';
+import 'package:demo/core/security/session_token_storage.dart';
 import 'package:demo/core/security/token_storage.dart';
 import 'package:demo/core/services/data_change_notifier.dart';
 import 'package:demo/core/services/go_router_navigation_service.dart';
@@ -23,14 +25,23 @@ import 'package:demo/core/widgets/integrity_gate/integrity_gate_view_model.dart'
 import 'package:demo/features/about/presentation/viewmodels/about_view_model.dart';
 import 'package:demo/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:demo/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:demo/features/auth/data/datasources/avatar_remote_data_source.dart';
+import 'package:demo/features/auth/data/datasources/sign_up_remote_data_source.dart';
 import 'package:demo/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:demo/features/auth/data/repositories/avatar_repository_impl.dart';
+import 'package:demo/features/auth/data/repositories/sign_up_repository_impl.dart';
 import 'package:demo/features/auth/domain/repositories/auth_repository.dart';
+import 'package:demo/features/auth/domain/repositories/avatar_repository.dart';
+import 'package:demo/features/auth/domain/repositories/sign_up_repository.dart';
+import 'package:demo/features/auth/domain/usecases/check_username_availability_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/complete_sign_up_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/get_current_user_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/login_use_case.dart';
 import 'package:demo/features/auth/domain/usecases/logout_use_case.dart';
-import 'package:demo/features/auth/domain/usecases/register_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/send_confirmation_code_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/upload_avatar_use_case.dart';
+import 'package:demo/features/auth/domain/usecases/verify_confirmation_code_use_case.dart';
 import 'package:demo/features/auth/presentation/viewmodels/login_view_model.dart';
-import 'package:demo/features/auth/presentation/viewmodels/register_view_model.dart';
 import 'package:demo/features/dashboard/presentation/viewmodels/dashboard_view_model.dart';
 import 'package:demo/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:demo/features/settings/data/repositories/settings_repository_impl.dart';
@@ -98,8 +109,14 @@ Future<void> setupLocator({
         ),
       ),
     )
-    ..registerLazySingleton<TokenStorage>(
-      () => SecureTokenStorage(locator<SecureStorage>()),
+    // Tokens live in secure storage, or in memory when the person did not
+    // ask to be remembered; both names resolve to the same instance.
+    ..registerLazySingleton<ScopedTokenStorage>(
+      () => ScopedTokenStorage(SecureTokenStorage(locator<SecureStorage>())),
+    )
+    ..registerLazySingleton<TokenStorage>(() => locator<ScopedTokenStorage>())
+    ..registerLazySingleton<SessionTokenStorage>(
+      () => locator<ScopedTokenStorage>(),
     )
     ..registerLazySingleton<DeviceIntegrityChecker>(
       () => JailbreakRootIntegrityChecker(JailbreakRootDetection.instance),
@@ -129,10 +146,29 @@ Future<void> setupLocator({
     ..registerLazySingleton<AuthRemoteDataSource>(
       () => AuthRemoteDataSourceImpl(locator<Dio>()),
     )
+    ..registerLazySingleton<SignUpRemoteDataSource>(
+      () => SignUpRemoteDataSourceImpl(locator<Dio>()),
+    )
+    ..registerLazySingleton<AvatarRemoteDataSource>(
+      () => AvatarRemoteDataSourceImpl(locator<Dio>()),
+    )
     ..registerLazySingleton<AuthLocalDataSource>(
       () => AuthLocalDataSourceImpl(
-        locator<TokenStorage>(),
+        locator<SessionTokenStorage>(),
         locator<SecureStorage>(),
+      ),
+    )
+    ..registerLazySingleton<SignUpRepository>(
+      () => SignUpRepositoryImpl(
+        signUp: locator<SignUpRemoteDataSource>(),
+        auth: locator<AuthRemoteDataSource>(),
+        local: locator<AuthLocalDataSource>(),
+      ),
+    )
+    ..registerLazySingleton<AvatarRepository>(
+      () => AvatarRepositoryImpl(
+        remote: locator<AvatarRemoteDataSource>(),
+        local: locator<AuthLocalDataSource>(),
       ),
     )
     ..registerLazySingleton<AuthRepository>(
@@ -144,8 +180,20 @@ Future<void> setupLocator({
     ..registerFactory<LoginUseCase>(
       () => LoginUseCase(locator<AuthRepository>()),
     )
-    ..registerFactory<RegisterUseCase>(
-      () => RegisterUseCase(locator<AuthRepository>()),
+    ..registerFactory<SendConfirmationCodeUseCase>(
+      () => SendConfirmationCodeUseCase(locator<SignUpRepository>()),
+    )
+    ..registerFactory<VerifyConfirmationCodeUseCase>(
+      () => VerifyConfirmationCodeUseCase(locator<SignUpRepository>()),
+    )
+    ..registerFactory<CheckUsernameAvailabilityUseCase>(
+      () => CheckUsernameAvailabilityUseCase(locator<SignUpRepository>()),
+    )
+    ..registerFactory<CompleteSignUpUseCase>(
+      () => CompleteSignUpUseCase(locator<SignUpRepository>()),
+    )
+    ..registerFactory<UploadAvatarUseCase>(
+      () => UploadAvatarUseCase(locator<AvatarRepository>()),
     )
     ..registerFactory<LogoutUseCase>(
       () => LogoutUseCase(locator<AuthRepository>()),
@@ -201,14 +249,6 @@ Future<void> setupLocator({
     ..registerFactory<LoginViewModel>(
       () => LoginViewModel(
         login: locator<LoginUseCase>(),
-        navigation: locator<NavigationService>(),
-        session: locator<SessionService>(),
-        screenProtection: locator<ScreenProtection>(),
-      ),
-    )
-    ..registerFactory<RegisterViewModel>(
-      () => RegisterViewModel(
-        register: locator<RegisterUseCase>(),
         navigation: locator<NavigationService>(),
         session: locator<SessionService>(),
         screenProtection: locator<ScreenProtection>(),

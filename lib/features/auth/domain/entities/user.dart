@@ -8,7 +8,8 @@ class User {
     required this.id,
     required this.name,
     required this.email,
-    this.phone,
+    required this.username,
+    this.hasAvatar = false,
   });
 
   /// Unique identifier.
@@ -20,8 +21,20 @@ class User {
   /// E-mail address.
   final String email;
 
-  /// Optional phone number.
-  final String? phone;
+  /// Public, unique handle (lower case).
+  final String username;
+
+  /// Whether a profile picture can be downloaded for this user.
+  final bool hasAvatar;
+
+  /// Copy with the given fields replaced.
+  User copyWith({bool? hasAvatar}) => User(
+    id: id,
+    name: name,
+    email: email,
+    username: username,
+    hasAvatar: hasAvatar ?? this.hasAvatar,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -29,10 +42,11 @@ class User {
       other.id == id &&
       other.name == name &&
       other.email == email &&
-      other.phone == phone;
+      other.username == username &&
+      other.hasAvatar == hasAvatar;
 
   @override
-  int get hashCode => Object.hash(id, name, email, phone);
+  int get hashCode => Object.hash(id, name, email, username, hasAvatar);
 
   @override
   String toString() => 'User($id)';

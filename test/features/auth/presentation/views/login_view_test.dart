@@ -95,8 +95,14 @@ void main() {
 
     testWidgets('submits valid credentials and goes home', (tester) async {
       when(login(any)).thenAnswer(
-        (_) async =>
-            right(const User(id: '1', name: 'Ana', email: 'ana@test.com')),
+        (_) async => right(
+          const User(
+            id: '1',
+            name: 'Ana',
+            email: 'ana@test.com',
+            username: 'ana',
+          ),
+        ),
       );
       await pumpView(tester);
 
@@ -163,15 +169,6 @@ void main() {
       await tester.pump();
 
       expect(obscured(), isFalse);
-    });
-
-    testWidgets('opens the register screen', (tester) async {
-      await pumpView(tester);
-
-      await tester.tap(find.textContaining('Crear cuenta'));
-      await tester.pump();
-
-      verify(navigation.push<void>(AppRoutes.register)).called(1);
     });
   });
 }

@@ -3,8 +3,8 @@ import 'package:demo/core/network/dio_exception_mapper.dart';
 import 'package:demo/core/network/network_constants.dart';
 import 'package:demo/features/auth/data/datasources/auth_endpoints.dart';
 import 'package:demo/features/auth/data/models/auth_response_dto.dart';
+import 'package:demo/features/auth/data/models/complete_sign_up_request_dto.dart';
 import 'package:demo/features/auth/data/models/login_request_dto.dart';
-import 'package:demo/features/auth/data/models/register_request_dto.dart';
 import 'package:dio/dio.dart';
 
 /// Remote access to the authentication API; throws [AppException]s only.
@@ -12,8 +12,8 @@ abstract interface class AuthRemoteDataSource {
   /// Signs in with credentials.
   Future<AuthResponseDto> login(LoginRequestDto request);
 
-  /// Creates an account.
-  Future<AuthResponseDto> register(RegisterRequestDto request);
+  /// Creates the account proven by the verification token in [request].
+  Future<AuthResponseDto> register(CompleteSignUpRequestDto request);
 
   /// Revokes the server-side session behind [refreshToken].
   ///
@@ -33,7 +33,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _post(AuthEndpoints.login, request.toJson());
 
   @override
-  Future<AuthResponseDto> register(RegisterRequestDto request) =>
+  Future<AuthResponseDto> register(CompleteSignUpRequestDto request) =>
       _post(AuthEndpoints.register, request.toJson());
 
   @override

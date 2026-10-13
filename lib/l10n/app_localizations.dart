@@ -140,12 +140,6 @@ abstract class AppLocalizations {
   /// **'Usa al menos 8 caracteres con mayúscula, minúscula, número y símbolo'**
   String get validationStrongPassword;
 
-  /// No description provided for @validationPhone.
-  ///
-  /// In es, this message translates to:
-  /// **'Ingresa un teléfono válido'**
-  String get validationPhone;
-
   /// No description provided for @validationMinLength.
   ///
   /// In es, this message translates to:
@@ -265,12 +259,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Nombre'**
   String get authNameLabel;
-
-  /// No description provided for @authPhoneLabel.
-  ///
-  /// In es, this message translates to:
-  /// **'Teléfono (opcional)'**
-  String get authPhoneLabel;
 
   /// No description provided for @authConfirmPasswordLabel.
   ///

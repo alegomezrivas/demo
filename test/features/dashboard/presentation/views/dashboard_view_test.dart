@@ -23,7 +23,12 @@ void main() {
   late MockGetTaskStatsUseCase getStats;
   late MockNavigationService navigation;
   late DataChangeNotifier changes;
-  const user = User(id: '1', name: 'Ana', email: 'ana@test.com');
+  const user = User(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
   const stats = TaskStats(
     total: 8,
     done: 2,

@@ -5,7 +5,6 @@ import 'package:demo/core/config/app_config.dart';
 import 'package:demo/core/security/screen_protection.dart';
 import 'package:demo/features/about/presentation/views/about_view.dart';
 import 'package:demo/features/auth/presentation/views/login_view.dart';
-import 'package:demo/features/auth/presentation/views/register_view.dart';
 import 'package:demo/features/dashboard/presentation/views/dashboard_view.dart';
 import 'package:demo/features/settings/presentation/views/settings_view.dart';
 import 'package:demo/features/tasks/presentation/views/task_form_view.dart';
@@ -76,10 +75,6 @@ abstract final class AppRouter {
         GoRoute(
           path: AppRoutes.login,
           builder: (context, state) => const LoginView(),
-        ),
-        GoRoute(
-          path: AppRoutes.register,
-          builder: (context, state) => const RegisterView(),
         ),
         GoRoute(
           path: AppRoutes.about,

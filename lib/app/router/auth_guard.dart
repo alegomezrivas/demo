@@ -8,10 +8,7 @@ class AuthGuard {
   /// Creates the guard around the [_session] state.
   const AuthGuard(this._session);
 
-  static const Set<String> _publicRoutes = {
-    AppRoutes.login,
-    AppRoutes.register,
-  };
+  static const Set<String> _publicRoutes = {AppRoutes.login};
 
   final SessionService _session;
 

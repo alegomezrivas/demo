@@ -20,7 +20,12 @@ void main() {
   late MockScreenProtection protection;
   late SessionService session;
   late LoginViewModel viewModel;
-  const user = User(id: '1', name: 'Ana', email: 'ana@test.com');
+  const user = User(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
 
   setUp(() {
     login = MockLoginUseCase();
@@ -127,12 +132,6 @@ void main() {
 
       expect(viewModel.obscurePassword, isFalse);
       expect(notified, 1);
-    });
-
-    test('goToRegister pushes the register route', () {
-      viewModel.goToRegister();
-
-      verify(navigation.push<void>(AppRoutes.register)).called(1);
     });
   });
 

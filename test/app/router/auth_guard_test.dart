@@ -19,7 +19,6 @@ void main() {
       routes: [
         GoRoute(path: AppRoutes.home, builder: (_, _) => page('home')),
         GoRoute(path: AppRoutes.login, builder: (_, _) => page('login')),
-        GoRoute(path: AppRoutes.register, builder: (_, _) => page('register')),
         GoRoute(path: AppRoutes.about, builder: (_, _) => page('about')),
       ],
     );
@@ -41,17 +40,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('login'), findsOneWidget);
-    });
-
-    testWidgets('lets signed-out users open the register screen', (
-      tester,
-    ) async {
-      await pumpApp(tester);
-
-      router.go(AppRoutes.register);
-      await tester.pumpAndSettle();
-
-      expect(find.text('register'), findsOneWidget);
     });
 
     testWidgets('moves to home as soon as the session starts', (tester) async {

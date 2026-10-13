@@ -27,7 +27,12 @@ void main() {
   late SessionService session;
   late AppPreferences preferences;
   late SettingsViewModel viewModel;
-  const user = User(id: '1', name: 'Ana', email: 'ana@test.com');
+  const user = User(
+    id: '1',
+    name: 'Ana',
+    email: 'ana@test.com',
+    username: 'ana',
+  );
 
   setUp(() {
     getCurrentUser = MockGetCurrentUserUseCase();

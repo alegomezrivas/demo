@@ -93,9 +93,6 @@ class LoginViewModel extends BaseViewModel {
     }, (_) => _onSignedIn());
   }
 
-  /// Opens the sign-up screen.
-  void goToRegister() => unawaited(_navigation.push<void>(AppRoutes.register));
-
   void _onSignedIn() {
     _session.markSignedIn();
     _navigation.go(AppRoutes.home);

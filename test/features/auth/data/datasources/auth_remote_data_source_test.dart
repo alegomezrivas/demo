@@ -2,8 +2,8 @@ import 'package:demo/core/error/exceptions.dart';
 import 'package:demo/core/network/network_constants.dart';
 import 'package:demo/features/auth/data/datasources/auth_endpoints.dart';
 import 'package:demo/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:demo/features/auth/data/models/complete_sign_up_request_dto.dart';
 import 'package:demo/features/auth/data/models/login_request_dto.dart';
-import 'package:demo/features/auth/data/models/register_request_dto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,7 +12,13 @@ import '../../../../helpers/fake_http_adapter.dart';
 void main() {
   const login = LoginRequestDto(email: 'a@b.co', password: 'pw');
   final okBody = {
-    'user': {'id': '1', 'name': 'Ana', 'email': 'a@b.co'},
+    'user': {
+      'id': '1',
+      'name': 'Ana',
+      'email': 'a@b.co',
+      'username': 'ana',
+      'hasAvatar': false,
+    },
     'accessToken': 'a',
     'refreshToken': 'r',
   };
@@ -113,11 +119,24 @@ void main() {
       final source = build((_) => FakeHttpAdapter.json(okBody, status: 201));
 
       final response = await source.register(
-        const RegisterRequestDto(name: 'Ana', email: 'a@b.co', password: 'pw'),
+        const CompleteSignUpRequestDto(
+          verificationToken: 'tok',
+          name: 'Ana',
+          username: 'ana',
+          password: 'pw',
+        ),
       );
 
       expect(response.refreshToken, 'r');
-      expect(adapter.requests.single.path, AuthEndpoints.register);
+      final request = adapter.requests.single;
+      expect(request.path, AuthEndpoints.register);
+      expect(request.data, {
+        'verificationToken': 'tok',
+        'name': 'Ana',
+        'username': 'ana',
+        'password': 'pw',
+      });
+      expect(request.extra[RequestExtras.skipAuth], isTrue);
     });
 
     test(
@@ -129,9 +148,10 @@ void main() {
 
         await expectLater(
           source.register(
-            const RegisterRequestDto(
+            const CompleteSignUpRequestDto(
+              verificationToken: 'tok',
               name: 'A',
-              email: 'a@b.co',
+              username: 'ana',
               password: 'pw',
             ),
           ),
