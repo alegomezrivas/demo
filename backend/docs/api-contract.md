@@ -221,6 +221,15 @@ Si llegan ambos headers, `X-Mock-Error` tiene prioridad. Un valor desconocido se
 - `POST /__reset` — restaura los datos semilla. Solo fuera de producción (en producción no existe: 404).
 - `GET /health` — `200 {"status":"ok"}`, sin información sensible.
 
+## 4.3 Detalles de autenticación implementados
+
+- **Access token:** JWT HS256 (`iss` `stark-showcase-backend`, `aud` `stark-showcase-app`, `sub` = id de usuario), TTL `ACCESS_TOKEN_TTL_SECONDS` (900 s por defecto). El secreto solo viene de `JWT_ACCESS_SECRET`.
+- **Refresh token:** cadena opaca de 384 bits, guardada solo como hash SHA-256, TTL `REFRESH_TOKEN_TTL_SECONDS` (30 días por defecto). Rotación en cada `POST /auth/refresh`.
+- **Detección de reutilización:** si se presenta un refresh token ya consumido, se revoca toda su familia (también el token legítimo más reciente) y responde 401 `invalid_refresh_token`.
+- **401 en rutas protegidas:** `unauthorized` (cabecera ausente, mal formada o token inválido) y `token_expired` (JWT caducado). La app trata ambos igual: refresh y un reintento.
+- **Contraseñas:** argon2id. En `login` se verifica siempre un hash (aunque el usuario no exista) para igualar tiempos.
+- **Códigos de error de `register`:** `details` por campo con `issue` entre `too_small`, `too_big`, `invalid_format`, `invalid_type`, `unrecognized_keys`, `missing_uppercase`, `missing_lowercase`, `missing_digit`, `missing_symbol`.
+
 ## 4.2 Reglas decididas
 
 - **Tareas por usuario.** Cada usuario solo ve y modifica las suyas. Acceder a una tarea ajena responde **404 `not_found`** (nunca 403), para no revelar que existe. El usuario demo arranca con 23 tareas semilla; las cuentas nuevas, vacías.

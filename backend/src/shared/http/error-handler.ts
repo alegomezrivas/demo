@@ -27,7 +27,8 @@ interface HttpFailure {
 export function zodDetails(error: ZodError): ErrorDetail[] {
   return error.issues.map((issue) => ({
     field: issue.path.map(String).join('.') || '(root)',
-    issue: issue.code,
+    // Custom refinements carry our own machine-readable key as the message.
+    issue: issue.code === 'custom' ? issue.message : issue.code,
   }));
 }
 

@@ -19,9 +19,11 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "argon2": "^0.45.1",
     "cors": "^2.8.6",
     "express": "^5.3.0",
     "helmet": "^8.3.0",
+    "jose": "^6.2.12",
     "pino": "^10.4.0",
     "zod": "^4.6.7"
   },

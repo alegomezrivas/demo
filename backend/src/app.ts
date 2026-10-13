@@ -1,7 +1,9 @@
 import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
+import type { Container } from './composition.js';
 import type { AppConfig } from './config/env.js';
+import { authRouter } from './contexts/auth/presentation/http/auth-router.js';
 import { errorHandler } from './shared/http/error-handler.js';
 import { healthRouter } from './shared/http/health-router.js';
 import { notFoundHandler } from './shared/http/not-found.js';
@@ -11,10 +13,11 @@ import type { Logger } from './shared/logging/logger.js';
 export interface AppDependencies {
   readonly config: AppConfig;
   readonly logger: Logger;
+  readonly container: Container;
 }
 
 /** Builds the Express app without listening, so tests can drive it with supertest. */
-export function createApp({ config, logger }: AppDependencies): Express {
+export function createApp({ config, logger, container }: AppDependencies): Express {
   const app = express();
   app.set('trust proxy', config.trustProxy ? 1 : false);
 
@@ -27,6 +30,7 @@ export function createApp({ config, logger }: AppDependencies): Express {
   app.use(express.json({ limit: config.bodyLimit }));
 
   app.use(healthRouter());
+  app.use('/auth', authRouter(container.auth));
 
   app.use(notFoundHandler);
   app.use(errorHandler(logger));

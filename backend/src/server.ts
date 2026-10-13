@@ -1,4 +1,5 @@
 import { createApp } from './app.js';
+import { createContainer } from './composition.js';
 import { ConfigError, loadConfig, type AppConfig } from './config/env.js';
 import { createLogger } from './shared/logging/logger.js';
 
@@ -14,10 +15,11 @@ function readConfig(): AppConfig {
   }
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const config = readConfig();
   const logger = createLogger(config.logLevel);
-  const server = createApp({ config, logger }).listen(config.port, () => {
+  const container = await createContainer(config);
+  const server = createApp({ config, logger, container }).listen(config.port, () => {
     logger.info({ port: config.port, env: config.env }, 'server listening');
   });
 
@@ -35,4 +37,7 @@ function main(): void {
   });
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error('Failed to start:', error instanceof Error ? error.name : error);
+  process.exit(1);
+});
