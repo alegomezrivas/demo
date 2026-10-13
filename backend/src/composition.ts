@@ -5,6 +5,7 @@ import { LogoutUser } from './contexts/auth/application/logout-user.js';
 import { RefreshSession } from './contexts/auth/application/refresh-session.js';
 import { RegisterUser } from './contexts/auth/application/register-user.js';
 import { SessionIssuer } from './contexts/auth/application/session-issuer.js';
+import type { AccessTokenService } from './contexts/auth/domain/access-token-service.js';
 import type { PasswordHasher } from './contexts/auth/domain/password-hasher.js';
 import { Argon2PasswordHasher } from './contexts/auth/infrastructure/argon2-password-hasher.js';
 import { CryptoRefreshTokenGenerator } from './contexts/auth/infrastructure/crypto-refresh-token-generator.js';
@@ -30,6 +31,8 @@ export interface Container {
   readonly auth: AuthUseCases;
   readonly tasks: TaskUseCases;
   readonly authenticate: AuthenticateAccessToken;
+  /** Exposed for the dev/staging simulation middleware. */
+  readonly accessTokens: AccessTokenService;
   /** Restores the seed data (used by `POST /__reset`). */
   reset(): Promise<void>;
 }
@@ -87,6 +90,7 @@ export async function createContainer(
       logout: new LogoutUser(refreshTokens, generator, clock),
     },
     authenticate: new AuthenticateAccessToken(accessTokens, users),
+    accessTokens,
     async reset() {
       users.clear();
       refreshTokens.clear();

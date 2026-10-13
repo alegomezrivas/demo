@@ -239,6 +239,23 @@ Si llegan ambos headers, `X-Mock-Error` tiene prioridad. Un valor desconocido se
 - **Cuerpo de crear/actualizar:** estricto; `id`, `createdAt` y propietario no se pueden enviar. `dueDate` acepta cualquier instante ISO 8601 (la app envía UTC con hasta microsegundos) y se devuelve normalizado a milisegundos (`...123Z`). `title` se recorta; `description` no.
 - **`POST /__reset`:** responde 204 sin cuerpo y restaura usuarios y tareas semilla e invalida todas las sesiones. No requiere autenticación y no existe en producción (404).
 
+## 4.5 Simulación implementada (solo desarrollo y staging)
+
+- Se aplica a `/auth/*` y `/tasks/*`. `/health`, `/openapi.json`, `/docs` y `/__reset` quedan fuera.
+- `X-Mock-Latency`: entero de 0 a 60 000 ms (más se recorta; valores no numéricos se ignoran). Se aplica antes que el error.
+- `X-Mock-Error: 500|401|403|404|422` responde con `{ code, message }` (`internal_error`, `unauthorized`, `forbidden`, `not_found`, `validation_error`) sin tocar datos.
+- `X-Mock-Error: timeout` mantiene la conexión abierta 60 s (más que el `receiveTimeout` de 30 s de la app) y la corta sin responder.
+- `X-Mock-Error: 401-once` solo actúa en `/tasks/*`: la primera petición con un access token **emitido por login o registro** recibe 401 `token_expired`; ese token queda marcado y las siguientes pasan. Los tokens **emitidos por un refresh** (claim `rfr`) siempre pasan, de modo que la app puede conservar la cabecera en el reintento tras el refresh sin entrar en bucle. Un nuevo login vuelve a activar el 401 una vez.
+- En producción (`MOCK_SIMULATION_ENABLED` forzado a `false`) los tres headers se ignoran y no aparecen en `/docs`.
+
+## 4.6 Límites de peticiones
+
+Por IP y ventana (`RATE_LIMIT_WINDOW_SECONDS`, 60 s por defecto): 300 en general, 10 compartidas entre `POST /auth/login` y `/auth/register`, 20 en `POST /auth/refresh`. Al superarlos: **429** `{ "code": "rate_limited", "message": ... }` con `Retry-After` y `RateLimit-*`. `/health` y `/docs` no cuentan. Detrás de un proxy hay que activar `TRUST_PROXY=true` o todas las peticiones compartirán IP.
+
+## 4.7 Documentación
+
+`GET /docs` (Swagger UI) y `GET /openapi.json` (OpenAPI 3.0.3), generados desde los mismos esquemas zod que validan las peticiones. Las respuestas de `/auth/*` llevan `Cache-Control: no-store`.
+
 ## 4.2 Reglas decididas
 
 - **Tareas por usuario.** Cada usuario solo ve y modifica las suyas. Acceder a una tarea ajena responde **404 `not_found`** (nunca 403), para no revelar que existe. El usuario demo arranca con 23 tareas semilla; las cuentas nuevas, vacías.

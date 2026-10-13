@@ -1,5 +1,6 @@
 /** Transport-agnostic category of an application error. */
-export type ErrorKind = 'validation' | 'unauthorized' | 'forbidden' | 'not_found' | 'conflict';
+export type ErrorKind =
+  'validation' | 'unauthorized' | 'forbidden' | 'not_found' | 'conflict' | 'rate_limited';
 
 /** Field-level problem reported with validation errors; never echoes input values. */
 export interface ErrorDetail {
@@ -38,6 +39,10 @@ export class AppError extends Error {
 
   static notFound(code = 'not_found'): AppError {
     return new AppError('not_found', code, 'The resource was not found.');
+  }
+
+  static rateLimited(code = 'rate_limited'): AppError {
+    return new AppError('rate_limited', code, 'Too many requests, please try again later.');
   }
 
   static conflict(code: string): AppError {

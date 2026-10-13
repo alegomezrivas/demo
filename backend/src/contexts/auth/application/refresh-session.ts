@@ -33,6 +33,6 @@ export class RefreshSession {
     if ((await this.users.findById(record.userId)) === undefined) {
       throw AppError.unauthorized(INVALID);
     }
-    return this.sessions.issue(record.userId, record.familyId);
+    return this.sessions.issue(record.userId, { familyId: record.familyId, refreshed: true });
   }
 }

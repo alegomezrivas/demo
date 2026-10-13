@@ -23,6 +23,11 @@ async function main(): Promise<void> {
     logger.info({ port: config.port, env: config.env }, 'server listening');
   });
 
+  // Keep idle connections open longer than the 60 s idle timeout of common proxies
+  // (Render, AWS ALB); otherwise the proxy reuses a connection Node already closed (502).
+  server.keepAliveTimeout = 65_000;
+  server.headersTimeout = 66_000;
+
   const shutdown = (signal: string): void => {
     logger.info({ signal }, 'shutting down');
     server.close(() => {

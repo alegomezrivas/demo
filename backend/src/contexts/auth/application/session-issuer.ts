@@ -19,8 +19,14 @@ export class SessionIssuer {
     private readonly refreshTtlSeconds: number,
   ) {}
 
-  /** Issues a pair; pass [familyId] when rotating so the chain stays linked. */
-  async issue(userId: string, familyId: string = randomUUID()): Promise<TokenPair> {
+  /**
+   * Issues a pair. When rotating, pass the existing [familyId] so the chain stays linked
+   * and set [refreshed] so the access token records that it came from a refresh.
+   */
+  async issue(
+    userId: string,
+    { familyId = randomUUID(), refreshed = false }: { familyId?: string; refreshed?: boolean } = {},
+  ): Promise<TokenPair> {
     const { token, hash } = this.generator.generate();
     const expiresAt = new Date(this.clock.now().getTime() + this.refreshTtlSeconds * 1000);
     await this.refreshTokens.save({
@@ -32,6 +38,9 @@ export class SessionIssuer {
       usedAt: null,
       revokedAt: null,
     });
-    return { accessToken: await this.accessTokens.issue(userId), refreshToken: token };
+    return {
+      accessToken: await this.accessTokens.issue(userId, { refreshed }),
+      refreshToken: token,
+    };
   }
 }

@@ -35,7 +35,14 @@ describe('JoseAccessTokenService', () => {
   const service = new JoseAccessTokenService(TEST_SECRET, 60, clock);
 
   it('round-trips the user id', async () => {
-    expect(await service.verify(await service.issue('user-9'))).toEqual({ userId: 'user-9' });
+    const claims = await service.verify(await service.issue('user-9'));
+    expect(claims).toMatchObject({ userId: 'user-9', refreshed: false });
+    expect(claims.tokenId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('marks tokens minted by a refresh', async () => {
+    const token = await service.issue('user-9', { refreshed: true });
+    expect((await service.verify(token)).refreshed).toBe(true);
   });
 
   it('flags expiry with token_expired', async () => {

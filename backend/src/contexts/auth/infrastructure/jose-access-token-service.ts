@@ -2,7 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { errors, jwtVerify, SignJWT } from 'jose';
 import type { Clock } from '../../../shared/clock.js';
 import { AppError } from '../../../shared/errors/app-error.js';
-import type { AccessTokenClaims, AccessTokenService } from '../domain/access-token-service.js';
+import type {
+  AccessTokenClaims,
+  AccessTokenService,
+  IssueOptions,
+} from '../domain/access-token-service.js';
 
 const ISSUER = 'stark-showcase-backend';
 const AUDIENCE = 'stark-showcase-app';
@@ -19,9 +23,11 @@ export class JoseAccessTokenService implements AccessTokenService {
     this.key = new TextEncoder().encode(secret);
   }
 
-  issue(userId: string): Promise<string> {
+  issue(userId: string, options: IssueOptions = {}): Promise<string> {
     const issuedAt = Math.floor(this.clock.now().getTime() / 1000);
-    return new SignJWT({})
+    // `rfr` marks tokens minted by a refresh; the mock simulation uses it to apply
+    // the one-off forced 401 only to tokens that come from a login.
+    return new SignJWT(options.refreshed === true ? { rfr: true } : {})
       .setProtectedHeader({ alg: 'HS256' })
       .setSubject(userId)
       .setIssuer(ISSUER)
@@ -43,7 +49,11 @@ export class JoseAccessTokenService implements AccessTokenService {
       if (typeof payload.sub !== 'string' || payload.sub.length === 0) {
         throw AppError.unauthorized();
       }
-      return { userId: payload.sub };
+      return {
+        userId: payload.sub,
+        tokenId: payload.jti ?? '',
+        refreshed: payload['rfr'] === true,
+      };
     } catch (error) {
       if (error instanceof AppError) throw error;
       throw AppError.unauthorized(error instanceof errors.JWTExpired ? 'token_expired' : undefined);

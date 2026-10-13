@@ -9,6 +9,7 @@ const STATUS_BY_KIND: Readonly<Record<ErrorKind, number>> = {
   forbidden: 403,
   not_found: 404,
   conflict: 409,
+  rate_limited: 429,
 };
 
 /** Uniform error body: `code` is what the Flutter app reads; the rest is informative. */

@@ -5,7 +5,7 @@ import { createContainer, type Container } from '../../src/composition.js';
 import { loadConfig, type AppConfig } from '../../src/config/env.js';
 import { Argon2PasswordHasher } from '../../src/contexts/auth/infrastructure/argon2-password-hasher.js';
 import type { Clock } from '../../src/shared/clock.js';
-import { createLogger } from '../../src/shared/logging/logger.js';
+import { createLogger, type Logger } from '../../src/shared/logging/logger.js';
 
 export const TEST_SECRET = 'test-only-secret-test-only-secret-0123456789';
 
@@ -13,6 +13,10 @@ const BASE_ENV: NodeJS.ProcessEnv = {
   NODE_ENV: 'test',
   LOG_LEVEL: 'silent',
   JWT_ACCESS_SECRET: TEST_SECRET,
+  // Effectively unlimited so functional tests are not throttled; rate-limit tests lower them.
+  RATE_LIMIT_MAX: '1000000',
+  RATE_LIMIT_AUTH_MAX: '1000000',
+  RATE_LIMIT_REFRESH_MAX: '1000000',
 };
 
 /** Clock whose time only moves when a test says so. */
@@ -44,11 +48,21 @@ export interface TestContext {
 }
 
 /** Builds the whole app with fast hashing and a controllable clock. */
-export async function buildTestContext(overrides: NodeJS.ProcessEnv = {}): Promise<TestContext> {
+export async function buildTestContext(
+  overrides: NodeJS.ProcessEnv = {},
+  extras: { timeoutHoldMs?: number; logger?: Logger } = {},
+): Promise<TestContext> {
   const config = testConfig(overrides);
   const clock = new FakeClock();
   const container = await createContainer(config, { clock, passwordHasher: fastHasher });
-  const app = createApp({ config, logger: createLogger('silent'), container });
+  const app = createApp({
+    config,
+    logger: extras.logger ?? createLogger('silent'),
+    container,
+    ...(extras.timeoutHoldMs === undefined
+      ? {}
+      : { simulation: { timeoutHoldMs: extras.timeoutHoldMs } }),
+  });
   return { app, container, clock, config };
 }
 

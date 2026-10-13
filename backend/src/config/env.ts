@@ -17,6 +17,10 @@ const envSchema = z.object({
   ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).default(900),
   REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().min(1).default(2_592_000),
   MOCK_SIMULATION_ENABLED: z.stringbool().optional(),
+  RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().min(1).default(60),
+  RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(300),
+  RATE_LIMIT_AUTH_MAX: z.coerce.number().int().min(1).default(10),
+  RATE_LIMIT_REFRESH_MAX: z.coerce.number().int().min(1).default(20),
 });
 
 /** Typed, immutable runtime configuration. */
@@ -32,6 +36,13 @@ export interface AppConfig {
     readonly accessSecret: string;
     readonly accessTtlSeconds: number;
     readonly refreshTtlSeconds: number;
+  };
+  /** Requests allowed per IP and window; login/register and refresh are stricter. */
+  readonly rateLimit: {
+    readonly windowSeconds: number;
+    readonly max: number;
+    readonly authMax: number;
+    readonly refreshMax: number;
   };
   /** Enables the X-Mock-* headers; never true in production. */
   readonly mockSimulationEnabled: boolean;
@@ -76,6 +87,12 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
       accessSecret: env.JWT_ACCESS_SECRET,
       accessTtlSeconds: env.ACCESS_TOKEN_TTL_SECONDS,
       refreshTtlSeconds: env.REFRESH_TOKEN_TTL_SECONDS,
+    },
+    rateLimit: {
+      windowSeconds: env.RATE_LIMIT_WINDOW_SECONDS,
+      max: env.RATE_LIMIT_MAX,
+      authMax: env.RATE_LIMIT_AUTH_MAX,
+      refreshMax: env.RATE_LIMIT_REFRESH_MAX,
     },
     mockSimulationEnabled: !isProduction && (env.MOCK_SIMULATION_ENABLED ?? true),
     resetEndpointEnabled: !isProduction,
